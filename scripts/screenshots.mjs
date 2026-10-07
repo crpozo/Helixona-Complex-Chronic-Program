@@ -19,7 +19,7 @@ const server = createServer((req, res) => {
 }).listen(4173)
 
 const routes = [
-  ['00-overview', '/', 'desktop'],
+  ['00-screens-index', '/screens', 'desktop'],
   ['01-patient-invite', '/patient/invite', 'phone'],
   ['02-patient-questionnaire', '/patient/intake', 'phone'],
   ['03-patient-uploads', '/patient/uploads', 'phone'],

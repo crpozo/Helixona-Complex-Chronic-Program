@@ -5,23 +5,26 @@
    Swap the values here once the official brand palette arrives.
    --------------------------------------------------------------- */
 @theme {
-  --font-sans: "Source Sans 3", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "Jost", "Futura", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", "Cormorant", Georgia, serif;
 
-  /* Deep teal accent */
-  --color-teal-50: #eef6f5;
-  --color-teal-100: #d6eae8;
-  --color-teal-200: #acd4d1;
-  --color-teal-300: #7ab9b5;
-  --color-teal-400: #4a9a96;
-  --color-teal-500: #2a807c;
-  --color-teal-600: #0f6e6a;
-  --color-teal-700: #0c5956;
-  --color-teal-800: #0a4543;
-  --color-teal-900: #073230;
+  /* Brand accent: Helixona black + champagne gold (token names kept as teal-* for compatibility) */
+  --color-teal-50: #faf6ec;   /* champagne tint */
+  --color-teal-100: #f3eadb;
+  --color-teal-200: #e6d7b8;
+  --color-teal-300: #dcc48f;
+  --color-teal-400: #d4b77a;  /* gold fill (buttons) */
+  --color-teal-500: #c4a368;  /* gold outline */
+  --color-teal-600: #141414;  /* primary action: near-black */
+  --color-teal-700: #0b0b0b;
+  --color-teal-800: #050505;  /* hero / header black */
+  --color-teal-900: #000000;
+
+  /* Square corners like the website */
+  --radius-sm: 0px; --radius-md: 2px; --radius-lg: 2px; --radius-xl: 2px; --radius-2xl: 3px; --radius-3xl: 4px;
 
   /* Warm neutral grays */
-  --color-sand-50: #faf8f5;
+  --color-sand-50: #faf8f4;
   --color-sand-100: #f3efea;
   --color-sand-200: #e6e0d8;
   --color-sand-300: #d2c9be;
@@ -48,24 +51,25 @@
 html, body, #root { height: 100%; }
 body {
   @apply bg-sand-50 text-sand-800 font-sans antialiased;
-  font-feature-settings: "cv05", "ss01";
+  
 }
 
-h1, h2, h3 { @apply tracking-tight; }
+h1, h2, h3 { @apply tracking-normal; }
+.font-display { font-weight: 500; letter-spacing: 0.005em; }
 
 @layer components {
 /* Shared primitives used across patient + staff surfaces */
 .card { @apply bg-white rounded-2xl border border-sand-200 shadow-card; }
 .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 disabled:opacity-50 disabled:cursor-not-allowed; }
-.btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 disabled:opacity-50 disabled:cursor-not-allowed bg-teal-600 text-white hover:bg-teal-700; }
-.btn-secondary { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 disabled:opacity-50 disabled:cursor-not-allowed bg-white text-teal-700 border border-sand-300 hover:bg-sand-50; }
+.btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 disabled:opacity-50 disabled:cursor-not-allowed bg-teal-400 text-sand-900 border border-teal-500 uppercase tracking-[0.14em] text-[12px] hover:bg-teal-300; }
+.btn-secondary { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 disabled:opacity-50 disabled:cursor-not-allowed bg-white text-sand-900 border border-teal-500 uppercase tracking-[0.14em] text-[12px] hover:bg-teal-50; }
 .btn-ghost { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 disabled:opacity-50 disabled:cursor-not-allowed text-sand-600 hover:bg-sand-100; }
 .btn-danger { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 disabled:opacity-50 disabled:cursor-not-allowed bg-white text-bad-700 border border-bad-600/30 hover:bg-bad-100; }
-.btn-lg { @apply px-5 py-3.5 text-base rounded-2xl; }
+.btn-lg { @apply px-5 py-4 text-[13px] tracking-[0.18em]; }
 .input { @apply w-full rounded-xl border border-sand-300 bg-white px-3.5 py-2.5 text-[15px] text-sand-800 placeholder:text-sand-400 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400; }
 .label { @apply block text-sm font-semibold text-sand-700 mb-1.5; }
 .help { @apply text-sm text-sand-500; }
-.eyebrow { @apply text-[11px] font-semibold uppercase tracking-[0.12em] text-sand-500; }
+.eyebrow { @apply text-[11px] font-medium uppercase tracking-[0.22em] text-sand-500; }
 .kbd { @apply font-mono text-[12px] bg-sand-100 border border-sand-200 rounded px-1.5 py-0.5 text-sand-700; }
 
 }

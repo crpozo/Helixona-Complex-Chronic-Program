@@ -1,6 +1,6 @@
 # Screens — Helixona Complex Chronic Program mockups
 
-Live mockup: **https://crpozo.github.io/Helixona-Complex-Chronic-Program/**
+Live mockup: **https://crpozo.github.io/Helixona-Complex-Chronic-Program/** (opens the app for the current role; the screen index is at `#/screens`)
 Routes use a `#` prefix (e.g. `…/#/patient/intake`) so every link works on GitHub Pages. Use the **role switcher** in the top bar to change who you are viewing as; the **All screens** index lists everything below.
 
 All data is fictional. Clinical questions are placeholders labeled *“Sample question — final content from Medical Director.”* Anything marked **To confirm** is an open item from CLAUDE.md §8, not a decision.

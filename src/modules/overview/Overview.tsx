@@ -9,7 +9,7 @@ export default function Overview() {
     <>
       <PageHeader eyebrow="Mockup index" title="Complex Chronic Program · MVP mockups"
         description="Clickable mockups for the operational app that sits next to eCW. Click any screen to open it, or use the role switcher in the top bar to browse as a patient or staff member. All data is sample data."
-        meta={<><Pill tone="teal" dot={false}>Priority 1 · Intake module</Pill><Pill tone="plum" dot={false}>Priority 2–3 · placeholders</Pill></>} />
+        meta={<><Pill tone="teal" dot={false}>Priority 1 · Intake module</Pill><Link to="/staff/inquiries" className="btn-primary px-3 py-1">Open the app</Link><Pill tone="plum" dot={false}>Priority 2–3 · placeholders</Pill></>} />
       <div className="mb-6"><Notice tone="warn" title="For reviewers">Clinical questions are placeholders labeled “Sample question — final content from Medical Director”. Items marked “To confirm” are open questions listed in CLAUDE.md §8, not decisions.</Notice></div>
       <div className="grid gap-5 lg:grid-cols-2">
         {groups.map((g) => (

@@ -4,7 +4,6 @@ import { ChevronDown, LayoutGrid, Smartphone, UserRound } from 'lucide-react'
 import type { Role } from '../../mock/types'
 import { nav, roles } from './roles'
 import { Wordmark } from '../../components/PhoneFrame'
-import { Pill } from '../../components/ui'
 
 interface ShellCtx { role: Role; setRole: (r: Role) => void }
 const Ctx = createContext<ShellCtx>({ role: 'advisor', setRole: () => {} })
@@ -18,7 +17,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     try { return (localStorage.getItem('hlx-role') as Role) || 'advisor' } catch { return 'advisor' }
   })
   useEffect(() => { if (isPatient && role !== 'patient') setRoleState('patient') }, [isPatient, role])
-  useEffect(() => { if (!isPatient && role === 'patient' && location.pathname !== '/') setRoleState('advisor') }, [isPatient, role, location.pathname])
+  useEffect(() => { if (!isPatient && role === 'patient' && location.pathname !== '/screens') setRoleState('advisor') }, [isPatient, role, location.pathname])
 
   const setRole = (r: Role) => {
     setRoleState(r)
@@ -32,24 +31,24 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider value={value}>
       <div className="min-h-full flex flex-col">
-        <header className="sticky top-0 z-30 border-b border-sand-200 bg-white/90 backdrop-blur">
+        <header className="sticky top-0 z-30 border-b border-teal-500/30 bg-teal-800 text-white">
           <div className="mx-auto flex max-w-[1400px] items-center gap-4 px-4 py-2.5">
-            <Link to="/" className="flex items-center gap-3">
-              <Wordmark size="sm" />
-              <span className="hidden sm:inline text-sm text-sand-500 border-l border-sand-200 pl-3">Complex Chronic Program</span>
+            <Link to={def.home} className="flex items-center gap-3">
+              <Wordmark size="sm" light />
+              <span className="hidden sm:inline text-[11px] uppercase tracking-[0.22em] text-white/60 border-l border-white/20 pl-3">Complex Chronic Program</span>
             </Link>
-            <Pill tone="plum" dot={false} className="hidden md:inline-flex">Mockup · sample data</Pill>
+            <span className="hidden md:inline-flex rounded-sm border border-teal-500/60 px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] text-teal-300">Mockup · sample data</span>
             <div className="ml-auto flex items-center gap-2">
-              <Link to="/" className="btn-ghost px-2.5 py-1.5 text-sm"><LayoutGrid size={16} /> <span className="hidden sm:inline">All screens</span></Link>
+              <Link to="/screens" className="inline-flex items-center gap-2 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.18em] text-white/80 hover:text-white"><LayoutGrid size={15} /> <span className="hidden sm:inline">All screens</span></Link>
               <RoleSwitcher role={role} setRole={setRole} />
             </div>
           </div>
           {!isPatient && items.length > 0 && (
             <nav className="mx-auto max-w-[1400px] px-4 flex gap-1 overflow-x-auto">
               {items.map((n) => (
-                <NavLink key={n.to} to={n.to} className={({ isActive }) => `whitespace-nowrap -mb-px border-b-2 px-3 py-2 text-sm font-medium ${isActive ? 'border-teal-600 text-teal-800' : 'border-transparent text-sand-500 hover:text-sand-800'}`}>
+                <NavLink key={n.to} to={n.to} className={({ isActive }) => `whitespace-nowrap -mb-px border-b-2 px-3 py-2 text-sm font-medium ${isActive ? 'border-teal-400 text-white' : 'border-transparent text-white/60 hover:text-white'}`}>
                   {n.label}
-                  {n.phase > 1 && <span className="ml-1.5 rounded bg-sand-100 px-1 text-[10px] text-sand-500 align-middle">P{n.phase}</span>}
+                  {n.phase > 1 && <span className="ml-1.5 rounded-sm border border-white/20 px-1 text-[10px] text-white/50 align-middle">P{n.phase}</span>}
                 </NavLink>
               ))}
             </nav>
@@ -72,7 +71,7 @@ function RoleSwitcher({ role, setRole }: { role: Role; setRole: (r: Role) => voi
   const def = roles.find((r) => r.key === role)!
   return (
     <div className="relative">
-      <button onClick={() => setOpen((o) => !o)} className="btn-secondary px-3 py-1.5 text-sm">
+      <button onClick={() => setOpen((o) => !o)} className="inline-flex items-center gap-2 rounded-full border border-teal-500 px-3.5 py-1.5 text-sm text-teal-200 hover:bg-white/5">
         {def.surface === 'patient' ? <Smartphone size={15} /> : <UserRound size={15} />}
         <span className="hidden sm:inline">Viewing as</span> <strong>{def.label}</strong> <ChevronDown size={14} />
       </button>

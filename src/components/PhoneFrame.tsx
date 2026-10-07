@@ -24,16 +24,18 @@ export function PatientTopBar({ title, back, right }: { title?: string; back?: R
   )
 }
 
+/** Helixona wordmark: letterspaced caps with the outlined gold X (recreated from the brand logo). */
 export function Wordmark({ size = 'md', light = false }: { size?: 'sm' | 'md' | 'lg'; light?: boolean }) {
-  const px = size === 'lg' ? 'text-3xl' : size === 'sm' ? 'text-lg' : 'text-2xl'
+  const h = size === 'lg' ? 34 : size === 'sm' ? 18 : 24
+  const font = size === 'lg' ? 'text-[24px]' : size === 'sm' ? 'text-[13px]' : 'text-[17px]'
   return (
-    <span className={`inline-flex items-center gap-2 ${light ? 'text-white' : 'text-teal-800'}`}>
-      <svg viewBox="0 0 32 32" className={size === 'lg' ? 'h-9 w-9' : size === 'sm' ? 'h-6 w-6' : 'h-7 w-7'} aria-hidden>
-        <rect width="32" height="32" rx="8" fill="#0F6E6A" />
-        <path d="M10 8c0 6 12 10 12 16M22 8c0 6-12 10-12 16" stroke="#E9F3F2" strokeWidth="2.4" strokeLinecap="round" fill="none" />
-        <path d="M12 12h8M12 20h8" stroke="#E9F3F2" strokeWidth="2" strokeLinecap="round" opacity=".7" />
+    <span className={`inline-flex items-center font-sans font-normal uppercase tracking-[0.42em] ${font} ${light ? 'text-white' : 'text-sand-900'}`} aria-label="Helixona">
+      HELI
+      <svg viewBox="0 0 100 100" style={{ height: h * 1.55, width: h * 1.55, margin: `0 -${h * 0.1}px 0 -${h * 0.22}px` }} aria-hidden>
+        <path d="M30 26 L45 50 L30 74 L41 74 L50.5 59 L60 74 L71 74 L56 50 L71 26 L60 26 L50.5 41 L41 26 Z" fill="none" stroke="#D4B77A" strokeWidth="3.2" strokeLinejoin="miter" />
+        <path d="M24 6 L50.5 50 M50.5 50 L77 94" stroke="#D4B77A" strokeWidth="1.6" strokeLinecap="round" opacity=".9" />
       </svg>
-      <span className={`font-display ${px} font-semibold tracking-tight`}>helixona</span>
+      ONA
     </span>
   )
 }

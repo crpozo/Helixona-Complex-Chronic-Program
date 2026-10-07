@@ -1,6 +1,15 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AppShell } from './modules/shell/AppShell'
 import Overview from './modules/overview/Overview'
+import { roles } from './modules/shell/roles'
+
+/** Land directly in the app for the last-used role (index of screens lives at /screens). */
+function Home() {
+  let role = 'advisor'
+  try { role = localStorage.getItem('hlx-role') || 'advisor' } catch { /* ignore */ }
+  const def = roles.find((r) => r.key === role) ?? roles[1]
+  return <Navigate to={def.home} replace />
+}
 import Roadmap from './modules/overview/Roadmap'
 import InvitationLanding from './modules/intake/patient/InvitationLanding'
 import Questionnaire from './modules/intake/patient/Questionnaire'
@@ -22,7 +31,8 @@ export default function App() {
     <HashRouter>
       <AppShell>
         <Routes>
-          <Route path="/" element={<Overview />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/screens" element={<Overview />} />
           {/* Patient (phone-first) */}
           <Route path="/patient" element={<Navigate to="/patient/invite" replace />} />
           <Route path="/patient/invite" element={<InvitationLanding />} />
