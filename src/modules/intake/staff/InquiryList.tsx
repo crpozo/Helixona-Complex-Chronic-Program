@@ -9,8 +9,17 @@ export default function InquiryList() {
   const nav = useNavigate()
   const [tab, setTab] = useState('cc')
   const [q, setQ] = useState('')
+  const [showFilters, setShowFilters] = useState(false)
+  const [f, setF] = useState({ status: 'All', owner: 'All', source: 'All' })
+  const statuses = ['All', ...new Set(inquiries.map((i) => i.status))]
+  const owners = ['All', ...new Set(inquiries.map((i) => i.owner))]
+  const sources = ['All', 'Website · Typeform', 'Referral', 'Campaign']
+  const active = Object.values(f).filter((v) => v !== 'All').length
   const rows = inquiries.filter((i) => (tab === 'all' ? true : tab === 'cc' ? i.pathway === 'Complex Chronic' : i.pathway !== 'Complex Chronic'))
     .filter((i) => !q || `${i.name} ${i.id} ${i.reason} ${i.city}`.toLowerCase().includes(q.toLowerCase()))
+    .filter((i) => f.status === 'All' || i.status === f.status)
+    .filter((i) => f.owner === 'All' || i.owner === f.owner)
+    .filter((i) => f.source === 'All' || (f.source === 'Referral' ? i.source.startsWith('Referral') : f.source === 'Campaign' ? /Google Ads|Instagram/.test(i.source) : i.source === f.source))
 
   const columns: Column<Inquiry>[] = [
     { key: 'id', header: 'Inquiry', render: (r) => <><div className="font-medium text-sand-900">{r.id}</div><div className="text-xs text-sand-500">{r.receivedAt}</div></>, width: '150px' },
@@ -26,7 +35,16 @@ export default function InquiryList() {
   return (
     <>
       <PageHeader eyebrow="Intake · Patient advisor" title="Inquiries" description="Website inquiries arrive from the Typeform with pathway, source, and submission details. Only the Complex Chronic pathway enters this program's workflow."
-        actions={<><button className="btn-secondary"><Filter size={16} /> Filters</button><button className="btn-primary" onClick={() => nav('/staff/patients/new')}>+ Add inquiry manually</button></>} />
+        actions={<><button onClick={() => setShowFilters((v) => !v)} className={`btn-secondary ${active ? 'bg-teal-50' : ''}`}><Filter size={16} /> Filters{active ? ` · ${active}` : ''}</button><button className="btn-primary" onClick={() => nav('/staff/patients/new')}>+ Add inquiry manually</button></>} />
+      {showFilters && (
+        <div className="card mb-5 flex flex-wrap items-end gap-4 p-4">
+          <label className="block"><span className="label">Status</span><select className="input py-2" value={f.status} onChange={(e) => setF({ ...f, status: e.target.value })}>{statuses.map((x) => <option key={x}>{x}</option>)}</select></label>
+          <label className="block"><span className="label">Owner</span><select className="input py-2" value={f.owner} onChange={(e) => setF({ ...f, owner: e.target.value })}>{owners.map((x) => <option key={x}>{x}</option>)}</select></label>
+          <label className="block"><span className="label">Source</span><select className="input py-2" value={f.source} onChange={(e) => setF({ ...f, source: e.target.value })}>{sources.map((x) => <option key={x}>{x}</option>)}</select></label>
+          <button onClick={() => setF({ status: 'All', owner: 'All', source: 'All' })} className="btn-ghost">Clear</button>
+          <span className="help ml-auto">{rows.length} of {inquiries.length} inquiries</span>
+        </div>
+      )}
       <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat label="New this week" value={4} hint="1 unassigned" tone="bad" />
         <Stat label="In outreach" value={1} hint="next call Oct 8" tone="warn" />
