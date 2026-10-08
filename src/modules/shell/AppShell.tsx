@@ -78,11 +78,11 @@ function RoleSwitcher({ role, setRole }: { role: Role; setRole: (r: Role) => voi
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-50 mt-2 w-72 overflow-hidden rounded-xl border border-sand-200 bg-white shadow-card">
+          <div className="absolute right-0 z-50 mt-2 w-72 overflow-hidden rounded-xl border border-sand-200 bg-white text-sand-800 shadow-card">
             <div className="px-3 py-2 eyebrow">Switch role</div>
             {roles.map((r) => (
               <button key={r.key} onClick={() => { setRole(r.key); setOpen(false) }}
-                className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-sand-50 ${r.key === role ? 'bg-teal-50 text-teal-900' : ''}`}>
+                className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm text-sand-900 hover:bg-sand-50 ${r.key === role ? 'bg-teal-50 font-semibold' : ''}`}>
                 <span className="flex items-center gap-2">{r.surface === 'patient' ? <Smartphone size={14} className="text-sand-400" /> : <UserRound size={14} className="text-sand-400" />}{r.label}</span>
                 <span className="text-xs text-sand-500">{r.person}</span>
               </button>
