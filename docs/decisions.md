@@ -8,3 +8,4 @@
 | 2026-10-06 | Stripe as payment processor | Requirements §11 (processor unspecified) | Client decision |
 | 2026-10-07 | Mockups deployed to GitHub Pages via Actions; hash routing so deep links work | — | Client reviews in the browser without hosting setup |
 | 2026-10-07 | Brand tokens follow CLAUDE.md §6 (deep teal, warm neutrals, Source Sans 3 + Fraunces) pending the official Helixona palette | — | helixona.com was not reachable from the build environment; tokens live in one place (`src/index.css`) for a quick swap |
+| 2026-10-08 | All Priority 1–3 mockups built in one pass (client asked not to wait for Priority 1 review) | CLAUDE.md §4 sequencing for mockups | Client request; the real build still ships by module, intake first |

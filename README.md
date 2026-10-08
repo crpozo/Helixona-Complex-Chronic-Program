@@ -25,8 +25,15 @@ src/
   mock/            sample data (patients, inquiries, eCW jobs, placeholder questionnaire)
   modules/
     shell/         top bar, role switcher, navigation
-    overview/      screen index and Priority 2–3 placeholders
+    overview/      screen index (#/screens)
     intake/        Priority 1 — patient/ (phone) and staff/ (desktop)
+    surveys/       Priority 2 — patient survey & crash report, alert queue, longitudinal view
+    config/        Priority 2 — survey builder, modalities, alert rules & precedence
+    registry/      Priority 2 — membership registry and member detail
+    booking/       Priority 3 — patient booking, resource calendar & exceptions
+    payments/      Priority 3 — agreement + Stripe setup, schedule & receipts, failed-payment queue
+    notifications/ Priority 3 — message templates and delivery log
+    dashboards/    Priority 3 — program dashboards and pilot defects
 screenshots/       one PNG per route for email review
 ```
 

@@ -37,13 +37,31 @@ const routes = [
   ['11-staff-chart-prep-queue', '/staff/chart-prep', 'desktop'],
   ['11b-staff-chart-prep-detail', '/staff/chart-prep/P-0044', 'desktop'],
   ['12-staff-ecw-exceptions', '/staff/ecw-exceptions', 'desktop'],
+  ['13-admin-survey-builder', '/staff/config/surveys', 'desktop'],
+  ['14-admin-modalities', '/staff/config/modalities', 'desktop'],
+  ['15-admin-alert-rules', '/staff/config/alerts', 'desktop'],
+  ['16-patient-survey', '/patient/survey', 'phone'],
+  ['16b-patient-crash-report', '/patient/crash', 'phone'],
+  ['17-staff-alert-queue', '/staff/alerts', 'desktop'],
+  ['17b-staff-patient-longitudinal', '/staff/alerts/patient/P-0041', 'desktop'],
+  ['18-staff-registry', '/staff/registry', 'desktop'],
+  ['18b-staff-member-detail', '/staff/registry/P-0019', 'desktop'],
+  ['19-patient-booking', '/patient/book', 'phone'],
+  ['20-staff-resource-calendar', '/staff/calendar', 'desktop'],
+  ['21-patient-agreement-payment', '/patient/agreement', 'phone'],
+  ['21b-patient-payments', '/patient/payments', 'phone'],
+  ['22-staff-failed-payments', '/staff/payments', 'desktop'],
+  ['23-admin-message-templates', '/staff/config/messages', 'desktop'],
+  ['24-staff-dashboards', '/staff/dashboards', 'desktop'],
 ]
 
 mkdirSync(OUT, { recursive: true })
+const roleFor = (route) => route.startsWith('/patient') ? 'patient' : /config\/(surveys|alerts)|alerts/.test(route) ? (route.includes('/staff/alerts') ? 'nursing' : 'physician') : /chart-prep|ecw-exceptions/.test(route) ? 'charlene' : /registry|calendar|payments/.test(route) ? 'karina' : /dashboards|config\/messages|config\/modalities/.test(route) ? 'admin' : 'advisor'
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined })
 for (const [name, route, kind] of routes) {
   const ctx = await browser.newContext({ viewport: kind === 'phone' ? { width: 430, height: 932 } : { width: 1440, height: 900 }, deviceScaleFactor: 1 })
   const page = await ctx.newPage()
+  await page.addInitScript((r) => { try { localStorage.setItem('hlx-role', r) } catch {} }, roleFor(route))
   await page.goto(`http://localhost:4173${BASE}#${route}`, { waitUntil: 'networkidle' })
   await page.waitForTimeout(400)
   await page.screenshot({ path: join(OUT, `${name}.png`), fullPage: kind !== 'phone' })

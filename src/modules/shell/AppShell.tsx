@@ -48,7 +48,6 @@ export function AppShell({ children }: { children: ReactNode }) {
               {items.map((n) => (
                 <NavLink key={n.to} to={n.to} className={({ isActive }) => `whitespace-nowrap -mb-px border-b-2 px-3 py-2 text-sm font-medium ${isActive ? 'border-teal-400 text-white' : 'border-transparent text-white/60 hover:text-white'}`}>
                   {n.label}
-                  {n.phase > 1 && <span className="ml-1.5 rounded-sm border border-white/20 px-1 text-[10px] text-white/50 align-middle">P{n.phase}</span>}
                 </NavLink>
               ))}
             </nav>

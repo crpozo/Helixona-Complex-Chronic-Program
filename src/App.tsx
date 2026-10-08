@@ -10,7 +10,6 @@ function Home() {
   const def = roles.find((r) => r.key === role) ?? roles[1]
   return <Navigate to={def.home} replace />
 }
-import Roadmap from './modules/overview/Roadmap'
 import InvitationLanding from './modules/intake/patient/InvitationLanding'
 import Questionnaire from './modules/intake/patient/Questionnaire'
 import Uploads from './modules/intake/patient/Uploads'
@@ -25,6 +24,22 @@ import IntakeReviewQueue from './modules/intake/staff/IntakeReviewQueue'
 import ChartPrepQueue from './modules/intake/staff/ChartPrepQueue'
 import ChartPrepDetail from './modules/intake/staff/ChartPrepDetail'
 import EcwExceptions from './modules/intake/staff/EcwExceptions'
+import Survey from './modules/surveys/patient/Survey'
+import CrashReport from './modules/surveys/patient/CrashReport'
+import AlertQueue from './modules/surveys/staff/AlertQueue'
+import PatientLongitudinal from './modules/surveys/staff/PatientLongitudinal'
+import SurveyBuilder from './modules/config/SurveyBuilder'
+import ModalityConfig from './modules/config/ModalityConfig'
+import AlertRules from './modules/config/AlertRules'
+import MessageTemplates from './modules/notifications/MessageTemplates'
+import Registry from './modules/registry/Registry'
+import MemberDetail from './modules/registry/MemberDetail'
+import Booking from './modules/booking/patient/Booking'
+import ResourceCalendar from './modules/booking/staff/ResourceCalendar'
+import Agreement from './modules/payments/patient/Agreement'
+import PaymentsPatient from './modules/payments/patient/PaymentsPatient'
+import FailedPayments from './modules/payments/staff/FailedPayments'
+import Dashboards from './modules/dashboards/Dashboards'
 
 export default function App() {
   return (
@@ -51,13 +66,25 @@ export default function App() {
           <Route path="/staff/chart-prep" element={<ChartPrepQueue />} />
           <Route path="/staff/chart-prep/:id" element={<ChartPrepDetail />} />
           <Route path="/staff/ecw-exceptions" element={<EcwExceptions />} />
-          {/* Priority 2–3 placeholders */}
-          <Route path="/staff/registry" element={<Roadmap />} />
-          <Route path="/staff/alerts" element={<Roadmap />} />
-          <Route path="/staff/clinical-config" element={<Roadmap />} />
-          <Route path="/staff/calendar" element={<Roadmap />} />
-          <Route path="/staff/payments" element={<Roadmap />} />
-          <Route path="/staff/dashboards" element={<Roadmap />} />
+          {/* Patient · surveys, booking, payments */}
+          <Route path="/patient/survey" element={<Survey />} />
+          <Route path="/patient/crash" element={<CrashReport />} />
+          <Route path="/patient/book" element={<Booking />} />
+          <Route path="/patient/agreement" element={<Agreement />} />
+          <Route path="/patient/payments" element={<PaymentsPatient />} />
+          {/* Staff · surveys & alerts, registry, booking, payments, config, dashboards */}
+          <Route path="/staff/alerts" element={<AlertQueue />} />
+          <Route path="/staff/alerts/patient/:id" element={<PatientLongitudinal />} />
+          <Route path="/staff/registry" element={<Registry />} />
+          <Route path="/staff/registry/:id" element={<MemberDetail />} />
+          <Route path="/staff/calendar" element={<ResourceCalendar />} />
+          <Route path="/staff/payments" element={<FailedPayments />} />
+          <Route path="/staff/config/surveys" element={<SurveyBuilder />} />
+          <Route path="/staff/config/modalities" element={<ModalityConfig />} />
+          <Route path="/staff/config/alerts" element={<AlertRules />} />
+          <Route path="/staff/config/messages" element={<MessageTemplates />} />
+          <Route path="/staff/clinical-config" element={<Navigate to="/staff/config/surveys" replace />} />
+          <Route path="/staff/dashboards" element={<Dashboards />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AppShell>

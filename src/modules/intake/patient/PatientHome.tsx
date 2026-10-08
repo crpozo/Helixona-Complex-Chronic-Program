@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Calendar, ClipboardList, CreditCard, FileCheck2, HeartPulse, Lock } from 'lucide-react'
+import { Calendar, ClipboardList, CreditCard, FileCheck2, HeartPulse } from 'lucide-react'
 import { PhoneFrame, Wordmark } from '../../../components/PhoneFrame'
 import { MonitoringNotice, Pill } from '../../../components/ui'
 
@@ -29,16 +29,16 @@ export default function PatientHome() {
           <Tile icon={<CreditCard size={20} />} label="Month 0 fee" status="Due at scheduling" tone="neutral" />
         </ul>
 
-        <div className="mt-6 eyebrow">Later in your program</div>
+        <div className="mt-6 eyebrow">During your program</div>
         <ul className="mt-2 space-y-2">
-          {[['Check-in surveys', 'After each treatment session'], ['Report a crash or flare', 'Anytime, reviewed during clinic hours'], ['Book sessions', 'Once your Plan of Care is set']].map(([t, d]) => (
-            <li key={t} className="card flex items-center gap-3 p-3.5 opacity-70">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sand-100 text-sand-400"><Lock size={15} /></span>
+          {[['/patient/survey', 'Check-in survey', 'Due today · 1 day after red light'], ['/patient/crash', 'Report a crash or flare', 'Anytime · reviewed during clinic hours'], ['/patient/book', 'Book a session', 'Nano bath Thu Oct 9 · 9:00 AM confirmed'], ['/patient/agreement', 'Membership agreement & payment', 'Available once your program is offered'], ['/patient/payments', 'Payments & receipts', 'Next: $2,000 on Nov 1']].map(([to, t, d]) => (
+            <li key={t}><Link to={to} className="card flex items-center gap-3 p-3.5 hover:border-teal-300">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-teal-50 text-teal-700"><HeartPulse size={15} /></span>
               <span className="flex-1"><span className="block font-semibold text-sand-800">{t}</span><span className="block text-xs text-sand-500">{d}</span></span>
-              <Pill dot={false}>Soon</Pill>
-            </li>
+            </Link></li>
           ))}
         </ul>
+        <p className="mt-2 text-[11px] text-sand-500">For review: these are shown unlocked so every patient screen is reachable from here. In the real app they appear as the program progresses.</p>
         <div className="mt-6"><MonitoringNotice /></div>
         <div className="mt-4 flex items-center justify-center gap-1 text-xs text-sand-500"><HeartPulse size={12} /> Helixona · Irvine, CA · (949) 555-0100</div>
       </div>

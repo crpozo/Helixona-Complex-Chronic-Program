@@ -31,20 +31,38 @@ All data is fictional. Clinical questions are placeholders labeled *“Sample qu
 | 11 | `#/staff/chart-prep` and `#/staff/chart-prep/P-0044` | Charlene | Queue by chart-prep status (Awaiting intake → Submitted → Reviewed → Ready → Placed in eCW / Exception). Detail: formatted note with **Copy to clipboard**, **Download PDF**, document inventory, and both placement paths: **eCW connector** (8 verified steps, duplicate marker, nightly schedule, verification state) and **Copy & paste** (3 steps + confirmation). | Exact eCW note location and PDF category (Charlene). eCW web vs. desktop client. |
 | 12 | `#/staff/ecw-exceptions` | Charlene / technical admin | Exception queue: job type (J2 note+PDF, J3 booking mirror, J4 schedule read-back), patient ID, failed step, severity (critical = after a write, no auto-retry), screenshot placeholder, **Retry** / **Done manually · close** with required note. | Connector health thresholds. |
 
-## Priority 2 — Surveys, alerts, membership (placeholders only)
+## Priority 2 — Surveys, alerts, membership (built)
 
-`#/staff/registry`, `#/staff/alerts`, `#/staff/clinical-config` show what will be mocked after Priority 1 review (CLAUDE.md §4, screens 13–18).
+| # | Route | Role | Purpose | Open questions |
+|---|---|---|---|---|
+| 13 | `#/staff/config/surveys` | Physician / admin | Survey template list and builder: sections from the question bank, required/optional, branching, scoring and calculated fields, assignment (program, stage, modality, physician, patient), schedule and stop rules, versions; draft → in review → approved → published → retired, with an authorized clinical publisher. | Who besides Dr. D. may publish. |
+| 14 | `#/staff/config/modalities` | Physician / Karina / admin | One record per modality: identity and eCW mapping, Plan of Care rules, scheduling rules (duration, buffer, resources, spacing, max per week, lead time, cancellation), preparation and contraindication prompts, survey follow-up offsets, alert logic, documents. Shows the plain-language rule text patients see. | Whether rooms/devices exist as eCW resources. Final modality list. |
+| 15 | `#/staff/config/alerts` | Physician | Alert rule editor (trigger, level, recipients incl. backup, response target, escalation, after-hours, patient emergency language) and the **precedence view**: global → program → stage → modality → physician → patient override, showing which layer applied and what was inherited. Levels & labels tab. | Final labels and thresholds per level. |
+| 16 | `#/patient/survey` | Patient | Post-treatment check-in (+1/+3/+7 days) with the monitoring notice; contact request flows to an alert. | Real survey content (Medical Director). |
+| 16 | `#/patient/crash` | Patient | Crash / flare report: severity, symptoms, onset, treatment context, free text, request contact; red-flag symptoms show emergency language and a 911 button. | Red-flag symptom list (clinical). |
+| 17 | `#/staff/alerts` | Nursing / physician | Alert queue: unassigned, assigned, acknowledged, overdue, escalated, resolved, reopened; level pills; take / acknowledge / escalate / resolve with reason code and follow-up note; history shows rule and applied layer. | Resolution reason codes. eCW placement of follow-up notes (ALT-08). |
+| 17 | `#/staff/alerts/patient/P-0041` | Nursing / physician | Longitudinal view: energy, pain, sleep over time with treatments and alerts marked; survey history; alerts for the patient. | Which scores to chart by default. |
+| 18 | `#/staff/registry` | Karina | Membership registry: every status from requirements §12 with phase, Month 0 dates, membership dates, pauses, active months, monthly amount, last change (who · when · why). | — |
+| 18 | `#/staff/registry/P-0019` | Karina / physician | Member detail: status history, key dates and total active months, allowed transitions with their effects (pause, Month 9 decisions, graduate, withdraw, discharge are never automatic), lifecycle rules table. | Reason-code catalogue per transition. |
 
-## Priority 3 — Booking, payments, notifications (placeholders only)
+## Priority 3 — Booking, payments, notifications (built)
 
-`#/staff/calendar`, `#/staff/payments`, `#/staff/dashboards` (CLAUDE.md §4, screens 19–24). Patient booking, agreement + Stripe payment setup, and message templates will be added here.
+| # | Route | Role | Purpose | Open questions |
+|---|---|---|---|---|
+| 19 | `#/patient/book` | Patient | Only authorized services; per modality **Book now**, **Request**, or **Not in your care plan**; spacing and weekly limits in plain language; slot picker enforces spacing; result shows **Reserved** (waiting for confirmation) vs. request pending; insurance visits read-only from eCW. | Preparation instructions wording. |
+| 20 | `#/staff/calendar` | Karina / nursing | Resource calendar with one lane per room/device (NP and IV lanes read-only from eCW); booking exceptions tab: eCW slot conflict (patient booking stays valid), mirror failed, requests to approve. | Whether rooms/devices exist as eCW resources. |
+| 21 | `#/patient/agreement` | Patient | Gated on “Program offered”: agreement summary ($2,000 × 9, Month 0 separate), document, signature, then Stripe-hosted card or ACH setup, then welcome. | Final agreement and authorization text (attorney). |
+| 21 | `#/patient/payments` | Patient | Anniversary schedule, Month 0 as a separate one-time charge, receipts and signed copies, change payment method. | — |
+| 22 | `#/staff/payments` | Karina | Failed-payment queue: amount, attempt, reason category, next action, communication history; retry, log call, send update link; **scheduling hold only with staff confirmation**; upcoming and all payments. | Retry cadence, grace period, hold policy, refunds (Karina + attorney). |
+| 23 | `#/staff/config/messages` | Admin / Karina | Message templates: event, audience, channel, timing, max sends, stop rule, merge fields, preview and test-send, versions; delivery log with result per message. | Final copy for each message family (Helixona). |
+| 24 | `#/staff/dashboards` | Cassandra / Carlos | Tiles for intake completion, chart prep, alerts, booking exceptions, contract completion, payment failures, active members, Month 9 reviews; enrollment funnel; surveys and alerts by week; connector health; pilot defect log; audit & security summary. | Which numbers go on the weekly report. |
 
 ## Shared patterns
 
 - **Queues** share one table pattern: severity stripe + status pill (text, never color alone), who/when/why on every row.
 - **Who · when · why** appears on every list and detail (actor, timestamp, reason code) because the real system is fully audited.
 - **Version tags** on anything clinical: “Questionnaire v3 · published by Dr. D. on Sep 15, 2026”.
-- **Monitoring notice** (“not continuously monitored, not a substitute for 911”) on the patient home; it will appear on every survey and crash-report screen in Priority 2.
+- **Monitoring notice** (“not continuously monitored, not a substitute for 911”) on the patient home, the survey and the crash-report screens.
 
 ## Brand
 
