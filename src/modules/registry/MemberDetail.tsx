@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { AuditList, Breadcrumb, Card, Field, Notice, PageHeader, Pill, Row, Tabs, toneFor } from '../../components/ui'
-import { members, statusCatalog } from '../../mock/program'
+import { memberNames, members, statusCatalog } from '../../mock/program'
 import { patientById } from '../../mock/patients'
 import { JourneyStrip } from '../intake/staff/PatientDetail'
 
@@ -12,11 +12,11 @@ export default function MemberDetail() {
   const [tab, setTab] = useState('timeline')
   const [next, setNext] = useState<string>('')
   const cat = statusCatalog.find((c) => c.status === m.status)
-  const fullHistory = [...m.history, m.lastChange].filter((h, i, a) => a.findIndex((x) => x.when === h.when && x.action === h.action) === i).reverse()
+  const fullHistory = [...m.history, m.lastChange].filter((h, i, a) => a.findIndex((x) => x.when === h.when && x.action === h.action) === i).sort((a, b) => Date.parse(a.when) - Date.parse(b.when)).reverse()
   return (
     <>
       <Breadcrumb items={[{ label: 'Membership registry', to: '/staff/registry' }, { label: m.id }]} />
-      <PageHeader eyebrow={`${m.id}${p ? ` · eCW ${p.ecwId}` : ''}`} title={p ? `${p.firstName} ${p.lastName}` : m.id} meta={<><Pill tone={toneFor(m.status)}>{m.status}</Pill><span>{cat?.phase}</span><span>· {m.activeMonths} active months</span></>} actions={<button className="btn-primary">Update status</button>} />
+      <PageHeader eyebrow={`${m.id}${p ? ` · eCW ${p.ecwId}` : ''}`} title={p ? `${p.firstName} ${p.lastName}` : memberNames[m.id] ?? m.id} meta={<><Pill tone={toneFor(m.status)}>{m.status}</Pill><span>{cat?.phase}</span><span>· {m.activeMonths} active months</span></>} actions={<button className="btn-primary">Update status</button>} />
       <div className="grid gap-5 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <Tabs value={tab} onChange={setTab} tabs={[{ key: 'timeline', label: 'Status history' }, { key: 'dates', label: 'Dates & months' }, { key: 'transition', label: 'Change status' }, { key: 'rules', label: 'Lifecycle rules' }]} />
