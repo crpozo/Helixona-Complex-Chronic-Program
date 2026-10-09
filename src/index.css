@@ -20,8 +20,8 @@
   --color-teal-800: #050505;  /* hero / header black */
   --color-teal-900: #000000;
 
-  /* Square corners like the website */
-  --radius-sm: 0px; --radius-md: 2px; --radius-lg: 2px; --radius-xl: 2px; --radius-2xl: 3px; --radius-3xl: 4px;
+  /* Rounded corners across the platform */
+  --radius-sm: 4px; --radius-md: 6px; --radius-lg: 8px; --radius-xl: 10px; --radius-2xl: 12px; --radius-3xl: 16px;
 
   /* Neutrals: white ground, light warm-grey lines, near-black text (matches helixona.com) */
   --color-sand-50: #ffffff;
