@@ -23,17 +23,17 @@
   /* Square corners like the website */
   --radius-sm: 0px; --radius-md: 2px; --radius-lg: 2px; --radius-xl: 2px; --radius-2xl: 3px; --radius-3xl: 4px;
 
-  /* Warm neutral grays */
-  --color-sand-50: #faf8f4;
-  --color-sand-100: #f3efea;
-  --color-sand-200: #e6e0d8;
-  --color-sand-300: #d2c9be;
-  --color-sand-400: #a9a096;
-  --color-sand-500: #7f776e;
-  --color-sand-600: #5e574f;
-  --color-sand-700: #433e38;
-  --color-sand-800: #2d2a26;
-  --color-sand-900: #1b1917;
+  /* Neutrals: white ground, light warm-grey lines, near-black text (matches helixona.com) */
+  --color-sand-50: #ffffff;
+  --color-sand-100: #f6f5f3;
+  --color-sand-200: #e9e6e1;
+  --color-sand-300: #d6d1c9;
+  --color-sand-400: #a8a197;
+  --color-sand-500: #7a736a;
+  --color-sand-600: #58524b;
+  --color-sand-700: #3b3733;
+  --color-sand-800: #232120;
+  --color-sand-900: #121212;
 
   /* Status */
   --color-ok-100: #dcefe3;  --color-ok-600: #2f7a4f;  --color-ok-700: #245f3d;
@@ -42,7 +42,7 @@
   --color-info-100: #e2e9f4; --color-info-600: #3a5f8f; --color-info-700: #2d4a70;
   --color-plum-100: #ece2f1; --color-plum-600: #6f4b8a;
 
-  --shadow-card: 0 1px 2px rgb(27 25 23 / 0.06), 0 4px 16px -8px rgb(27 25 23 / 0.12);
+  --shadow-card: 0 1px 2px rgb(18 18 18 / 0.04);
   --radius-xl2: 1.1rem;
 }
 
@@ -59,7 +59,7 @@ h1, h2, h3 { @apply tracking-normal; }
 
 @layer components {
 /* Shared primitives used across patient + staff surfaces */
-.card { @apply bg-white rounded-2xl border border-sand-200 shadow-card; }
+.card { @apply bg-white rounded-2xl border border-sand-200; }
 .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 disabled:opacity-50 disabled:cursor-not-allowed; }
 .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 disabled:opacity-50 disabled:cursor-not-allowed bg-teal-400 text-sand-900 border border-teal-500 uppercase tracking-[0.14em] text-[12px] hover:bg-teal-300; }
 .btn-secondary { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 disabled:opacity-50 disabled:cursor-not-allowed bg-white text-sand-900 border border-teal-500 uppercase tracking-[0.14em] text-[12px] hover:bg-teal-50; }
