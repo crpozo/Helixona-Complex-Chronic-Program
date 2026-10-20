@@ -24,18 +24,9 @@ export function PatientTopBar({ title, back, right }: { title?: string; back?: R
   )
 }
 
-/** Helixona wordmark: letterspaced caps with the outlined gold X (recreated from the brand logo). */
+/** Helixona wordmark: the official logo (white letters + gold X on dark; dark letters on light). */
 export function Wordmark({ size = 'md', light = false }: { size?: 'sm' | 'md' | 'lg'; light?: boolean }) {
-  const h = size === 'lg' ? 34 : size === 'sm' ? 18 : 24
-  const font = size === 'lg' ? 'text-[24px]' : size === 'sm' ? 'text-[13px]' : 'text-[17px]'
-  return (
-    <span className={`inline-flex items-center font-sans font-normal uppercase tracking-[0.42em] ${font} ${light ? 'text-white' : 'text-sand-900'}`} aria-label="Helixona">
-      HELI
-      <svg viewBox="0 0 100 100" style={{ height: h * 1.55, width: h * 1.55, margin: `0 -${h * 0.1}px 0 -${h * 0.22}px` }} aria-hidden>
-        <path d="M30 26 L45 50 L30 74 L41 74 L50.5 59 L60 74 L71 74 L56 50 L71 26 L60 26 L50.5 41 L41 26 Z" fill="none" stroke="#D4B77A" strokeWidth="3.2" strokeLinejoin="miter" />
-        <path d="M24 6 L50.5 50 M50.5 50 L77 94" stroke="#D4B77A" strokeWidth="1.6" strokeLinecap="round" opacity=".9" />
-      </svg>
-      ONA
-    </span>
-  )
+  const h = size === 'lg' ? 36 : size === 'sm' ? 22 : 28
+  const base = import.meta.env.BASE_URL
+  return <img src={`${base}${light ? 'logo-on-dark.png' : 'logo-on-light.png'}`} alt="Helixona" style={{ height: h, width: 'auto' }} className="block select-none" draggable={false} />
 }
