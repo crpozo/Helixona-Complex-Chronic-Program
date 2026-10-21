@@ -16,41 +16,40 @@
       --line: #e9e6e1; --line-strong: #d6d1c9; --ground: #ffffff; --panel: #f6f5f3;
       --gold: #d4b77a; --gold-line: #c4a368; --gold-tint: #faf6ec;
       --ok-bg: #dcefe3; --ok: #245f3d; --warn-bg: #fbecd2; --warn: #8a5210; --info-bg: #e2e9f4; --info: #2d4a70;
-      --radius: 12px;
+      --radius: 10px;
     }
     * { box-sizing: border-box; }
-    html, body { margin: 0; background: var(--ground); color: var(--text); font-family: "Jost", "Futura", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    html, body { height: 100%; margin: 0; background: var(--ground); color: var(--text); font-family: "Jost", "Futura", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    body { display: flex; flex-direction: column; }
     a { color: inherit; }
-    header { background: var(--black); color: #fff; }
-    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
-    .top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 0; }
-    .top img { height: 34px; width: auto; display: block; }
-    .top .domain { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); }
-    .hero { padding: 28px 0 36px; border-top: 1px solid rgba(255,255,255,0.08); }
-    .hero h1 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500; font-size: 40px; margin: 0 0 8px; letter-spacing: 0.005em; }
-    .hero p { margin: 0; color: #c9c4bb; max-width: 640px; font-size: 16px; }
-    .search { margin-top: 22px; display: flex; gap: 10px; max-width: 520px; }
-    .search input { flex: 1; font: inherit; font-size: 15px; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: #fff; }
+    header { background: var(--black); color: #fff; flex: none; }
+    .wrap { max-width: 1240px; margin: 0 auto; padding: 0 20px; width: 100%; }
+    .top { display: flex; align-items: center; gap: 22px; padding: 14px 0; }
+    .top img { height: 28px; width: auto; display: block; }
+    .top h1 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500; font-size: 24px; margin: 0; letter-spacing: 0.01em; padding-left: 22px; border-left: 1px solid rgba(255,255,255,0.18); }
+    .top p { margin: 0; color: #c9c4bb; font-size: 13px; }
+    .top .domain { margin-left: auto; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); }
+    .search input { font: inherit; font-size: 13px; width: 240px; padding: 7px 11px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: #fff; }
     .search input::placeholder { color: #9b958c; }
-    .search input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 2px rgba(212,183,122,0.35); }
-    main { padding: 36px 0 60px; }
-    section { margin-bottom: 40px; }
-    .eyebrow { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.22em; color: var(--muted); margin: 0 0 4px; }
-    section h2 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 600; font-size: 28px; margin: 0 0 4px; }
-    section .note { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
-    .card { position: relative; display: flex; flex-direction: column; gap: 10px; padding: 18px 18px 16px 22px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); text-decoration: none; transition: border-color .15s, box-shadow .15s, transform .15s; overflow: hidden; }
-    .card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--stripe, var(--line-strong)); }
-    .card.link:hover { border-color: var(--gold-line); box-shadow: 0 6px 18px rgba(18,18,18,0.08); transform: translateY(-1px); }
+    .search input:focus { outline: none; border-color: var(--gold); }
+    main { flex: 1; min-height: 0; padding: 18px 0 10px; display: flex; flex-direction: column; gap: 16px; overflow: hidden; }
+    section { display: grid; grid-template-columns: 180px 1fr; gap: 16px; align-items: start; }
+    .eyebrow { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.22em; color: var(--muted); margin: 0; }
+    section h2 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 600; font-size: 22px; margin: 2px 0 2px; line-height: 1.1; }
+    section .note { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .card { position: relative; display: flex; flex-direction: column; gap: 5px; padding: 10px 12px 10px 15px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); transition: border-color .15s, box-shadow .15s; overflow: hidden; }
+    .card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--stripe, var(--line-strong)); }
+    .card.link:hover { border-color: var(--gold-line); box-shadow: 0 4px 14px rgba(18,18,18,0.08); }
     .card h3 a { text-decoration: none; }
-    .card h3 a::after { content: ""; position: absolute; inset: 0; }   /* whole card opens the main link */
+    .card h3 a::after { content: ""; position: absolute; inset: 0; }
     .card .links, .card .pill { position: relative; z-index: 1; }
     .card.disabled { background: var(--panel); color: var(--muted); }
-    .card .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-    .card h3 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: 0.01em; }
-    .card p { margin: 0; font-size: 14px; line-height: 1.45; color: var(--muted); }
-    .card .url { font-size: 12px; color: var(--faint); word-break: break-all; }
-    .pill { flex: none; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+    .card .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .card h3 { margin: 0; font-size: 14px; font-weight: 600; line-height: 1.25; }
+    .card p { margin: 0; font-size: 12px; line-height: 1.35; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .card .url { font-size: 11px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pill { flex: none; font-size: 9.5px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; white-space: nowrap; margin-top: 1px; }
     .pill.live { background: var(--ok-bg); color: var(--ok); }
     .pill.internal { background: var(--warn-bg); color: var(--warn); }
     .pill.external { background: var(--info-bg); color: var(--info); }
@@ -59,29 +58,29 @@
     .card[data-status="internal"] { --stripe: #b06a12; }
     .card[data-status="external"] { --stripe: #3a5f8f; }
     .card[data-status="soon"] { --stripe: var(--line-strong); }
-    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
-    .tag { font-size: 11px; color: var(--muted); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 2px 7px; }
-    .links { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 2px; }
-    .links a { font-size: 13px; color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--gold-line); }
+    .tags { display: none; }
+    .links { display: flex; flex-wrap: wrap; gap: 4px 10px; }
+    .links a { font-size: 11.5px; color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--gold-line); }
     .links a:hover { background: var(--gold-tint); }
-    .empty { color: var(--muted); font-size: 14px; padding: 20px 0; }
-    footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; padding: 20px 0 40px; }
-    footer code { font-family: ui-monospace, Menlo, monospace; font-size: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
-    @media (max-width: 600px) { .hero h1 { font-size: 32px; } .top img { height: 28px; } }
+    .empty { color: var(--muted); font-size: 14px; }
+    footer { flex: none; border-top: 1px solid var(--line); color: var(--muted); font-size: 11.5px; padding: 8px 0 10px; }
+    footer code { font-family: ui-monospace, Menlo, monospace; font-size: 11px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+    @media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 700px) {
+      html, body { height: auto; } main { overflow: visible; }
+      section { grid-template-columns: 1fr; gap: 8px; } .grid { grid-template-columns: 1fr; }
+      .top { flex-wrap: wrap; gap: 10px; } .top h1 { padding-left: 0; border: 0; } .search input { width: 100%; }
+    }
   </style>
 </head>
 <body>
   <header>
-    <div class="wrap">
-      <div class="top">
-        <img src="./logo-on-dark.png" alt="Helixona" />
-        <span class="domain">bot.helixona.com</span>
-      </div>
-      <div class="hero">
-        <h1>Systems</h1>
-        <p>Every Helixona application, mockup and tool in one place. Pick a card to open it.</p>
-        <div class="search"><input id="q" type="search" placeholder="Search by name, description or tag…" autocomplete="off" /></div>
-      </div>
+    <div class="wrap top">
+      <img src="./logo-on-dark.png" alt="Helixona" />
+      <h1>Systems</h1>
+      <p>Every Helixona application, mockup and tool. Pick a card to open it in a new tab.</p>
+      <span class="domain">bot.helixona.com</span>
+      <div class="search"><input id="q" type="search" placeholder="Search…" autocomplete="off" /></div>
     </div>
   </header>
 
@@ -123,7 +122,7 @@
         items: g.items.filter(it => !f || [it.name, it.description, ...(it.tags || []), it.url].join(" ").toLowerCase().includes(f)),
       })).filter(g => g.items.length);
       root.innerHTML = groups.length
-        ? groups.map(g => `<section><p class="eyebrow">${g.items.length} ${g.items.length === 1 ? "item" : "items"}</p><h2>${esc(g.group)}</h2>${g.note ? `<p class="note">${esc(g.note)}</p>` : ""}<div class="grid">${g.items.map(cardHTML).join("")}</div></section>`).join("")
+        ? groups.map(g => `<section><div><p class="eyebrow">${g.items.length} ${g.items.length === 1 ? "item" : "items"}</p><h2>${esc(g.group)}</h2>${g.note ? `<p class="note">${esc(g.note)}</p>` : ""}</div><div class="grid">${g.items.map(cardHTML).join("")}</div></section>`).join("")
         : `<p class="empty">Nothing matches “${esc(filter)}”.</p>`;
     }
 
