@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Calendar, ClipboardList, CreditCard, FileCheck2, HeartPulse } from 'lucide-react'
 import { PhoneFrame, Wordmark } from '../../../components/PhoneFrame'
 import { MonitoringNotice, Pill } from '../../../components/ui'
+import { getPathway, pathwayLabel } from '../../../mock/questionnaire'
 
 export default function PatientHome() {
   return (
@@ -9,7 +10,7 @@ export default function PatientHome() {
       <div className="px-5 pt-12 pb-8">
         <div className="flex items-center justify-between"><Wordmark size="sm" /><span className="text-xs text-sand-500">Marisol A.</span></div>
         <h1 className="mt-6 font-display text-[26px] font-semibold text-sand-900">Good evening, Marisol</h1>
-        <p className="text-sand-600">You're in <strong>Month 0 — Assessment</strong>.</p>
+        <p className="text-sand-600">{getPathway() === 'chronic' ? <>You're in <strong>Month 0 — Assessment</strong>.</> : <>Your pathway: <strong>{pathwayLabel.optimization}</strong>. First visit not yet scheduled.</>}</p>
 
         <div className="card mt-5 overflow-hidden">
           <div className="bg-teal-800 px-4 py-3 text-white">

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Check, Cloud, Plus, Trash2 } from 'lucide-react'
 import { PhoneFrame, PatientTopBar } from '../../../components/PhoneFrame'
 import { Choice, Field, Pill, VersionTag } from '../../../components/ui'
-import { assignedFormIds, forms, questionnaireMeta, sampleAnswers, type Form, type Q, type Sec } from '../../../mock/questionnaire'
+import { assignedByPathway, forms, getPathway, pathwayLabel, questionnaireMeta, sampleAnswers, setPathway, type Form, type Pathway, type Q, type Sec } from '../../../mock/questionnaire'
 
 type Answers = Record<string, unknown>
 
@@ -21,9 +21,12 @@ const visible = (sec: Sec, q: Q, a: Answers) => {
 
 export default function Questionnaire() {
   const nav = useNavigate()
-  const assigned = useMemo(() => assignedFormIds.map((id) => forms.find((f) => f.id === id)!), [])
+  const [pathway, setPathwayState] = useState<Pathway>(getPathway())
+  const assignment = assignedByPathway[pathway]
+  const assigned = useMemo(() => assignment.map((a) => forms.find((f) => f.id === a.formId)!), [assignment])
   const [view, setView] = useState<'forms' | 'sections' | 'section'>('forms')
   const [form, setForm] = useState<Form>(assigned[0])
+  const switchPathway = (p: Pathway) => { setPathway(p); setPathwayState(p); setForm(forms.find((f) => f.id === assignedByPathway[p][0].formId)!); setSIdx(0); setView('forms') }
   const [sIdx, setSIdx] = useState(0)
   const [answers, setAnswers] = useState<Answers>(() => ({ ...sampleAnswers }))
   const [saved, setSaved] = useState<'saved' | 'saving'>('saved')
@@ -33,15 +36,21 @@ export default function Questionnaire() {
   const set = (id: string, v: unknown) => setAnswers((a) => ({ ...a, [id]: v }))
   const secState = (s: Sec) => { const qs = s.questions.filter((q) => visible(s, q, answers)); const n = qs.filter((q) => answered(q, answers[q.id])).length; return n === 0 ? 'not started' : n === qs.length ? 'complete' : 'partial' }
   const formProgress = (f: Form) => { const qs = f.sections.flatMap((s) => s.questions.filter((q) => visible(s, q, answers))); return Math.round((qs.filter((q) => answered(q, answers[q.id])).length / qs.length) * 100) }
-  const total = assigned.flatMap((f) => f.sections.flatMap((s) => s.questions)).length
-  const done = assigned.flatMap((f) => f.sections.flatMap((s) => s.questions)).filter((q) => answered(q, answers[q.id])).length
+  const nowForms = assigned.filter((_, i) => !assignment[i].when)
+  const total = nowForms.flatMap((f) => f.sections.flatMap((s) => s.questions)).length
+  const done = nowForms.flatMap((f) => f.sections.flatMap((s) => s.questions)).filter((q) => answered(q, answers[q.id])).length
   const pct = Math.round((done / total) * 100)
+  const pctNow = pct
   const SaveState = <span className="inline-flex items-center gap-1 text-xs text-sand-500">{saved === 'saved' ? <><Check size={13} className="text-ok-600" /> Saved just now</> : <><Cloud size={13} className="animate-pulse" /> Saving…</>}</span>
 
   if (view === 'forms') return (
     <PhoneFrame>
       <PatientTopBar title="Health questionnaire" back={<Link to="/patient/home" className="btn-ghost px-2 py-1 text-sm"><ArrowLeft size={16} /></Link>} right={SaveState} />
       <div className="px-5 pb-8">
+        <div className="mb-3 rounded-xl border border-dashed border-plum-600/30 bg-plum-100/40 p-2.5">
+          <div className="text-[10.5px] font-semibold uppercase tracking-wide text-plum-600">For review · pathway chosen on the website inquiry</div>
+          <div className="mt-1.5 flex gap-1 rounded-lg bg-white p-1 text-xs font-medium">{(['chronic', 'optimization'] as Pathway[]).map((p) => <button key={p} onClick={() => switchPathway(p)} className={`flex-1 rounded-md py-1.5 ${pathway === p ? 'bg-teal-600 text-white' : 'text-sand-600'}`}>{pathwayLabel[p]}</button>)}</div>
+        </div>
         <div className="card p-4">
           <div className="flex items-center justify-between"><span className="text-sm font-semibold text-sand-800">{pct}% complete</span><span className="text-xs text-sand-500">{done} of {total} questions</span></div>
           <div className="mt-2 h-2 rounded-full bg-sand-200"><div className="h-2 rounded-full bg-teal-600 transition-all" style={{ width: `${pct}%` }} /></div>
@@ -49,16 +58,16 @@ export default function Questionnaire() {
         </div>
         <div className="mt-4 flex items-center justify-between"><span className="eyebrow">Your forms</span><VersionTag>Questionnaire v{questionnaireMeta.version}</VersionTag></div>
         <ul className="mt-2 space-y-2">
-          {assigned.map((f, i) => { const p = formProgress(f); return (
-            <li key={f.id}><button onClick={() => { setForm(f); setView('sections') }} className="card flex w-full items-center gap-3 p-3.5 text-left hover:border-teal-300">
+          {assigned.map((f, i) => { const p = formProgress(f); const later = assignment[i].when; return (
+            <li key={f.id}><button onClick={() => { setForm(f); setView('sections') }} className={`card flex w-full items-center gap-3 p-3.5 text-left hover:border-teal-300 ${later ? 'opacity-70' : ''}`}>
               <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold ${p === 100 ? 'bg-ok-100 text-ok-700' : p > 0 ? 'bg-warn-100 text-warn-700' : 'bg-sand-100 text-sand-600'}`}>{p === 100 ? <Check size={16} /> : i + 1}</span>
-              <span className="flex-1 min-w-0"><span className="block font-semibold text-sand-900">{f.short}</span><span className="block text-xs text-sand-500">{f.sections.length} sections · {f.sections.reduce((n, s) => n + s.questions.length, 0)} questions</span></span>
-              <Pill tone={p === 100 ? 'ok' : p > 0 ? 'warn' : 'neutral'} dot={false}>{p === 100 ? 'Done' : p > 0 ? `${p}%` : 'Start'}</Pill>
+              <span className="flex-1 min-w-0"><span className="block font-semibold text-sand-900">{f.short}</span><span className="block text-xs text-sand-500">{later ? later + ' · ' : ''}{f.sections.length} sections · {f.sections.reduce((n, s) => n + s.questions.length, 0)} questions</span></span>
+              <Pill tone={p === 100 ? 'ok' : p > 0 ? 'warn' : later ? 'neutral' : 'neutral'} dot={false}>{p === 100 ? 'Done' : p > 0 ? `${p}%` : later ? 'Later' : 'Start'}</Pill>
             </button></li>) })}
         </ul>
-        <p className="mt-3 text-[11px] text-sand-500">Forms are assigned by your care team. Condition-specific forms (Lyme, Brain, Health Optimization) appear here only when assigned.</p>
-        <button onClick={() => nav('/patient/uploads')} disabled={pct < 100} className="btn-primary btn-lg mt-6 w-full">{pct < 100 ? 'Finish all forms to continue' : 'Continue to documents'}</button>
-        {pct < 100 && <button onClick={() => { const f = assigned.find((x) => formProgress(x) < 100)!; setForm(f); setSIdx(Math.max(0, f.sections.findIndex((s) => secState(s) !== 'complete'))); setView('section') }} className="btn-secondary btn-lg mt-2 w-full">Resume where I left off</button>}
+        <p className="mt-3 text-[11px] text-sand-500">{pathway === 'chronic' ? 'Complex Chronic patients complete the New Patient Packet, SF-36, Metabolic and Mold forms. Lyme and Brain forms appear only when your physician assigns them.' : 'Health Optimization (L2/L3) patients complete the L2/L3 New Patient form before the first visit and the Follow-Up form before later visits.'}</p>
+        <button onClick={() => nav('/patient/uploads')} disabled={pctNow < 100} className="btn-primary btn-lg mt-6 w-full">{pctNow < 100 ? 'Finish your forms to continue' : 'Continue to documents'}</button>
+        {pctNow < 100 && <button onClick={() => { const f = assigned.find((x, i) => !assignment[i].when && formProgress(x) < 100)!; setForm(f); setSIdx(Math.max(0, f.sections.findIndex((s) => secState(s) !== 'complete'))); setView('section') }} className="btn-secondary btn-lg mt-2 w-full">Resume where I left off</button>}
       </div>
     </PhoneFrame>
   )

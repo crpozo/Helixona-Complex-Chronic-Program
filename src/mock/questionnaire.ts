@@ -12,8 +12,16 @@ export const questionnaireMeta = {
   source: 'NP - Questionnaires 2.xlsx',
 }
 
-/** Forms assigned to the demo patient (Complex Chronic). Condition-specific forms are assigned by the physician. */
-export const assignedFormIds = ['new-patient', 'sf36', 'metabolic', 'mold']
+export type Pathway = 'chronic' | 'optimization'
+export const pathwayLabel: Record<Pathway, string> = { chronic: 'Complex Chronic Program', optimization: 'Health Optimization (L2/L3)' }
+/** Forms assigned by pathway. Condition-specific forms (Lyme, Brain) are added by the physician. */
+export const assignedByPathway: Record<Pathway, { formId: string; when?: string }[]> = {
+  chronic: [{ formId: 'new-patient' }, { formId: 'sf36' }, { formId: 'metabolic' }, { formId: 'mold' }],
+  optimization: [{ formId: 'l2l3-new' }, { formId: 'l2l3-fu', when: 'After your first visit' }],
+}
+export const getPathway = (): Pathway => { try { return (localStorage.getItem('hlx-pathway') as Pathway) || 'chronic' } catch { return 'chronic' } }
+export const setPathway = (p: Pathway) => { try { localStorage.setItem('hlx-pathway', p) } catch { /* ignore */ } }
+export const assignedFormIds = assignedByPathway.chronic.map((a) => a.formId)
 
 export const sections = forms[0].sections
 
