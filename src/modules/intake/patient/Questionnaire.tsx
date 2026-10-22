@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Check, Cloud, Plus, Trash2 } from 'lucide-react'
-import { PhoneFrame, PatientTopBar } from '../../../components/PhoneFrame'
+import { PhoneFrame, PatientTopBar, Wordmark } from '../../../components/PhoneFrame'
 import { Choice, Field, Pill, VersionTag } from '../../../components/ui'
 import { assignedByPathway, forms, getPathway, pathwayLabel, questionnaireMeta, sampleAnswers, setPathway, type Form, type Pathway, type Q, type Sec } from '../../../mock/questionnaire'
 
@@ -24,7 +24,7 @@ export default function Questionnaire() {
   const [pathway, setPathwayState] = useState<Pathway>(getPathway())
   const assignment = assignedByPathway[pathway]
   const assigned = useMemo(() => assignment.map((a) => forms.find((f) => f.id === a.formId)!), [assignment])
-  const [view, setView] = useState<'forms' | 'sections' | 'section'>('forms')
+  const [view, setView] = useState<'intro' | 'forms' | 'sections' | 'section'>(() => { try { return sessionStorage.getItem('hlx-story-intro') ? 'forms' : 'intro' } catch { return 'intro' } })
   const [form, setForm] = useState<Form>(assigned[0])
   const switchPathway = (p: Pathway) => { setPathway(p); setPathwayState(p); setForm(forms.find((f) => f.id === assignedByPathway[p][0].formId)!); setSIdx(0); setView('forms') }
   const [sIdx, setSIdx] = useState(0)
@@ -42,6 +42,30 @@ export default function Questionnaire() {
   const pct = Math.round((done / total) * 100)
   const pctNow = pct
   const SaveState = <span className="inline-flex items-center gap-1 text-xs text-sand-500">{saved === 'saved' ? <><Check size={13} className="text-ok-600" /> Saved just now</> : <><Cloud size={13} className="animate-pulse" /> Saving…</>}</span>
+
+  if (view === 'intro') return (
+    <PhoneFrame>
+      <div className="flex flex-1 flex-col">
+        <div className="bg-teal-800 px-6 pt-14 pb-10 text-white">
+          <Wordmark light size="md" />
+          <h1 className="mt-6 font-display text-[30px] leading-[1.1] font-semibold">Your Healing Journey Begins Here</h1>
+          <p className="mt-3 font-display text-[19px] italic text-teal-100">Your story matters. Every detail can be a clue.</p>
+        </div>
+        <div className="-mt-5 flex-1 rounded-t-3xl bg-white px-5 pt-6 pb-8">
+          <div className="space-y-3 text-[15px] leading-relaxed text-sand-700">
+            <p>At Helixona, we believe understanding your health begins with understanding you. This is more than a typical medical questionnaire. It's the foundation for connecting the pieces, recognizing patterns, and exploring the root causes of your health challenges.</p>
+            <p>Please allow 45–90 minutes to complete your health story. Find a quiet space and answer each question as thoughtfully and honestly as you can. The details matter, and if you're unsure of an answer, it's okay to say so.</p>
+            <p>Your physician personally reviews all of your answers before your first appointment, taking time to understand your unique health journey and prepare for your visit.</p>
+            <p>We know this takes time and energy, especially when you're not feeling your best. Take your time. Your progress is automatically saved, so you can pause, rest, and return whenever you're ready.</p>
+            <p>Every piece you share helps us see the bigger picture.</p>
+            <p className="font-semibold text-sand-900">Together, we begin putting the pieces of your health puzzle together.</p>
+          </div>
+          <button onClick={() => { try { sessionStorage.setItem('hlx-story-intro', '1') } catch { /* ignore */ } setView('forms') }} className="btn-primary btn-lg mt-8 w-full">Begin My Health Story</button>
+          <Link to="/patient/home" className="btn-ghost mt-2 w-full">Not now</Link>
+        </div>
+      </div>
+    </PhoneFrame>
+  )
 
   if (view === 'forms') return (
     <PhoneFrame>

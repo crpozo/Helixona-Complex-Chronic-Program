@@ -116,7 +116,7 @@ If something simpler is preferred, plain HTML + Tailwind CDN per screen is accep
 - Exact eCW location for the intake note and PDF category (session with Charlene).
 - eCW version: web client or desktop client (changes the bot design, not the mockups).
 - Whether rooms/devices exist as eCW resources today.
-- Final list of intake/HIPAA/financial/consent forms and who signs each (Shibani).
+- ~~Final list of intake/HIPAA/financial/consent forms (Shibani).~~ Received Oct 22, 2026: ten consents in `docs/source/consents/`, generated into `src/mock/consentContent.ts` by `scripts/build_consents.py`. Still open: who countersigns, which are signed at intake vs. first visit, annual renewal, and the Privacy Officer contact placeholder in the Notice of Privacy Practices.
 - Payment rules: retry cadence, grace period, hold policy, refunds (Karina + attorney).
 - eCW license: any clause on automated access (attorney).
 - Whether eCW offers FHIR R4 / HL7 interfaces / healow Open Access and at what cost (would replace parts of the bot).

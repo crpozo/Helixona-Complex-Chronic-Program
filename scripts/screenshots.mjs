@@ -21,6 +21,7 @@ const server = createServer((req, res) => {
 const routes = [
   ['00-screens-index', '/screens', 'desktop'],
   ['01-patient-invite', '/patient/invite', 'phone'],
+  ['02a-patient-health-story-intro', '/patient/intake?demo=intro', 'phone'],
   ['02-patient-questionnaire', '/patient/intake', 'phone'],
   ['02b-patient-questionnaire-section', '/patient/intake?demo=section', 'phone'],
   ['02c-patient-questionnaire-health-optimization', '/patient/intake?demo=ho', 'phone'],
@@ -65,6 +66,7 @@ for (const [name, route, kind] of routes) {
   const page = await ctx.newPage()
   await page.addInitScript((r) => { try { localStorage.setItem('hlx-role', r) } catch {} }, roleFor(route))
   await page.addInitScript((p) => { try { localStorage.setItem('hlx-pathway', p) } catch {} }, route.includes('demo=ho') ? 'optimization' : 'chronic')
+  if (!route.includes('demo=intro')) await page.addInitScript(() => { try { sessionStorage.setItem('hlx-story-intro', '1') } catch {} })
   await page.goto(`http://localhost:4173${BASE}#${route}`, { waitUntil: 'networkidle' })
   await page.waitForTimeout(400)
   if (route.includes('demo=section')) { await page.getByText('New Patient Packet').first().click(); await page.waitForTimeout(200); await page.getByText('Current Health Review').first().click(); await page.waitForTimeout(300) }

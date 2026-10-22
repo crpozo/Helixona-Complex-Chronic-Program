@@ -1,20 +1,16 @@
 import type { Patient, UploadItem, FormItem } from './types'
+import { consents } from './consentContent'
 
-const standardForms = (signedCount: number): FormItem[] => {
-  const all: Omit<FormItem, 'status'>[] = [
-    { key: 'intake', title: 'Intake Information & Acknowledgement', version: 'v2.1', signer: 'Patient' },
-    { key: 'hipaa', title: 'HIPAA Notice of Privacy Practices', version: 'v4.0', signer: 'Patient' },
-    { key: 'privacy', title: 'Privacy & Records Release Authorization', version: 'v1.3', signer: 'Patient' },
-    { key: 'comms', title: 'Email & Text Communications Consent', version: 'v1.0', signer: 'Patient' },
-    { key: 'financial', title: 'Financial Policy — Month 0 Assessment', version: 'v3.2', signer: 'Patient + staff countersign' },
-  ]
-  return all.map((f, i) => ({
-    ...f,
+const standardForms = (signedCount: number): FormItem[] =>
+  consents.map((c, i) => ({
+    key: c.key,
+    title: c.title,
+    version: c.version,
+    signer: 'Patient',
     status: i < signedCount ? 'signed' : i === signedCount ? 'viewed' : 'pending',
-    signedAt: i < signedCount ? `Sep ${28 + Math.min(i, 2)}, 2026 · ${9 + i}:${(12 + i * 7) % 60 < 10 ? '0' : ''}${(12 + i * 7) % 60} AM` : undefined,
+    signedAt: i < signedCount ? `Sep ${28 + Math.min(i, 2)}, 2026 · ${9 + (i % 3)}:${String((12 + i * 7) % 60).padStart(2, "0")} AM` : undefined,
     method: i < signedCount ? (i % 2 === 0 ? 'Drawn' : 'Typed') : undefined,
   }))
-}
 
 const uploads = (overrides: Partial<Record<string, Partial<UploadItem>>> = {}): UploadItem[] => {
   const base: UploadItem[] = [
@@ -45,7 +41,7 @@ export const patients: Patient[] = [
     ] },
     intake: { version: 1, progress: 100, submittedAt: 'Sep 30, 2026 · 7:18 PM', sections: { 'New Patient Packet': 'complete', 'SF-36 · Quality of Life': 'complete', 'Metabolic Assessment': 'complete', 'Mold History': 'complete', 'Lyme Disease': 'complete', 'Brain Region Localization': 'complete' } },
     uploads: uploads({ labs: { status: 'returned', note: 'Lab PDF is missing pages 3–4 (lipid panel). Please re-upload the full report.' } }),
-    forms: standardForms(4),
+    forms: standardForms(9),
     history: [
       { actor: 'Ana (advisor)', when: 'Sep 22, 2026 · 10:05 AM', action: 'Status → Advisor interview completed', reason: 'Qualified · Complex Chronic pathway' },
       { actor: 'Karina', when: 'Sep 24, 2026 · 3:30 PM', action: 'Status → Insurance benefits review', reason: 'PPO verified · out-of-network benefits apply to NP visits' },
@@ -64,7 +60,7 @@ export const patients: Patient[] = [
     ] },
     intake: { version: 1, progress: 100, submittedAt: 'Sep 25, 2026 · 9:40 PM', sections: { 'New Patient Packet': 'complete', 'SF-36 · Quality of Life': 'complete', 'Metabolic Assessment': 'complete', 'Mold History': 'complete', 'Lyme Disease': 'complete', 'Brain Region Localization': 'complete' } },
     uploads: uploads(),
-    forms: standardForms(5),
+    forms: standardForms(10),
     history: [
       { actor: 'Ana (advisor)', when: 'Sep 18, 2026 · 2:12 PM', action: 'Status → Accepted for Month 0', reason: 'ADM-01 · Meets program criteria' },
       { actor: 'Patient', when: 'Sep 25, 2026 · 9:40 PM', action: 'Intake submitted (Questionnaire v1)' },
@@ -79,7 +75,7 @@ export const patients: Patient[] = [
     invitation: { state: 'submitted', sentAt: 'Sep 8, 2026 · 9:00 AM', expiresAt: 'Sep 22, 2026', method: 'Magic link', history: [] },
     intake: { version: 1, progress: 100, submittedAt: 'Sep 12, 2026 · 3:05 PM', sections: {} },
     uploads: uploads(),
-    forms: standardForms(5),
+    forms: standardForms(10),
     history: [
       { actor: 'eCW connector', when: 'Sep 16, 2026 · 6:04 AM', action: 'Note + PDF placed in eCW · verified', reason: 'Marker HLX:INT-2041:v2' },
       { actor: 'Charlene', when: 'Sep 16, 2026 · 8:30 AM', action: 'Chart prep reviewed · closed' },
@@ -108,7 +104,7 @@ export const patients: Patient[] = [
     invitation: { state: 'submitted', sentAt: 'Sep 2, 2026 · 1:00 PM', expiresAt: 'Sep 16, 2026', method: 'Code', history: [] },
     intake: { version: 1, progress: 100, submittedAt: 'Sep 9, 2026 · 11:12 AM', sections: {} },
     uploads: uploads(),
-    forms: standardForms(5),
+    forms: standardForms(10),
     history: [
       { actor: 'eCW connector', when: 'Oct 5, 2026 · 6:02 AM', action: 'Exception · PDF read-back failed', reason: 'Document not found after upload · no automatic retry' },
     ],

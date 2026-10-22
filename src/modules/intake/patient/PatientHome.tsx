@@ -25,7 +25,7 @@ export default function PatientHome() {
         <div className="mt-6 eyebrow">Your program</div>
         <ul className="mt-2 grid grid-cols-2 gap-2">
           <Tile to="/patient/intake" icon={<ClipboardList size={20} />} label="Questionnaire" status="Submitted" tone="ok" />
-          <Tile to="/patient/forms" icon={<FileCheck2 size={20} />} label="Signed forms" status="4 of 5" tone="warn" />
+          <Tile to="/patient/forms" icon={<FileCheck2 size={20} />} label="Signed forms" status="9 of 10" tone="warn" />
           <Tile icon={<Calendar size={20} />} label="Assessment visit" status="Not yet scheduled" tone="neutral" />
           <Tile icon={<CreditCard size={20} />} label="Month 0 fee" status="Due at scheduling" tone="neutral" />
         </ul>

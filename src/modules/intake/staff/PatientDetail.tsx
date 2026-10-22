@@ -38,7 +38,7 @@ export default function PatientDetail() {
             <Row label="Questionnaire">{p.intake ? <><VersionTag>v{p.intake.version}</VersionTag> {p.intake.progress}%</> : 'Not started'}</Row>
             <Row label="Submitted">{p.intake?.submittedAt ?? '—'}</Row>
             <Row label="Documents">{p.uploads.filter((u) => u.status === 'uploaded').length} uploaded · {p.uploads.filter((u) => u.status === 'missing').length} missing · {p.uploads.filter((u) => u.status === 'returned').length} returned</Row>
-            <Row label="Forms signed">{p.forms.filter((f) => f.status === 'signed').length} of {p.forms.length}</Row>
+            <Row label="Consents signed">{p.forms.filter((f) => f.status === 'signed').length} of {p.forms.length}</Row>
             <Row label="Chart prep"><Pill tone={toneFor(p.chartPrep)}>{p.chartPrep}</Pill></Row>
           </Card>
           <Card title="Recent activity" subtitle="Who · when · why">
