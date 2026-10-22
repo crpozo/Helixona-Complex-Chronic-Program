@@ -9,13 +9,13 @@ Clickable, no-backend mockups for the operational app that sits next to eClinica
 ```bash
 npm install
 npm run dev          # http://localhost:5173/Helixona-Complex-Chronic-Program/
-npm run build        # type-check + production build to dist/
+npm run build        # type-check + production build to the repo root and dist/
 npm run screenshots  # PNG per route into screenshots/ (needs Playwright's Chromium)
 ```
 
 ## Deploy
 
-Every push to `main` or a `claude/**` branch runs `.github/workflows/deploy-pages.yml`, which builds the site and publishes `dist/` to GitHub Pages. The workflow enables Pages automatically on first run; if the deploy job is skipped, set **Settings → Pages → Source** to **GitHub Actions** once.
+`npm run build` writes the production site twice: to the repository root (`index.html` + `assets/`, committed) and to `dist/`. GitHub Pages therefore works in either mode: "Deploy from a branch" serves the committed root build, and the Actions workflow (`.github/workflows/deploy-pages.yml`) publishes `dist/` on every push. Always run `npm run build` before committing so the root build matches the source.
 
 ## Structure
 
