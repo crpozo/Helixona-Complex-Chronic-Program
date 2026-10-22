@@ -65,7 +65,7 @@ export default function CreatePatient() {
                 </div>
               </Field>
               <Field label="Assigned package" hint="Set by the program configuration; shown for transparency.">
-                <div className="flex flex-wrap gap-1.5 pt-1"><Pill tone="teal" dot={false}>Questionnaire v3</Pill><Pill tone="teal" dot={false}>Document uploads</Pill><Pill tone="teal" dot={false}>5 forms</Pill></div>
+                <div className="flex flex-wrap gap-1.5 pt-1"><Pill tone="teal" dot={false}>New Patient Packet v1</Pill><Pill tone="teal" dot={false}>SF-36 · Metabolic · Mold</Pill><Pill tone="teal" dot={false}>Document uploads</Pill><Pill tone="teal" dot={false}>5 forms</Pill></div>
               </Field>
             </div>
           </Card>

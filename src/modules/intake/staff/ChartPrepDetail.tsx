@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { Bot, Check, ClipboardCopy, Download, FileText, Hand } from 'lucide-react'
 import { AuditList, Breadcrumb, Card, Notice, PageHeader, Pill, Row, Tabs, ToConfirm, Toast, VersionTag, toneFor } from '../../../components/ui'
 import { patientById } from '../../../mock/patients'
-import { sampleAnswers, sections } from '../../../mock/questionnaire'
+import { sampleAnswers, sections, questionnaireMeta } from '../../../mock/questionnaire'
 
 export default function ChartPrepDetail() {
   const { id = '' } = useParams()
@@ -12,7 +12,7 @@ export default function ChartPrepDetail() {
   const [toast, setToast] = useState<string | null>(null)
   const [status, setStatus] = useState(p?.chartPrep ?? 'Awaiting intake')
 
-  const note = useMemo(() => (p ? buildNote(p.id, p.ecwId, `${p.firstName} ${p.lastName}`, p.dob, p.firstName, p.intake?.version ?? 3, p.intake?.submittedAt ?? '—', p.uploads) : ''), [p])
+  const note = useMemo(() => (p ? buildNote(p.id, p.ecwId, `${p.firstName} ${p.lastName}`, p.dob, p.firstName, p.lastName, p.intake?.version ?? 3, p.intake?.submittedAt ?? '—', p.uploads) : ''), [p])
   if (!p) return <Notice tone="bad">Patient not found.</Notice>
 
   const copy = async () => {
@@ -32,7 +32,7 @@ export default function ChartPrepDetail() {
       <Toast message={toast} />
       <Breadcrumb items={[{ label: 'Chart prep', to: '/staff/chart-prep' }, { label: p.id }]} />
       <PageHeader eyebrow={`${p.id} · eCW ${p.ecwId} · DOB ${p.dob}`} title={`${p.firstName} ${p.lastName}`}
-        meta={<><Pill tone={toneFor(status)}>{status}</Pill><VersionTag>Questionnaire v{p.intake?.version ?? 3} · published by Dr. D. on Sep 15, 2026</VersionTag><span>Submitted {p.intake?.submittedAt ?? '—'}</span></>}
+        meta={<><Pill tone={toneFor(status)}>{status}</Pill><VersionTag>Questionnaire v{p.intake?.version ?? 1} · as supplied by the Medical Director · pending publish</VersionTag><span>Submitted {p.intake?.submittedAt ?? '—'}</span></>}
         actions={<><button onClick={copy} className="btn-primary"><ClipboardCopy size={16} /> Copy note to clipboard</button><button onClick={() => { setToast(`Downloading Helixona_Intake_${p.id.slice(2)}_v${p.intake?.version ?? 3}.pdf`); setTimeout(() => setToast(null), 2000) }} className="btn-secondary"><Download size={16} /> Download PDF</button></>} />
 
       <div className="grid gap-5 lg:grid-cols-5">
@@ -93,12 +93,13 @@ export default function ChartPrepDetail() {
   )
 }
 
-function buildNote(pid: string, ecw: string, name: string, dob: string, firstName: string, version: number, submitted: string, uploads: { label: string; files: { name: string; uploadedAt: string }[] }[]) {
-  const answers: Record<string, unknown> = { ...sampleAnswers, a1: firstName, a2: dob, a5: 'Family member — see chart' }
+function buildNote(pid: string, ecw: string, name: string, dob: string, firstName: string, lastName: string, version: number, submitted: string, uploads: { label: string; files: { name: string; uploadedAt: string }[] }[]) {
+  const answers: Record<string, unknown> = { ...sampleAnswers }
+  for (const s of sections) for (const q of s.questions) { if (q.text.startsWith('First Name')) answers[q.id] = firstName; if (q.text.startsWith('Last Name')) answers[q.id] = lastName; if (q.text.startsWith('Date of Birth')) answers[q.id] = dob; if (q.text === 'Email') answers[q.id] = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`; if (q.text.startsWith('Emergency Contact Name')) answers[q.id] = 'See chart' }
   const lines: string[] = []
-  lines.push(`HELIXONA COMPLEX CHRONIC PROGRAM — INTAKE QUESTIONNAIRE`)
+  lines.push(`HELIXONA COMPLEX CHRONIC PROGRAM — NEW PATIENT PACKET`)
   lines.push(`Patient: ${name}   DOB: ${dob}   eCW: ${ecw}   Internal ID: ${pid}`)
-  lines.push(`Questionnaire v${version} (published Sep 15, 2026 by Medical Director)   Submitted: ${submitted}`)
+  lines.push(`Questionnaire v${version} (${questionnaireMeta.source}, as supplied by the Medical Director)   Submitted: ${submitted}`)
   lines.push(`Marker: HLX:INT-${pid.slice(2)}:v${version}   [Do not edit this line]`)
   lines.push(``)
   let n = 1
@@ -106,12 +107,15 @@ function buildNote(pid: string, ecw: string, name: string, dob: string, firstNam
     lines.push(`== ${s.title.toUpperCase()} ==`)
     for (const q of s.questions) {
       const a = answers[q.id]
-      if (q.showIf && answers[q.showIf.questionId] !== q.showIf.equals) continue
-      if (q.type === 'medications' && Array.isArray(a)) {
-        lines.push(`${n++}. ${q.text}:`)
-        for (const m of a as { name: string; dose: string; frequency: string; reason: string }[]) lines.push(`   - ${m.name} ${m.dose} — ${m.frequency} (${m.reason})`)
+      if (q.type === 'table' && Array.isArray(a)) {
+        lines.push(`${n++}. ${q.columns![0]}s:`)
+        for (const r of a as Record<string, string>[]) lines.push(`   - ${q.columns!.map((c) => r[c]).filter(Boolean).join(' · ')}`)
+      } else if (q.type === 'treatments' && Array.isArray(a)) {
+        lines.push(`${n++}. ${q.text}`); for (const t of a as { treatment: string; score?: number }[]) lines.push(`   - ${t.treatment}${t.score ? ` — helped ${t.score}/10` : ''}`)
+      } else if (q.type === 'matrix') {
+        lines.push(`${n++}. ${q.text || s.title}`); for (const r of q.rows!) lines.push(`   - ${r}: ${(a as Record<string, string> | undefined)?.[r] ?? '(not answered)'}`)
       } else if (Array.isArray(a)) {
-        lines.push(`${n++}. ${q.text}`); for (const x of a) lines.push(`   - ${x}`)
+        lines.push(`${n++}. ${q.text}`); for (const x of a) if (x) lines.push(`   - ${x}`)
       } else {
         lines.push(`${n++}. ${q.text}`); lines.push(`   ${a === undefined ? '(not answered)' : String(a)}${q.type === 'scale' ? ` / ${q.max ?? 10}` : ''}`)
       }

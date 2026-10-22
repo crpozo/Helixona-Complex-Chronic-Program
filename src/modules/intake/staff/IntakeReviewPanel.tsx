@@ -40,7 +40,7 @@ export default function IntakeReviewPanel({ patient }: { patient: Patient }) {
         <Card title="Completeness checklist" subtitle={`Questionnaire v${patient.intake?.version ?? '—'} · ${patient.intake?.submittedAt ? `submitted ${patient.intake.submittedAt}` : 'not yet submitted'}`}
           actions={<Pill tone={blockers.length ? 'warn' : 'ok'}>{blockers.length ? `${blockers.length} open item${blockers.length > 1 ? 's' : ''}` : 'Complete'}</Pill>}>
           <div className="divide-y divide-sand-100">
-            <ChecklistRow ok={patient.intake?.progress === 100} label="Health questionnaire" detail={patient.intake ? `${sectionsDone} of ${sectionsTotal || 7} sections · ${patient.intake.progress}%` : 'Not started'} />
+            <ChecklistRow ok={patient.intake?.progress === 100} label="Health questionnaire" detail={patient.intake ? `${sectionsDone} of ${sectionsTotal || 4} forms complete · ${patient.intake.progress}% · New Patient Packet, SF-36, Metabolic, Mold` : 'Not started'} />
             {uploads.map((u) => (
               <ChecklistRow key={u.key} ok={u.status === 'uploaded'} optional={!u.required} label={u.label}
                 detail={u.status === 'uploaded' ? u.files.map((f) => `${f.name} (${f.size}, ${f.uploadedAt})`).join(' · ') : u.status === 'returned' ? `Returned to patient · ${u.note}` : u.required ? 'Missing' : 'Not provided (optional)'}

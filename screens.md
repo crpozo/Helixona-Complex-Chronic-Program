@@ -3,7 +3,7 @@
 Live mockup: **https://crpozo.github.io/Helixona-Complex-Chronic-Program/** (opens the app for the current role; the screen index is at `#/screens`)
 Routes use a `#` prefix (e.g. `…/#/patient/intake`) so every link works on GitHub Pages. Use the **role switcher** in the top bar to change who you are viewing as; the **All screens** index lists everything below.
 
-All data is fictional. Clinical questions are placeholders labeled *“Sample question — final content from Medical Director.”* Anything marked **To confirm** is an open item from CLAUDE.md §8, not a decision.
+All data is fictional. The intake questionnaire is the Medical Director's content as supplied (`docs/source/NP - Questionnaires 2.xlsx` → `src/mock/questionnaireContent.ts`): New Patient Packet, SF-36, Mold, Metabolic, Lyme, Brain, and the L2/L3 Health Optimization forms (new and follow-up). Post-treatment survey and crash-report questions are still placeholders. Anything marked **To confirm** is an open item from CLAUDE.md §8, not a decision.
 
 ## Priority 1 — Intake module (built)
 
@@ -12,7 +12,7 @@ All data is fictional. Clinical questions are placeholders labeled *“Sample qu
 | # | Route | Purpose | Open questions |
 |---|---|---|---|
 | 1 | `#/patient/invite` | “You’ve been invited by Helixona” landing. Verify by secure email link **or** texted 6-digit code (both shown), then a “what we’ll do together” checklist. | Final sign-in method (Carlos). Whether the patient should see the advisor's name. |
-| 2 | `#/patient/intake` | Section overview with progress, “Saved just now”, resume where you left off. Each section: one question group per screen, all question types (short/long text, single/multi choice, yes/no, date, number, 0–10 scale, repeating medication list), conditional questions, required-field validation. | Real questionnaire (Medical Director). Whether sections can be answered out of order. |
+| 2 | `#/patient/intake` | Assigned forms → sections → questions, with progress, “Saved just now”, resume. Supports every type in the spreadsheet: short/long text, single/multi choice, yes/no, date, number, 1–10 scale, numbered lists, treatment list with 1–10 helpfulness, medication/supplement tables, symptom matrices (Never/Often/Frequently/Always, SF-36 scales, Lyme 0–4) with automatic category totals, digital signature. | Which forms are assigned by default to Complex Chronic; clinical publish by Dr. D. |
 | 3 | `#/patient/uploads` | Required and optional document slots; take photo / choose file; inventory; **returned item** flow (advisor asks for a new copy). | Max file size and accepted types. Whether insurance card is already collected by the advisor. |
 | 4 | `#/patient/forms` | Assigned documents with version and signer; open → must scroll to end → agree → typed **or** drawn signature → timestamped. Patient gets a copy by email. | Final form list, versions, and who signs (Shibani). Which forms need staff countersign. |
 | 5 | `#/patient/submitted` | Confirmation + “what happens next” (advisor review → chart prep → Month 0 scheduling + fee). | Exact wording about Month 0 fee timing. |
