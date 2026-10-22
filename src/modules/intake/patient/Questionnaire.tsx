@@ -65,7 +65,7 @@ export default function Questionnaire() {
               <Pill tone={p === 100 ? 'ok' : p > 0 ? 'warn' : later ? 'neutral' : 'neutral'} dot={false}>{p === 100 ? 'Done' : p > 0 ? `${p}%` : later ? 'Later' : 'Start'}</Pill>
             </button></li>) })}
         </ul>
-        <p className="mt-3 text-[11px] text-sand-500">{pathway === 'chronic' ? 'Complex Chronic patients complete the New Patient Packet, SF-36, Metabolic and Mold forms. Lyme and Brain forms appear only when your physician assigns them.' : 'Health Optimization (L2/L3) patients complete the L2/L3 New Patient form before the first visit and the Follow-Up form before later visits.'}</p>
+        <p className="mt-3 text-[11px] text-sand-500">{pathway === 'chronic' ? 'Complex Chronic patients complete all six forms: New Patient Packet, SF-36, Metabolic, Mold, Lyme and Brain.' : 'Health Optimization (L2/L3) patients complete the L2/L3 New Patient form before the first visit and the Follow-Up form before later visits.'}</p>
         <button onClick={() => nav('/patient/uploads')} disabled={pctNow < 100} className="btn-primary btn-lg mt-6 w-full">{pctNow < 100 ? 'Finish your forms to continue' : 'Continue to documents'}</button>
         {pctNow < 100 && <button onClick={() => { const f = assigned.find((x, i) => !assignment[i].when && formProgress(x) < 100)!; setForm(f); setSIdx(Math.max(0, f.sections.findIndex((s) => secState(s) !== 'complete'))); setView('section') }} className="btn-secondary btn-lg mt-2 w-full">Resume where I left off</button>}
       </div>

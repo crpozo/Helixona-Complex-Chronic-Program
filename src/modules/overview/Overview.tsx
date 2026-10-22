@@ -10,7 +10,7 @@ export default function Overview() {
       <PageHeader eyebrow="Mockup index" title="Complex Chronic Program · MVP mockups"
         description="Clickable mockups for the operational app that sits next to eCW. Click any screen to open it, or use the role switcher in the top bar to browse as a patient or staff member. All data is sample data."
         meta={<><Pill tone="teal" dot={false}>Priority 1 · Intake module</Pill><Link to="/staff/inquiries" className="btn-primary px-3 py-1">Open the app</Link><Pill tone="teal" dot={false}>Priority 2 · Surveys, alerts, registry</Pill><Pill tone="teal" dot={false}>Priority 3 · Booking, payments, notifications</Pill></>} />
-      <div className="mb-6"><Notice tone="warn" title="For reviewers">The intake questionnaire uses the Medical Director's forms exactly as supplied (New Patient Packet, SF-36, Metabolic, Mold; Lyme, Brain and L2/L3 Health Optimization available for assignment). Survey and crash-report questions are still placeholders. Items marked “To confirm” are open questions, not decisions.</Notice></div>
+      <div className="mb-6"><Notice tone="warn" title="For reviewers">The intake questionnaire uses the Medical Director's forms exactly as supplied (Complex Chronic: New Patient Packet, SF-36, Metabolic, Mold, Lyme, Brain; Health Optimization: L2/L3 New Patient and Follow-Up). Survey and crash-report questions are still placeholders. Items marked “To confirm” are open questions, not decisions.</Notice></div>
       <div className="grid gap-5 lg:grid-cols-2">
         {groups.map((g) => (
           <Card key={g} title={g} padded={false}>

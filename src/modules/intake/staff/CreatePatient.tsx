@@ -65,7 +65,7 @@ export default function CreatePatient() {
                 </div>
               </Field>
               <Field label="Assigned package" hint={`Follows the pathway chosen on the website: ${inquiry?.pathway ?? "Complex Chronic"}.`}>
-                <div className="flex flex-wrap gap-1.5 pt-1">{inquiry?.pathway.startsWith('Health') ? <><Pill tone="info" dot={false}>L2/L3 New Patient v1</Pill><Pill tone="info" dot={false}>L2/L3 Follow-Up (later visits)</Pill></> : <><Pill tone="teal" dot={false}>New Patient Packet v1</Pill><Pill tone="teal" dot={false}>SF-36 · Metabolic · Mold</Pill></>}<Pill tone="teal" dot={false}>Document uploads</Pill><Pill tone="teal" dot={false}>5 forms</Pill></div>
+                <div className="flex flex-wrap gap-1.5 pt-1">{inquiry?.pathway.startsWith('Health') ? <><Pill tone="info" dot={false}>L2/L3 New Patient v1</Pill><Pill tone="info" dot={false}>L2/L3 Follow-Up (later visits)</Pill></> : <><Pill tone="teal" dot={false}>New Patient Packet v1</Pill><Pill tone="teal" dot={false}>SF-36 · Metabolic · Mold · Lyme · Brain</Pill></>}<Pill tone="teal" dot={false}>Document uploads</Pill><Pill tone="teal" dot={false}>5 forms</Pill></div>
               </Field>
             </div>
           </Card>

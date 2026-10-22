@@ -43,7 +43,7 @@ export const patients: Patient[] = [
       { actor: 'Patient', when: 'Sep 27, 2026 · 8:45 AM', action: 'Started questionnaire' },
       { actor: 'Patient', when: 'Sep 30, 2026 · 7:18 PM', action: 'Submitted intake' },
     ] },
-    intake: { version: 1, progress: 100, submittedAt: 'Sep 30, 2026 · 7:18 PM', sections: { 'New Patient Packet': 'complete', 'SF-36 · Quality of Life': 'complete', 'Metabolic Assessment': 'complete', 'Mold History': 'complete' } },
+    intake: { version: 1, progress: 100, submittedAt: 'Sep 30, 2026 · 7:18 PM', sections: { 'New Patient Packet': 'complete', 'SF-36 · Quality of Life': 'complete', 'Metabolic Assessment': 'complete', 'Mold History': 'complete', 'Lyme Disease': 'complete', 'Brain Region Localization': 'complete' } },
     uploads: uploads({ labs: { status: 'returned', note: 'Lab PDF is missing pages 3–4 (lipid panel). Please re-upload the full report.' } }),
     forms: standardForms(4),
     history: [
@@ -62,7 +62,7 @@ export const patients: Patient[] = [
       { actor: 'Patient', when: 'Sep 19, 2026 · 6:02 PM', action: 'Opened' },
       { actor: 'Patient', when: 'Sep 25, 2026 · 9:40 PM', action: 'Submitted intake' },
     ] },
-    intake: { version: 1, progress: 100, submittedAt: 'Sep 25, 2026 · 9:40 PM', sections: { 'New Patient Packet': 'complete', 'SF-36 · Quality of Life': 'complete', 'Metabolic Assessment': 'complete', 'Mold History': 'complete' } },
+    intake: { version: 1, progress: 100, submittedAt: 'Sep 25, 2026 · 9:40 PM', sections: { 'New Patient Packet': 'complete', 'SF-36 · Quality of Life': 'complete', 'Metabolic Assessment': 'complete', 'Mold History': 'complete', 'Lyme Disease': 'complete', 'Brain Region Localization': 'complete' } },
     uploads: uploads(),
     forms: standardForms(5),
     history: [
@@ -94,7 +94,7 @@ export const patients: Patient[] = [
       { actor: 'Patient', when: 'Oct 3, 2026 · 7:15 PM', action: 'Opened' },
       { actor: 'Patient', when: 'Oct 3, 2026 · 7:20 PM', action: 'Started questionnaire' },
     ] },
-    intake: { version: 1, progress: 38, sections: { 'New Patient Packet': 'partial', 'SF-36 · Quality of Life': 'not started', 'Metabolic Assessment': 'not started', 'Mold History': 'not started' } },
+    intake: { version: 1, progress: 38, sections: { 'New Patient Packet': 'partial', 'SF-36 · Quality of Life': 'not started', 'Metabolic Assessment': 'not started', 'Mold History': 'not started', 'Lyme Disease': 'not started', 'Brain Region Localization': 'not started' } },
     uploads: uploads({ 'ins-front': { status: 'missing', files: [] }, 'ins-back': { status: 'missing', files: [] }, 'photo-id': { status: 'missing', files: [] }, meds: { status: 'missing', files: [] }, labs: { status: 'missing', files: [] }, records: { status: 'optional', files: [] } }),
     forms: standardForms(0),
     history: [

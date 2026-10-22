@@ -14,9 +14,9 @@ export const questionnaireMeta = {
 
 export type Pathway = 'chronic' | 'optimization'
 export const pathwayLabel: Record<Pathway, string> = { chronic: 'Complex Chronic Program', optimization: 'Health Optimization (L2/L3)' }
-/** Forms assigned by pathway. Condition-specific forms (Lyme, Brain) are added by the physician. */
+/** Forms assigned by pathway. */
 export const assignedByPathway: Record<Pathway, { formId: string; when?: string }[]> = {
-  chronic: [{ formId: 'new-patient' }, { formId: 'sf36' }, { formId: 'metabolic' }, { formId: 'mold' }],
+  chronic: [{ formId: 'new-patient' }, { formId: 'sf36' }, { formId: 'metabolic' }, { formId: 'mold' }, { formId: 'lyme' }, { formId: 'brain' }],
   optimization: [{ formId: 'l2l3-new' }, { formId: 'l2l3-fu', when: 'After your first visit' }],
 }
 export const getPathway = (): Pathway => { try { return (localStorage.getItem('hlx-pathway') as Pathway) || 'chronic' } catch { return 'chronic' } }
