@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@source "../src";
+@source "../app";
 
 /* ---------------------------------------------------------------
    Helixona brand tokens. Everything visual derives from these.
