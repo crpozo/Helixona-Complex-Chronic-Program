@@ -26,7 +26,7 @@ export default function PatientHome() {
         <ul className="mt-2 grid grid-cols-2 gap-2">
           <Tile to="/patient/intake" icon={<ClipboardList size={20} />} label="Questionnaire" status="Submitted" tone="ok" />
           <Tile to="/patient/forms" icon={<FileCheck2 size={20} />} label="Signed forms" status="9 of 10" tone="warn" />
-          <Tile icon={<Calendar size={20} />} label="Assessment visit" status="Schedule with your new patient coordinator" tone="teal" />
+          <Tile icon={<Calendar size={20} />} label="Assessment visit" status="Schedule with Marie" tone="teal" />
           <Tile icon={<CreditCard size={20} />} label="Card on file" status="Add a card to book" tone="neutral" />
         </ul>
 

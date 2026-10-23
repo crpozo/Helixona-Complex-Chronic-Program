@@ -8,7 +8,8 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   root: 'app',
   publicDir: '../public',
-  base: process.env.VITE_BASE ?? '/Helixona-Complex-Chronic-Program/',
+  // Relative base: the same build works at github.io/<repo>/ and at a custom domain root.
+  base: process.env.VITE_BASE ?? './',
   plugins: [react(), tailwindcss()],
   build: { outDir: process.env.OUT_DIR ?? '../dist', emptyOutDir: process.env.OUT_DIR ? false : true },
 })

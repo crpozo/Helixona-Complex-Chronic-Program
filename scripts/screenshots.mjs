@@ -5,7 +5,7 @@ import { createServer } from 'node:http'
 import { readFileSync, statSync, existsSync, mkdirSync } from 'node:fs'
 import { join, extname } from 'node:path'
 
-const BASE = '/Helixona-Complex-Chronic-Program/'
+const BASE = '/'
 const DIST = new URL('../dist/', import.meta.url).pathname
 const OUT = new URL('../screenshots/', import.meta.url).pathname
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2' }
