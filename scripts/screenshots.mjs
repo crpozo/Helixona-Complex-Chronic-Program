@@ -20,6 +20,8 @@ const server = createServer((req, res) => {
 
 const routes = [
   ['00-screens-index', '/screens', 'desktop'],
+  ['00a-public-become-a-patient', '/public/become-a-patient', 'phone'],
+  ['00b-public-book-a-treatment', '/public/book', 'phone'],
   ['01-patient-invite', '/patient/invite', 'phone'],
   ['02a-patient-health-story-intro', '/patient/intake?demo=intro', 'phone'],
   ['02-patient-questionnaire', '/patient/intake', 'phone'],

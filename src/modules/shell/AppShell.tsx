@@ -12,7 +12,7 @@ export const useShell = () => useContext(Ctx)
 export function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation()
   const navigate = useNavigate()
-  const isPatient = location.pathname.startsWith('/patient')
+  const isPatient = location.pathname.startsWith('/patient') || location.pathname.startsWith('/public')
   const [role, setRoleState] = useState<Role>(() => {
     try { return (localStorage.getItem('hlx-role') as Role) || 'advisor' } catch { return 'advisor' }
   })

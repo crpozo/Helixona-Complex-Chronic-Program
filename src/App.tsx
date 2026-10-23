@@ -24,6 +24,8 @@ import IntakeReviewQueue from './modules/intake/staff/IntakeReviewQueue'
 import ChartPrepQueue from './modules/intake/staff/ChartPrepQueue'
 import ChartPrepDetail from './modules/intake/staff/ChartPrepDetail'
 import EcwExceptions from './modules/intake/staff/EcwExceptions'
+import BecomePatient from './modules/public/BecomePatient'
+import BookTreatment from './modules/public/BookTreatment'
 import Survey from './modules/surveys/patient/Survey'
 import CrashReport from './modules/surveys/patient/CrashReport'
 import AlertQueue from './modules/surveys/staff/AlertQueue'
@@ -49,6 +51,9 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/screens" element={<Overview />} />
           {/* Patient (phone-first) */}
+          {/* Public · helixona.com entry points (no sign-in) */}
+          <Route path="/public/become-a-patient" element={<BecomePatient />} />
+          <Route path="/public/book" element={<BookTreatment />} />
           <Route path="/patient" element={<Navigate to="/patient/invite" replace />} />
           <Route path="/patient/invite" element={<InvitationLanding />} />
           <Route path="/patient/intake" element={<Questionnaire />} />

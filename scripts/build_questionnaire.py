@@ -79,6 +79,8 @@ NP.append(sec('np-social','Social and Family History',[
 ]))
 NP.append(sec('np-lifestyle','Lifestyle & Digestive Health',[
   q('Gluten-Free (%)','number',min=0,max=100), q('Dairy-Free (%)','number',min=0,max=100), q('Sugar-Free (%)','number',min=0,max=100),
+  # Added by Dr. D. in the Oct 20, 2026 review (not in the spreadsheet): more diet styles patients follow.
+  q('Low FODMAP (%)','number',min=0,max=100), q('Low histamine (%)','number',min=0,max=100), q('Mediterranean / anti-inflammatory (%)','number',min=0,max=100), q('Kidney-friendly (CKD) (%)','number',min=0,max=100), q('Acid reflux / GERD-friendly (%)','number',min=0,max=100), q('Low carb (%)','number',min=0,max=100),
   q('On average, how many alcoholic drinks do you consume per week?','number'),
   q('On average, how many caffeinated drinks do you consume per week?','number'),
   q('Do you smoke now or have you smoked in the past? If so, substance, frequency and duration of use, and quit date if applicable:','long'),

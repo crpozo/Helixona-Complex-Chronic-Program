@@ -5,6 +5,13 @@ Routes use a `#` prefix (e.g. `…/#/patient/intake`) so every link works on Git
 
 All data is fictional. The intake questionnaire is the Medical Director's content as supplied (`docs/source/NP - Questionnaires 2.xlsx` → `src/mock/questionnaireContent.ts`): New Patient Packet, SF-36, Mold, Metabolic, Lyme, Brain, and the L2/L3 Health Optimization forms (new and follow-up). Post-treatment survey and crash-report questions are still placeholders. Anything marked **To confirm** is an open item from CLAUDE.md §8, not a decision.
 
+## Public — helixona.com entry points (built Oct 23, from the Oct 20 review)
+
+| # | Route | Purpose | Open questions |
+|---|---|---|---|
+| P1 | `#/public/become-a-patient` | Replaces Typeform. Two doors: **Complex Chronic** (“Is your health struggling…”) asks name, phone, email, main concerns, PPO insurance, able to come to Irvine regularly → “We'll call you within one business day” (screening call before the long questionnaire). **Health Optimization** (“Feeling good and looking for ways to be even better?”) asks what they're looking for and sends the secure questionnaire link immediately, no human in the loop. | Exact qualifying questions and whether to mention the deposit on the form (Cassandra / Mira). |
+| P2 | `#/public/book` | Treatment-only booking, no enrollment: therapy list with price and duration → time → returning (phone on file) or new patient, DOB, address, card via Stripe → informed consent for that therapy (annual) → confirmation with cancellation / no-show policy. Salt room allows up to 4 people with a note. **EBOO** and **Erchonia laser** require physician clearance and route to “Become a patient”. Booking is mirrored to eCW and verified. | Prices, durations and no-show fee amount; which therapies can be booked without clearance; Stripe account (Karina). |
+
 ## Priority 1 — Intake module (built)
 
 ### Patient (phone frame on desktop, full-screen on phones)
