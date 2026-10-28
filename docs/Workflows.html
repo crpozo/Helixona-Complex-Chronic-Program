@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Flows We Need From Kai</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+  @page { size: Letter; margin: 0.6in 0.65in 0.7in 0.65in; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Jost", system-ui, sans-serif; font-size: 10.6pt; line-height: 1.42; color: #232120; }
+  h1, h2, h3 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500; margin: 0; letter-spacing: 0.005em; }
+  .hero { background: #050505; color: #fff; margin: 0 0 6px; padding: 0.42in 0.45in 0.4in; border-radius: 6px; }
+  .hero .brand { font-size: 8.5pt; letter-spacing: 0.3em; text-transform: uppercase; color: #e9e2d2; margin-bottom: 22px; }
+  .hero .brand b { color: #d4b77a; font-weight: 500; }
+  .hero h1 { font-size: 30pt; line-height: 1.08; margin-bottom: 14px; }
+  .hero p { margin: 0; font-size: 11pt; color: #c9c4bb; max-width: 6.4in; }
+  .eyebrow { font-size: 7.5pt; letter-spacing: 0.26em; text-transform: uppercase; color: #a08a5a; margin: 0 0 4px; }
+  h2 { font-size: 20pt; margin-bottom: 10px; }
+  section { margin-top: 30px; } section.pagebreak { margin-top: 0; } section.fixed, footer { break-inside: avoid; }
+  p { margin: 0 0 9px; }
+  ul { margin: 0 0 8px; padding-left: 16px; }
+  li { margin: 0 0 5px; }
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0 14px; }
+  .tile { border: 1px solid #e9e6e1; border-radius: 6px; padding: 11px 12px; background: #fbfaf8; }
+  .tile b { display: block; font-weight: 600; margin-bottom: 4px; }
+  .tile span { font-size: 9.5pt; color: #58524b; line-height: 1.4; }
+  table.items { width: 100%; border-collapse: collapse; margin: 6px 0 4px; }
+  table.items th { text-align: left; font-size: 7.5pt; letter-spacing: 0.22em; text-transform: uppercase; color: #7a736a; font-weight: 500; padding: 6px 8px 6px 0; border-bottom: 1px solid #d6d1c9; }
+  table.items td { padding: 7px 8px 7px 0; border-bottom: 1px solid #e9e6e1; vertical-align: top; }
+  table.items td:first-child { font-weight: 600; width: 1.75in; }
+  .flow { display: grid; grid-template-columns: 0.55in 1fr; gap: 0 10px; padding: 16px 0 14px; border-bottom: 1px solid #d6d1c9; break-inside: avoid; }
+  .flow:last-of-type { border-bottom: 0; }
+  .flow .id { font-family: "Cormorant Garamond", Georgia, serif; font-size: 20pt; color: #a08a5a; line-height: 1; padding-top: 2px; }
+  .flow h3 { font-size: 15.5pt; margin-bottom: 2px; }
+  .flow .sit { font-size: 9pt; color: #7a736a; margin-bottom: 6px; }
+  .flow .sit b { color: #232120; font-weight: 600; }
+  .flow .need { font-size: 7.5pt; letter-spacing: 0.22em; text-transform: uppercase; color: #a08a5a; margin: 6px 0 4px; }
+  .flow ul { margin-bottom: 0; }
+  .flow.new { background: #faf6ec; border: 1px solid #e6d7b8; border-radius: 6px; padding: 14px 14px 12px; margin-top: 10px; }
+  .flow.new .why { font-size: 9.5pt; color: #58524b; margin-bottom: 4px; }
+  .pagebreak { break-before: page; }
+  footer { margin-top: 28px; padding-top: 10px; border-top: 1px solid #e9e6e1; font-size: 8.5pt; color: #7a736a; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="brand">HELI<b>X</b>ONA</div>
+  <h1>What we are building, and<br/>the flows we need from you</h1>
+  <p>A brief for Kai: the Complex Chronic Program platform in one page, and the thirteen workflows to capture in detail with the people who run them today. October 2026.</p>
+</div>
+
+<section>
+  <p class="eyebrow">In short</p>
+  <h2>What we are building</h2>
+  <p>Helixona is an integrative medicine clinic in Irvine, California. Its flagship offer is the <b>Complex Chronic Program</b>: nine months of physician-led care for people with persistent fatigue, autoimmune conditions, Lyme, mold illness, long COVID and similar complex problems. A patient pays a separate assessment fee (Month 0), then $2,000 a month for nine months, and may continue afterwards if the physician and patient agree.</p>
+  <p>The clinic’s medical record, <b>eClinicalWorks (eCW)</b>, stays the legal chart and the calendar for insurance visits. Everything else the program needs is being built as a <b>patient platform</b>, used by patients on their phone and by staff on desktop:</p>
+  <div class="tiles">
+    <div class="tile"><b>Intake</b><span>Website inquiry, screening, the physician’s questionnaire, document uploads, ten consents with e-signature, chart prep into eCW.</span></div>
+    <div class="tile"><b>Daily care</b><span>Daily health check-in, crash or flare reports, alerts to the nurses with response targets, patient history over time.</span></div>
+    <div class="tile"><b>Bookings</b><span>Program sessions on rooms and devices by Plan of Care rules; single therapies anyone can book and pay from the website; a copy of each booking in eCW.</span></div>
+    <div class="tile"><b>Membership and money</b><span>Agreement, card or bank on file, monthly charge, failed-payment handling, Month 9 review, receipts. Stripe for payments.</span></div>
+    <div class="tile"><b>Communications</b><span>Every email and text a patient receives, from invitation to receipts, with approved wording.</span></div>
+    <div class="tile"><b>eCW bot</b><span>A bot that places the intake note and PDF in the chart, mirrors bookings into the calendar and reads it back every morning, checking its own work.</span></div>
+  </div>
+  <p>The clickable mockups of every screen already exist. What we are missing is the <b>detail of how each flow works today and how it should work in the platform</b>: who does what, in what order, with which rule, and what the patient sees. That is what we need from you.</p>
+</section>
+
+<section class="pagebreak">
+  <p class="eyebrow">The ask</p>
+  <h2>What we need from you</h2>
+  <ul>
+    <li><b>A brief description</b> of the program as the clinic describes it, in its own words: who it is for, what the patient gets each month, what makes it different. One page, approved by Cassandra. It goes on the website and in the patient agreement.</li>
+    <li><b>Thirteen flows, in detail</b>, one document each, captured with the person who runs it today (listed below). Use the mockups as the pictures; we need the words behind them. <b>Start with F0</b>: the full eCW schedule is what every booking flow depends on.</li>
+    <li><b>The open questions</b> each owner could not answer, so we can close them in one follow-up.</li>
+  </ul>
+  <p>For every flow, capture the same seven things:</p>
+  <table class="items">
+    <tr><th>Item</th><th>What to write down</th></tr>
+    <tr><td>Trigger</td><td>What starts the flow and who notices.</td></tr>
+    <tr><td>Steps</td><td>Each step in order, with the person who does it and the tool they use today.</td></tr>
+    <tr><td>Decisions</td><td>Every yes/no along the way and the rule behind it.</td></tr>
+    <tr><td>What the patient sees</td><td>Screens, emails and texts at each step.</td></tr>
+    <tr><td>Record</td><td>What must be written down: who, when, why.</td></tr>
+    <tr><td>Exceptions</td><td>What goes wrong today and how it is handled.</td></tr>
+    <tr><td>Open questions</td><td>Anything the owner could not answer in the meeting.</td></tr>
+  </table>
+</section>
+
+<section class="pagebreak">
+  <p class="eyebrow">The flows</p>
+  <h2>Thirteen flows and who to sit with</h2>
+
+  <div class="flow new">
+    <div class="id">F0</div>
+    <div>
+      <h3>The full eCW schedule: every provider, room and therapy</h3>
+      <div class="sit"><b>Sit with:</b> Mira (front desk) · Charlene · the eCW administrator</div>
+      <p class="why">Why first: the platform will book program sessions and single therapies on its own calendar, and eCW will keep taking bookings for insurance visits and for whatever the front desk still books by hand. To never offer a slot that eCW has already given away, the platform must read the <b>complete</b> eCW schedule, all staff and all therapies, before each booking and every morning. Every booking flow (F7, F8) and the bot’s mirror (F12) depends on this.</p>
+      <div class="need">We need</div>
+      <ul>
+        <li>Every calendar that exists in eCW today: each physician, NP, nurse, therapist, room, device and therapy. Which of them are set up as providers, which as resources, and which are not in eCW at all (booked on paper, a whiteboard or a spreadsheet)</li>
+        <li>Screen share: how the front desk views the whole day and the whole week for all staff at once, and whether that view can be printed or exported (reports, Excel, PDF) with every column</li>
+        <li>What each appointment carries: start and end time, provider or resource, visit type, reason, status (scheduled, confirmed, arrived, checked out, cancelled, no-show), who booked it and when it last changed</li>
+        <li>Everything that occupies time without being an appointment: blocked time, lunch, holidays, provider availability templates, double-booking and overbooking rules, waiting lists</li>
+        <li>How often the schedule changes during the day, who changes it (front desk, providers, call center, patients through healow) and how the team finds out today</li>
+        <li>The collision rule we should apply: how far ahead to read (for example 60 days), how often (every morning plus a fresh read right before each booking), what counts as a conflict for a room, a device or a person, and who resolves one when it happens</li>
+        <li>Whether eCW offers any export or interface for the schedule (scheduled reports, HL7 SIU messages, FHIR R4, healow Open Access) and what it costs, since that would replace screen reading by the bot</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="flow">
+    <div class="id">F1</div>
+    <div>
+      <h3>Website inquiry and qualification</h3>
+      <div class="sit"><b>Sit with:</b> Cassandra · Marie (new patient coordinator)</div>
+      <p>How a person goes from the website to a screening call (Complex Chronic) or to an automatic link (Health Optimization).</p>
+      <div class="need">We need</div>
+      <ul>
+        <li>The two doors on the website and the exact questions on each form</li>
+        <li>The three qualifying questions and what disqualifies</li>
+        <li>Who receives the inquiry, how fast they call, what the call covers</li>
+        <li>What happens to people who are not a fit (message, referral)</li>
+        <li>Statuses the team uses from inquiry to invitation</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="flow">
+    <div class="id">F2</div>
+    <div>
+      <h3>Screening call and admissions</h3>
+      <div class="sit"><b>Sit with:</b> Ana (patient advisor)</div>
+      <p>The interview, the insurance check and the admissions outcome before a patient is invited to intake.</p>
+      <div class="need">We need</div>
+      <ul>
+        <li>Interview questions and the notes kept (internal, never in the chart)</li>
+        <li>Insurance verification steps and who does them</li>
+        <li>Outcomes: accepted for Month 0 / denied / fell off, with reason codes</li>
+        <li>When the invitation to the questionnaire is sent and by whom</li>
+        <li>What the patient receives (email, text) at each step</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="flow">
+    <div class="id">F3</div>
+    <div>
+      <h3>Patient intake</h3>
+      <div class="sit"><b>Sit with:</b> Karina</div>
+      <p>Everything the patient completes before Month 0 and how staff track it.</p>
+      <div class="need">We need</div>
+      <ul>
+        <li>Questionnaire forms assigned by pathway (Complex Chronic: six forms; Health Optimization: L2/L3)</li>
+        <li>Documents requested: insurance card, ID, medication list, labs, imaging, records, referrals</li>
+        <li>The ten consents: order, who countersigns, which at intake vs first visit, annual renewal</li>
+        <li>How incomplete intakes are chased (reminders, returning an item to the patient)</li>
+        <li>When an intake counts as complete and who marks it “ready for chart prep”</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="flow">
+    <div class="id">F4</div>
+    <div>
+      <h3>Chart prepping</h3>
+      <div class="sit"><b>Sit with:</b> Charlene</div>
+      <p>How the intake becomes a note and a PDF in eClinicalWorks, today by hand and later by the bot.</p>
+      <div class="need">We need</div>
+      <ul>
+        <li>Screen share: where the note is pasted in eCW, note type and section</li>
+        <li>Document category and naming for the PDF</li>
+        <li>What a clean, structured note looks like for the physician</li>
+        <li>Her review checklist before and after placing it</li>
+        <li>How she handles corrections and a second version of an intake</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="flow">
+    <div class="id">F5</div>
+    <div>
+      <h3>Month 0: assessment visit and fee</h3>
+      <div class="sit"><b>Sit with:</b> Marie · Karina</div>
+      <p>From “documents approved” to the assessment visit with the physician.</p>
+      <div class="need">We need</div>
+      <ul>
+        <li>Notification to the patient and how they schedule (self-service or by phone)</li>
+        <li>Month 0 fee: amount, when it is charged (at booking or day-of), refund rules</li>
+        <li>Card on file: when it is collected and who sees it</li>
+        <li>What happens at the visit and what the physician produces (Plan of Care)</li>
+        <li>How the patient is told “program offered” or not</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="flow">
+    <div class="id">F6</div>
+    <div>
+      <h3>Daily check-in, flare reports and alerts</h3>
+      <div class="sit"><b>Sit with:</b> Dr. D · nursing lead</div>
+      <p>What patients report every day, how it turns into alerts, and how nurses respond.</p>
+      <div class="need">We need</div>
+      <ul>
+        <li>Final wording of the daily check-in and the crash/flare report</li>
+        <li>Alert levels, who receives each, response targets, escalation when nobody answers</li>
+        <li>After-hours behavior and the “not continuously monitored” wording</li>
+        <li>How a nurse documents a follow-up and closes an alert</li>
+        <li>SF-36 every six months: when it is sent and who reviews it</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="flow">
+    <div class="id">F7</div>
+    <div>
+      <h3>Plan of Care, modalities and session booking</h3>
+      <div class="sit"><b>Sit with:</b> Dr. D · nursing · Mira (front desk)</div>
+      <p>Which therapies a patient may book and how a booking is made and confirmed, on top of the schedule read in F0.</p>
+      <div class="need">We need</div>
+      <ul>
+        <li>List of modalities with the room or device behind each</li>
+        <li>Spacing and frequency rules in plain language</li>
+        <li>Which require physician clearance (EBOO, Erchonia laser)</li>
+        <li>Preparation instructions and follow-up check-in timing per modality</li>
+        <li>How the front desk books insurance visits in eCW today, step by step</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="flow">
+    <div class="id">F8</div>
+    <div>
+      <h3>Treatment-only booking (website)</h3>
+      <div class="sit"><b>Sit with:</b> Cassandra · Karina · Mira</div>
+      <p>Anyone booking a single therapy without joining the program.</p>
+      <div class="need">We need</div>
+      <ul>
+        <li>Therapies offered, prices, durations, group sizes (salt room)</li>
+        <li>Payment at booking, cancellation and no-show policy</li>
+        <li>Which consent is signed per therapy and how often</li>
+        <li>Returning vs new visitor: what is asked</li>
+        <li>Confirmation and reminder messages</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="flow">
+    <div class="id">F9</div>
+    <div>
+      <h3>Membership agreement and payments</h3>
+      <div class="sit"><b>Sit with:</b> Karina · attorney</div>
+      <p>The contract, the recurring charge and what happens when a payment fails.</p>
+      <div class="need">We need</div>
+      <ul>
+        <li>Agreement content and when it becomes available (only after “Program offered”)</li>
+        <li>Billing: $2,000 × 9 on the anniversary date, Month 0 separate</li>
+        <li>Failed payment: notices, retry days, grace period, holds (never automatic), refunds</li>
+        <li>Receipts and signed copies the patient receives</li>
+        <li>Moving from RepeatMD to Stripe: what changes for staff</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="flow">
+    <div class="id">F10</div>
+    <div>
+      <h3>Membership lifecycle and Month 9 review</h3>
+      <div class="sit"><b>Sit with:</b> Dr. D · Karina · Cassandra</div>
+      <p>Statuses from Month 0 to the Month 9 decision.</p>
+      <div class="need">We need</div>
+      <ul>
+        <li>Status list and the reason behind each change (pause, withdraw, discharge)</li>
+        <li>Who can change a status and what it triggers (billing, bookings, messages)</li>
+        <li>The Month 9 review: who attends, what is decided, how it is recorded</li>
+        <li>Continuing month to month vs maintenance vs graduating</li>
+        <li>Total active months and pauses: how they are counted</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="flow">
+    <div class="id">F11</div>
+    <div>
+      <h3>Patient communications</h3>
+      <div class="sit"><b>Sit with:</b> Marie · Cassandra</div>
+      <p>Every email and text a patient receives during the program.</p>
+      <div class="need">We need</div>
+      <ul>
+        <li>The full list of events that trigger a message (invitation, reminders, confirmations, receipts, payment notices)</li>
+        <li>Channel and timing for each</li>
+        <li>Wording approved by Cassandra</li>
+        <li>Stop rules (patient opted out, program ended)</li>
+        <li>What must never appear in a text or email preview</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="flow">
+    <div class="id">F12</div>
+    <div>
+      <h3>eClinicalWorks today: manual steps the bot will copy</h3>
+      <div class="sit"><b>Sit with:</b> Charlene · Mira</div>
+      <p>The exact clicks staff make in eCW so the bot can do the same and verify it.</p>
+      <div class="need">We need</div>
+      <ul>
+        <li>Opening a chart and confirming identity</li>
+        <li>Placing a note and uploading a document (F4)</li>
+        <li>Creating, moving and cancelling an appointment for a room or device</li>
+        <li>Reading the day’s schedule for every provider and resource (F0), and spotting a change since the last read</li>
+        <li>Which eCW client is used (web or desktop) and any maintenance windows</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="fixed">
+  <p class="eyebrow">Fixed points</p>
+  <h2>Decisions already made</h2>
+  <ul>
+    <li>Pilot with 3 to 5 patients first.</li>
+    <li>Clinical content (questionnaire, check-ins, alert rules) is Dr. D’s and is implemented exactly as she supplies it.</li>
+    <li>Patients never self-enroll in the program; Complex Chronic always goes through a screening call.</li>
+    <li>The platform owns rooms, devices and program bookings; eCW receives a copy. Insurance visits stay in eCW.</li>
+    <li>The platform never offers a slot without first reading the full eCW schedule; a conflict goes to a person, never to the patient.</li>
+    <li>Stripe for all payments. Month 0 is a separate charge from the $2,000 × 9 membership.</li>
+    <li>A failed payment never discharges a patient or changes care by itself.</li>
+    <li>The platform is reviewed during office hours and never presents itself as monitoring; every check-in says so.</li>
+  </ul>
+</section>
+
+<footer>Helixona · Complex Chronic Program · brief and flow request for Kai · October 2026. Companions: the clickable mockups, the program build plan (meetings), and the eCW bot flows.</footer>
+
+</body>
+</html>
