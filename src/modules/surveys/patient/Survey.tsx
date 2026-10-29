@@ -38,7 +38,6 @@ export default function Survey() {
   const nav = useNavigate()
   const [a, setA] = useState<Record<string, number | undefined>>({})
   const [t, setT] = useState<Record<string, string>>({})
-  const [note, setNote] = useState('')
   const [contact, setContact] = useState<string>()
   const [step, setStep] = useState<'snapshot' | 'treatments' | 'done'>('snapshot')
   const set = (k: string, v: number) => setA((x) => ({ ...x, [k]: v }))
@@ -74,7 +73,6 @@ export default function Survey() {
                 <div className="mt-2 space-y-2">{treatmentOptions.map((o) => <Choice key={o} label={o} selected={t[r.name] === o} onClick={() => setT({ ...t, [r.name]: o })} />)}</div>
               </div>
             ))}
-            <Field label={<span className="text-[16px] font-semibold">Anything else you'd like your care team to know?</span>}><textarea rows={3} className="input text-[16px]" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Optional" /></Field>
             <Field label={<span className="text-[16px] font-semibold">Would you like someone from the care team to contact you?</span>} required><div className="grid grid-cols-2 gap-2">{['Yes', 'No'].map((o) => <Choice key={o} size="lg" label={o} selected={contact === o} onClick={() => setContact(o)} />)}</div></Field>
           </div>
           <button disabled={!contact} onClick={() => setStep('done')} className="btn-primary btn-lg mt-8 w-full">Save my check-in</button>
