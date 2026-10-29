@@ -15,7 +15,7 @@ export default function InvitationLanding() {
         <div className="bg-teal-800 px-6 pt-14 pb-10 text-white">
           <Wordmark light size="md" />
           <h1 className="mt-6 font-display text-[30px] leading-[1.1] font-semibold">You've been invited by Helixona</h1>
-          <p className="mt-3 text-teal-100 text-[15px]">Ana, your patient advisor, has set up your private intake for the Complex Chronic Program. It takes about 25 minutes and you can stop and come back anytime.</p>
+          <p className="mt-3 text-teal-100 text-[15px]">Ana, your patient advisor, has set up your private intake for the Complex Chronic Program. Allow 45–90 minutes; you can stop and come back anytime.</p>
         </div>
 
         <div className="-mt-5 flex-1 rounded-t-3xl bg-sand-50 px-5 pt-6 pb-8">
@@ -25,7 +25,7 @@ export default function InvitationLanding() {
                 <div className="eyebrow">Invitation for</div>
                 <div className="mt-0.5 text-lg font-semibold text-sand-900">Marisol A.</div>
                 <div className="text-sm text-sand-500">Sent Sep 26 · expires Oct 10, 2026</div>
-                <div className="mt-3 flex gap-2"><Pill tone="teal">Intake questionnaire</Pill><Pill tone="teal">5 documents to sign</Pill></div>
+                <div className="mt-3 flex gap-2"><Pill tone="teal">Intake questionnaire</Pill><Pill tone="teal">10 documents to sign</Pill></div>
               </div>
               <p className="mt-6 text-sm text-sand-600 font-medium">First, let's confirm it's you. Choose one:</p>
               <button onClick={() => setStep('verify-link')} className="mt-3 card flex w-full items-center gap-4 p-4 text-left hover:border-teal-300">
@@ -75,14 +75,14 @@ export default function InvitationLanding() {
               <h2 className="mt-4 text-xl font-semibold text-sand-900">Welcome, Marisol</h2>
               <p className="mt-2 text-sand-600">You're verified. Here's what we'll do together:</p>
               <ol className="mt-5 space-y-3 text-left">
-                {[['Health questionnaire', 'About 25 minutes · save and return anytime'], ['Upload documents', 'Insurance card, ID, medication list, recent labs'], ['Review and sign 5 forms', 'Takes about 5 minutes']].map(([t, d], i) => (
+                {[['Health questionnaire', 'Allow 45–90 minutes · save and return anytime'], ['Upload documents', 'Insurance card, ID, medication list, recent labs'], ['Review and sign 10 consents', 'Takes about 15 minutes']].map(([t, d], i) => (
                   <li key={t} className="card flex items-center gap-3 p-3.5">
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal-600 text-sm font-bold text-white">{i + 1}</span>
                     <span><span className="block font-semibold text-sand-900">{t}</span><span className="block text-sm text-sand-500">{d}</span></span>
                   </li>
                 ))}
               </ol>
-              <button onClick={() => nav('/patient/intake')} className="btn-primary btn-lg mt-8 w-full">Start the questionnaire</button>
+              <button onClick={() => { try { sessionStorage.removeItem('hlx-story-intro') } catch { /* ignore */ } nav('/patient/intake') }} className="btn-primary btn-lg mt-8 w-full">Start the questionnaire</button>
             </div>
           )}
         </div>

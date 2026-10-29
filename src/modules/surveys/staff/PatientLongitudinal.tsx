@@ -30,6 +30,10 @@ export default function PatientLongitudinal() {
             {pAlerts.length === 0 && <p className="help">No alerts.</p>}
             <div className="space-y-3">{pAlerts.map((a) => <div key={a.id} className="border-b border-sand-100 pb-3 last:border-0"><div className="flex items-center justify-between gap-2"><Pill tone={levelTone[a.level]}>{a.level}</Pill><span className="text-xs text-sand-500">{a.createdAt}</span></div><div className="mt-1 text-sm text-sand-800">{a.summary}</div><div className="text-xs text-sand-500">{a.id} · {a.status} · {a.assignee}</div></div>)}</div>
           </Card>
+          <Card title="SF-36 every 6 months" subtitle="Repeated at baseline, Month 6 and Month 12 so progress is visible to patient and physician.">
+            <div className="space-y-2">{[['Physical functioning', 35, 55], ['Energy / fatigue', 20, 40], ['Emotional well-being', 48, 64], ['Pain', 30, 50], ['General health', 25, 45]].map(([l, b, n]) => <div key={l as string}><div className="flex justify-between text-xs"><span className="text-sand-700">{l}</span><span className="text-sand-500">{b} → <strong className="text-sand-900">{n}</strong></span></div><div className="mt-1 h-2 rounded-full bg-sand-100"><div className="h-2 rounded-full bg-teal-300" style={{ width: `${n as number}%` }}><div className="h-2 rounded-full bg-teal-700" style={{ width: `${((b as number) / (n as number)) * 100}%` }} /></div></div></div>)}</div>
+            <p className="help mt-3">Dark = baseline (Sep 8) · light = Month 6 (projected). Next SF-36 due Mar 8, 2027.</p>
+          </Card>
           <Card title="Care context">
             <Row label="Stage">Month 0 in progress</Row>
             <Row label="Recent sessions">Nano bath Oct 5 · Laser Sep 22</Row>

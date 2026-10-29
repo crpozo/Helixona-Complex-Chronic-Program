@@ -64,8 +64,8 @@ export default function CreatePatient() {
                   <label className={`flex flex-1 items-center gap-2 rounded-xl border px-3 py-2.5 text-sm ${form.channels.sms ? 'border-teal-500 bg-teal-50' : 'border-sand-300'}`}><input type="checkbox" className="accent-teal-600" checked={form.channels.sms} onChange={(e) => set('channels', { ...form.channels, sms: e.target.checked })} /><MessageSquareText size={15} /> Text</label>
                 </div>
               </Field>
-              <Field label="Assigned package" hint="Set by the program configuration; shown for transparency.">
-                <div className="flex flex-wrap gap-1.5 pt-1"><Pill tone="teal" dot={false}>Questionnaire v3</Pill><Pill tone="teal" dot={false}>Document uploads</Pill><Pill tone="teal" dot={false}>5 forms</Pill></div>
+              <Field label="Assigned package" hint={`Follows the pathway chosen on the website: ${inquiry?.pathway ?? "Complex Chronic"}.`}>
+                <div className="flex flex-wrap gap-1.5 pt-1">{inquiry?.pathway.startsWith('Health') ? <><Pill tone="info" dot={false}>L2/L3 New Patient v1</Pill><Pill tone="info" dot={false}>L2/L3 Follow-Up (later visits)</Pill></> : <><Pill tone="teal" dot={false}>New Patient Packet v1</Pill><Pill tone="teal" dot={false}>SF-36 · Metabolic · Mold · Lyme · Brain</Pill></>}<Pill tone="teal" dot={false}>Document uploads</Pill><Pill tone="teal" dot={false}>10 consents</Pill></div>
               </Field>
             </div>
           </Card>

@@ -12,7 +12,7 @@ export const useShell = () => useContext(Ctx)
 export function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation()
   const navigate = useNavigate()
-  const isPatient = location.pathname.startsWith('/patient')
+  const isPatient = location.pathname.startsWith('/patient') || location.pathname.startsWith('/public')
   const [role, setRoleState] = useState<Role>(() => {
     try { return (localStorage.getItem('hlx-role') as Role) || 'advisor' } catch { return 'advisor' }
   })
@@ -57,7 +57,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <footer className="border-t border-sand-200 bg-white/60 px-4 py-3 text-xs text-sand-500">
           <div className="mx-auto max-w-[1400px] flex flex-wrap justify-between gap-2">
             <span>Helixona · Complex Chronic Program · MVP mockups. No real patient data. Viewing as <strong className="text-sand-700">{def.label} ({def.person})</strong>.</span>
-            <span>Questionnaire v3 · published by Dr. D. on Sep 15, 2026</span>
+            <span>Questionnaire v1 · as supplied by the Medical Director (Oct 22, 2026) · pending publish</span>
           </div>
         </footer>
       </div>

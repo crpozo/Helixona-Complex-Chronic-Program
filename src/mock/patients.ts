@@ -1,20 +1,16 @@
 import type { Patient, UploadItem, FormItem } from './types'
+import { consents } from './consentContent'
 
-const standardForms = (signedCount: number): FormItem[] => {
-  const all: Omit<FormItem, 'status'>[] = [
-    { key: 'intake', title: 'Intake Information & Acknowledgement', version: 'v2.1', signer: 'Patient' },
-    { key: 'hipaa', title: 'HIPAA Notice of Privacy Practices', version: 'v4.0', signer: 'Patient' },
-    { key: 'privacy', title: 'Privacy & Records Release Authorization', version: 'v1.3', signer: 'Patient' },
-    { key: 'comms', title: 'Email & Text Communications Consent', version: 'v1.0', signer: 'Patient' },
-    { key: 'financial', title: 'Financial Policy — Month 0 Assessment', version: 'v3.2', signer: 'Patient + staff countersign' },
-  ]
-  return all.map((f, i) => ({
-    ...f,
+const standardForms = (signedCount: number): FormItem[] =>
+  consents.map((c, i) => ({
+    key: c.key,
+    title: c.title,
+    version: c.version,
+    signer: 'Patient',
     status: i < signedCount ? 'signed' : i === signedCount ? 'viewed' : 'pending',
-    signedAt: i < signedCount ? `Sep ${28 + Math.min(i, 2)}, 2026 · ${9 + i}:${(12 + i * 7) % 60 < 10 ? '0' : ''}${(12 + i * 7) % 60} AM` : undefined,
+    signedAt: i < signedCount ? `Sep ${28 + Math.min(i, 2)}, 2026 · ${9 + (i % 3)}:${String((12 + i * 7) % 60).padStart(2, "0")} AM` : undefined,
     method: i < signedCount ? (i % 2 === 0 ? 'Drawn' : 'Typed') : undefined,
   }))
-}
 
 const uploads = (overrides: Partial<Record<string, Partial<UploadItem>>> = {}): UploadItem[] => {
   const base: UploadItem[] = [
@@ -43,14 +39,14 @@ export const patients: Patient[] = [
       { actor: 'Patient', when: 'Sep 27, 2026 · 8:45 AM', action: 'Started questionnaire' },
       { actor: 'Patient', when: 'Sep 30, 2026 · 7:18 PM', action: 'Submitted intake' },
     ] },
-    intake: { version: 3, progress: 100, submittedAt: 'Sep 30, 2026 · 7:18 PM', sections: { 'About you': 'complete', 'Your main concerns': 'complete', 'Medical history': 'complete', 'Medications & supplements': 'complete', 'Symptoms today': 'complete', 'Lifestyle': 'complete', 'Goals for care': 'complete' } },
+    intake: { version: 1, progress: 100, submittedAt: 'Sep 30, 2026 · 7:18 PM', sections: { 'New Patient Packet': 'complete', 'SF-36 · Quality of Life': 'complete', 'Metabolic Assessment': 'complete', 'Mold History': 'complete', 'Lyme Disease': 'complete', 'Brain Region Localization': 'complete' } },
     uploads: uploads({ labs: { status: 'returned', note: 'Lab PDF is missing pages 3–4 (lipid panel). Please re-upload the full report.' } }),
-    forms: standardForms(4),
+    forms: standardForms(9),
     history: [
       { actor: 'Ana (advisor)', when: 'Sep 22, 2026 · 10:05 AM', action: 'Status → Advisor interview completed', reason: 'Qualified · Complex Chronic pathway' },
       { actor: 'Karina', when: 'Sep 24, 2026 · 3:30 PM', action: 'Status → Insurance benefits review', reason: 'PPO verified · out-of-network benefits apply to NP visits' },
       { actor: 'Ana (advisor)', when: 'Sep 26, 2026 · 1:58 PM', action: 'Status → Accepted for Month 0', reason: 'ADM-01 · Meets program criteria' },
-      { actor: 'Patient', when: 'Sep 30, 2026 · 7:18 PM', action: 'Intake submitted (Questionnaire v3)' },
+      { actor: 'Patient', when: 'Sep 30, 2026 · 7:18 PM', action: 'Intake submitted (Questionnaire v1)' },
       { actor: 'Ana (advisor)', when: 'Oct 1, 2026 · 9:02 AM', action: 'Returned item to patient', reason: 'Lab report incomplete' },
     ],
   },
@@ -62,12 +58,12 @@ export const patients: Patient[] = [
       { actor: 'Patient', when: 'Sep 19, 2026 · 6:02 PM', action: 'Opened' },
       { actor: 'Patient', when: 'Sep 25, 2026 · 9:40 PM', action: 'Submitted intake' },
     ] },
-    intake: { version: 3, progress: 100, submittedAt: 'Sep 25, 2026 · 9:40 PM', sections: { 'About you': 'complete', 'Your main concerns': 'complete', 'Medical history': 'complete', 'Medications & supplements': 'complete', 'Symptoms today': 'complete', 'Lifestyle': 'complete', 'Goals for care': 'complete' } },
+    intake: { version: 1, progress: 100, submittedAt: 'Sep 25, 2026 · 9:40 PM', sections: { 'New Patient Packet': 'complete', 'SF-36 · Quality of Life': 'complete', 'Metabolic Assessment': 'complete', 'Mold History': 'complete', 'Lyme Disease': 'complete', 'Brain Region Localization': 'complete' } },
     uploads: uploads(),
-    forms: standardForms(5),
+    forms: standardForms(10),
     history: [
       { actor: 'Ana (advisor)', when: 'Sep 18, 2026 · 2:12 PM', action: 'Status → Accepted for Month 0', reason: 'ADM-01 · Meets program criteria' },
-      { actor: 'Patient', when: 'Sep 25, 2026 · 9:40 PM', action: 'Intake submitted (Questionnaire v3)' },
+      { actor: 'Patient', when: 'Sep 25, 2026 · 9:40 PM', action: 'Intake submitted (Questionnaire v1)' },
       { actor: 'Ana (advisor)', when: 'Sep 29, 2026 · 8:50 AM', action: 'Status → Reviewed for completeness', reason: 'All required items present' },
       { actor: 'Ana (advisor)', when: 'Sep 29, 2026 · 8:52 AM', action: 'Marked ready for chart prep' },
       { actor: 'Karina', when: 'Oct 2, 2026 · 4:15 PM', action: 'Status → Month 0 scheduled', reason: 'Assessment Oct 14, 2026 · Month 0 payment received' },
@@ -77,9 +73,9 @@ export const patients: Patient[] = [
     id: 'P-0041', ecwId: 'ECW-117902', firstName: 'Priya', lastName: 'Raman', dob: '07/29/1983', phone: '(949) 555-0117', email: 'priya.raman@example.com', city: 'Newport Beach, CA', advisor: 'Ana',
     status: 'Month 0 in progress', chartPrep: 'Placed in eCW',
     invitation: { state: 'submitted', sentAt: 'Sep 8, 2026 · 9:00 AM', expiresAt: 'Sep 22, 2026', method: 'Magic link', history: [] },
-    intake: { version: 2, progress: 100, submittedAt: 'Sep 12, 2026 · 3:05 PM', sections: {} },
+    intake: { version: 1, progress: 100, submittedAt: 'Sep 12, 2026 · 3:05 PM', sections: {} },
     uploads: uploads(),
-    forms: standardForms(5),
+    forms: standardForms(10),
     history: [
       { actor: 'eCW connector', when: 'Sep 16, 2026 · 6:04 AM', action: 'Note + PDF placed in eCW · verified', reason: 'Marker HLX:INT-2041:v2' },
       { actor: 'Charlene', when: 'Sep 16, 2026 · 8:30 AM', action: 'Chart prep reviewed · closed' },
@@ -94,7 +90,7 @@ export const patients: Patient[] = [
       { actor: 'Patient', when: 'Oct 3, 2026 · 7:15 PM', action: 'Opened' },
       { actor: 'Patient', when: 'Oct 3, 2026 · 7:20 PM', action: 'Started questionnaire' },
     ] },
-    intake: { version: 3, progress: 38, sections: { 'About you': 'complete', 'Your main concerns': 'complete', 'Medical history': 'partial', 'Medications & supplements': 'not started', 'Symptoms today': 'not started', 'Lifestyle': 'not started', 'Goals for care': 'not started' } },
+    intake: { version: 1, progress: 38, sections: { 'New Patient Packet': 'partial', 'SF-36 · Quality of Life': 'not started', 'Metabolic Assessment': 'not started', 'Mold History': 'not started', 'Lyme Disease': 'not started', 'Brain Region Localization': 'not started' } },
     uploads: uploads({ 'ins-front': { status: 'missing', files: [] }, 'ins-back': { status: 'missing', files: [] }, 'photo-id': { status: 'missing', files: [] }, meds: { status: 'missing', files: [] }, labs: { status: 'missing', files: [] }, records: { status: 'optional', files: [] } }),
     forms: standardForms(0),
     history: [
@@ -106,9 +102,9 @@ export const patients: Patient[] = [
     id: 'P-0039', ecwId: 'ECW-117455', firstName: 'Lena', lastName: 'Kowalski', dob: '05/06/1979', phone: '(657) 555-0121', email: 'lena.k@example.com', city: 'Costa Mesa, CA', advisor: 'Ana',
     status: 'Month 0 in progress', chartPrep: 'Exception',
     invitation: { state: 'submitted', sentAt: 'Sep 2, 2026 · 1:00 PM', expiresAt: 'Sep 16, 2026', method: 'Code', history: [] },
-    intake: { version: 2, progress: 100, submittedAt: 'Sep 9, 2026 · 11:12 AM', sections: {} },
+    intake: { version: 1, progress: 100, submittedAt: 'Sep 9, 2026 · 11:12 AM', sections: {} },
     uploads: uploads(),
-    forms: standardForms(5),
+    forms: standardForms(10),
     history: [
       { actor: 'eCW connector', when: 'Oct 5, 2026 · 6:02 AM', action: 'Exception · PDF read-back failed', reason: 'Document not found after upload · no automatic retry' },
     ],

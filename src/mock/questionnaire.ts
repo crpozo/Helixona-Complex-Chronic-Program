@@ -1,119 +1,51 @@
-// Placeholder clinical content. Every question is labeled in the UI as
-// "Sample question — final content from Medical Director". The real
-// questionnaire is implemented exactly as supplied (CLAUDE.md §2).
-
-export type QuestionType =
-  | 'short' | 'long' | 'single' | 'multi' | 'yesno' | 'date' | 'number' | 'scale' | 'medications'
-
-export interface Question {
-  id: string
-  type: QuestionType
-  text: string
-  help?: string
-  required?: boolean
-  options?: string[]
-  showIf?: { questionId: string; equals: string }
-  min?: number
-  max?: number
-  minLabel?: string
-  maxLabel?: string
-}
-
-export interface Section {
-  id: string
-  title: string
-  intro?: string
-  questions: Question[]
-}
+// Questionnaire metadata + sample answers used by the demo patient and the eCW note preview.
+// Content itself lives in questionnaireContent.ts (generated from the Medical Director's spreadsheet).
+import { forms } from './questionnaireContent'
+export { forms }
+export type { Form, Q, Sec } from './questionnaireContent'
 
 export const questionnaireMeta = {
-  version: 3,
-  publishedBy: 'Dr. D. (Medical Director)',
-  publishedOn: 'Sep 15, 2026',
-  status: 'Published',
-  estimatedMinutes: 25,
+  version: 1,
+  publishedBy: 'Medical Director',
+  publishedOn: 'Oct 22, 2026',
+  status: 'Draft · as supplied (not yet published by Dr. D.)',
+  source: 'NP - Questionnaires 2.xlsx',
 }
 
-export const sections: Section[] = [
-  {
-    id: 'about', title: 'About you',
-    intro: 'A few basics so we can confirm your record. Your advisor already has most of this.',
-    questions: [
-      { id: 'a1', type: 'short', text: 'What name would you like us to use?', required: true },
-      { id: 'a2', type: 'date', text: 'Date of birth', required: true },
-      { id: 'a3', type: 'single', text: 'Preferred way for us to contact you', required: true, options: ['Phone call', 'Text message', 'Email'] },
-      { id: 'a4', type: 'yesno', text: 'Do you have someone who helps manage your health care (a caregiver, partner, or family member)?' },
-      { id: 'a5', type: 'short', text: 'Their name and relationship to you', showIf: { questionId: 'a4', equals: 'Yes' } },
-    ],
-  },
-  {
-    id: 'concerns', title: 'Your main concerns',
-    intro: 'Tell us what brought you to Helixona, in your own words.',
-    questions: [
-      { id: 'c1', type: 'long', text: 'What are the main health concerns you would like help with?', required: true, help: 'There is no wrong answer. Write as much or as little as you like.' },
-      { id: 'c2', type: 'number', text: 'For roughly how many years have these concerns affected you?', min: 0, max: 80 },
-      { id: 'c3', type: 'scale', text: 'Overall, how much do these concerns limit your daily life right now?', required: true, min: 0, max: 10, minLabel: 'Not at all', maxLabel: 'Completely' },
-      { id: 'c4', type: 'multi', text: 'Which of these have you already tried?', options: ['Conventional medications', 'Physical therapy', 'Dietary changes', 'Supplements', 'Acupuncture or bodywork', 'Counseling or therapy', 'None of these'] },
-    ],
-  },
-  {
-    id: 'history', title: 'Medical history',
-    questions: [
-      { id: 'h1', type: 'multi', text: 'Have you been diagnosed with any of the following?', options: ['Autoimmune condition', 'Diabetes or prediabetes', 'Heart or blood-pressure condition', 'Thyroid condition', 'Digestive condition', 'Chronic pain or fibromyalgia', 'Long COVID or post-viral illness', 'Cancer (current or past)', 'None of these'] },
-      { id: 'h2', type: 'yesno', text: 'Have you had any surgeries or hospital stays in the past 5 years?', required: true },
-      { id: 'h3', type: 'long', text: 'Please list them with approximate dates', showIf: { questionId: 'h2', equals: 'Yes' } },
-      { id: 'h4', type: 'yesno', text: 'Do you have any known allergies to medications, foods, or materials?', required: true },
-      { id: 'h5', type: 'long', text: 'Please list your allergies and what happens', showIf: { questionId: 'h4', equals: 'Yes' } },
-    ],
-  },
-  {
-    id: 'meds', title: 'Medications & supplements',
-    intro: 'Include prescriptions, over-the-counter medicines, vitamins, and herbal products. You can also upload a list on the next step.',
-    questions: [
-      { id: 'm1', type: 'medications', text: 'Current medications and supplements', required: true },
-    ],
-  },
-  {
-    id: 'today', title: 'Symptoms today',
-    intro: 'This gives your care team a starting point to compare against later.',
-    questions: [
-      { id: 's1', type: 'scale', text: 'Energy level today', required: true, min: 0, max: 10, minLabel: 'None', maxLabel: 'Full' },
-      { id: 's2', type: 'scale', text: 'Pain level today', required: true, min: 0, max: 10, minLabel: 'No pain', maxLabel: 'Worst imaginable' },
-      { id: 's3', type: 'scale', text: 'Sleep quality over the past week', required: true, min: 0, max: 10, minLabel: 'Very poor', maxLabel: 'Excellent' },
-      { id: 's4', type: 'single', text: 'How often do you experience "crashes" (days where symptoms are much worse after activity)?', options: ['Never', 'A few times a year', 'Monthly', 'Weekly', 'Most days'] },
-    ],
-  },
-  {
-    id: 'lifestyle', title: 'Lifestyle',
-    questions: [
-      { id: 'l1', type: 'single', text: 'How would you describe your typical diet?', options: ['No particular pattern', 'Mediterranean', 'Low carbohydrate', 'Vegetarian or vegan', 'Gluten-free', 'Other'] },
-      { id: 'l2', type: 'number', text: 'On average, how many hours do you sleep per night?', min: 0, max: 16 },
-      { id: 'l3', type: 'yesno', text: 'Do you currently use tobacco or nicotine products?' },
-      { id: 'l4', type: 'single', text: 'How often do you drink alcohol?', options: ['Never', 'Occasionally', 'A few times a week', 'Daily'] },
-    ],
-  },
-  {
-    id: 'goals', title: 'Goals for care',
-    questions: [
-      { id: 'g1', type: 'long', text: 'If the next nine months went well, what would be different in your life?', required: true },
-      { id: 'g2', type: 'long', text: 'Is there anything else you want the Medical Director to know before your first visit?' },
-    ],
-  },
-]
+export type Pathway = 'chronic' | 'optimization'
+export const pathwayLabel: Record<Pathway, string> = { chronic: 'Complex Chronic Program', optimization: 'Health Optimization (L2/L3)' }
+/** Forms assigned by pathway. */
+export const assignedByPathway: Record<Pathway, { formId: string; when?: string }[]> = {
+  chronic: [{ formId: 'new-patient' }, { formId: 'sf36' }, { formId: 'metabolic' }, { formId: 'mold' }, { formId: 'lyme' }, { formId: 'brain' }],
+  optimization: [{ formId: 'l2l3-new' }, { formId: 'l2l3-fu', when: 'After your first visit' }],
+}
+export const getPathway = (): Pathway => { try { return (localStorage.getItem('hlx-pathway') as Pathway) || 'chronic' } catch { return 'chronic' } }
+export const setPathway = (p: Pathway) => { try { localStorage.setItem('hlx-pathway', p) } catch { /* ignore */ } }
+export const assignedFormIds = assignedByPathway.chronic.map((a) => a.formId)
 
+export const sections = forms[0].sections
+
+const byText = (formId: string, startsWith: string) => {
+  for (const s of forms.find((f) => f.id === formId)!.sections) for (const q of s.questions) if (q.text.startsWith(startsWith)) return q.id
+  return ''
+}
 export const sampleAnswers: Record<string, unknown> = {
-  a1: 'Marisol', a2: '1971-03-14', a3: 'Text message', a4: 'Yes', a5: 'Luis Andrade — husband',
-  c1: 'Daily fatigue that gets worse after any activity, migraines 2–3 times a week, and widespread muscle pain. I was diagnosed with fibromyalgia in 2019 and nothing has really helped long-term.',
-  c2: 7, c3: 7, c4: ['Conventional medications', 'Physical therapy', 'Supplements'],
-  h1: ['Chronic pain or fibromyalgia', 'Thyroid condition'], h2: 'No', h4: 'Yes', h5: 'Sulfa antibiotics — rash. Shellfish — swelling.',
-  m1: [
-    { name: 'Levothyroxine', dose: '75 mcg', frequency: 'Once daily, morning', reason: 'Hypothyroidism' },
-    { name: 'Duloxetine', dose: '60 mg', frequency: 'Once daily', reason: 'Fibromyalgia pain' },
-    { name: 'Magnesium glycinate', dose: '400 mg', frequency: 'Nightly', reason: 'Sleep / muscle cramps' },
-    { name: 'Vitamin D3', dose: '5,000 IU', frequency: 'Once daily', reason: 'Low vitamin D (lab 2025)' },
-  ],
-  s1: 3, s2: 6, s3: 4, s4: 'Weekly',
-  l1: 'Gluten-free', l2: 6, l3: 'No', l4: 'Occasionally',
-  g1: 'Being able to work a full day without crashing afterwards, and fewer migraine days so I can spend evenings with my family.',
-  g2: 'I am sensitive to many medications and prefer to start low and go slow.',
+  [byText('new-patient', 'First Name')]: 'Marisol', [byText('new-patient', 'Last Name')]: 'Andrade', [byText('new-patient', 'Date of Birth')]: '1971-03-14', [byText('new-patient', 'Sex')]: 'female', [byText('new-patient', 'Age')]: 55,
+  [byText('new-patient', 'Email')]: 'm.andrade@example.com', [byText('new-patient', 'City')]: 'Irvine', [byText('new-patient', 'State')]: 'CA', [byText('new-patient', 'Phone (Cell)')]: '(949) 555-0142',
+  [byText('new-patient', 'Emergency Contact Name')]: 'Luis Andrade', [byText('new-patient', 'Relationship')]: 'Husband',
+  [byText('new-patient', 'How did you hear')]: 'Helixona Website', [byText('new-patient', 'Insurance Carrier')]: 'Anthem Blue Cross PPO',
+  [byText('new-patient', 'Do you give permission')]: 'Yes',
+  [byText('new-patient', 'What provider/facility')]: 'Rheumatology associates, Newport Beach (2024–2026)',
+  [byText('new-patient', 'How many and which specialists')]: 'Four: rheumatology, neurology (migraines), endocrinology, pain management.',
+  [byText('new-patient', 'My primary concerns')]: ['Daily fatigue that gets worse after any activity', 'Migraines 2–3 times a week', 'Widespread muscle pain (fibromyalgia, 2019)', 'Poor sleep', 'Brain fog in the afternoons'],
+  [byText('new-patient', "Treatments you've received")]: [{ treatment: 'Physical therapy (12 weeks)', score: 4 }, { treatment: 'Duloxetine', score: 5 }, { treatment: 'Magnesium + vitamin D', score: 6 }],
+  [byText('new-patient', 'In the space below')]: 'Symptoms started after a viral infection in 2018. Work stress and poor sleep make everything worse.',
+  [byText('new-patient', 'Please check any conditions')]: ['Thyroid Disorder', 'Autoimmune Disorder'],
+  [byText('new-patient', 'Medication')]: [{ Medication: 'Levothyroxine', Dosage: '75 mcg', 'Brand Name': 'Synthroid', Frequency: 'Once daily, morning', 'Take for': 'Hypothyroidism', 'Prescribed by': 'Dr. Patel' }, { Medication: 'Duloxetine', Dosage: '60 mg', 'Brand Name': 'Cymbalta', Frequency: 'Once daily', 'Take for': 'Fibromyalgia pain', 'Prescribed by': 'Dr. Lee' }],
+  [byText('new-patient', 'Supplement')]: [{ Supplement: 'Magnesium glycinate', Dosage: '400 mg', 'Brand Name': 'Pure Encapsulations', 'Taken for': 'Sleep / muscle cramps', 'Recommended by (if applicable)': 'Self', 'Where did you purchase from?': 'Online' }, { Supplement: 'Vitamin D3', Dosage: '5,000 IU', 'Brand Name': 'Thorne', 'Taken for': 'Low vitamin D', 'Recommended by (if applicable)': 'Dr. Patel', 'Where did you purchase from?': 'Pharmacy' }],
+  [byText('new-patient', 'Please list your known allergies')]: 'Sulfa antibiotics — rash (moderate). Shellfish — swelling (moderate).',
+  [byText('new-patient', 'Highest Level Education')]: "Bachelor's degree", [byText('new-patient', 'Marital Status')]: 'Married',
+  [byText('new-patient', 'Average hours of sleep')]: 6, [byText('new-patient', 'Do you snore')]: 'No', [byText('new-patient', 'Do you wake up feeling rested')]: 'No',
+  [byText('new-patient', 'Rate your current stress')]: 7,
+  [byText('new-patient', 'Chronological Timeline')]: '2018 viral infection → 2019 fibromyalgia diagnosis → 2021 hypothyroidism → 2024 migraines worsen → 2026 fatigue limits work.',
 }

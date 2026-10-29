@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Calendar, ClipboardList, CreditCard, FileCheck2, HeartPulse } from 'lucide-react'
 import { PhoneFrame, Wordmark } from '../../../components/PhoneFrame'
 import { MonitoringNotice, Pill } from '../../../components/ui'
+import { getPathway, pathwayLabel } from '../../../mock/questionnaire'
 
 export default function PatientHome() {
   return (
@@ -9,7 +10,7 @@ export default function PatientHome() {
       <div className="px-5 pt-12 pb-8">
         <div className="flex items-center justify-between"><Wordmark size="sm" /><span className="text-xs text-sand-500">Marisol A.</span></div>
         <h1 className="mt-6 font-display text-[26px] font-semibold text-sand-900">Good evening, Marisol</h1>
-        <p className="text-sand-600">You're in <strong>Month 0 — Assessment</strong>.</p>
+        <p className="text-sand-600">{getPathway() === 'chronic' ? <>You're in <strong>Month 0 — Assessment</strong>.</> : <>Your pathway: <strong>{pathwayLabel.optimization}</strong>. First visit not yet scheduled.</>}</p>
 
         <div className="card mt-5 overflow-hidden">
           <div className="bg-teal-800 px-4 py-3 text-white">
@@ -24,14 +25,14 @@ export default function PatientHome() {
         <div className="mt-6 eyebrow">Your program</div>
         <ul className="mt-2 grid grid-cols-2 gap-2">
           <Tile to="/patient/intake" icon={<ClipboardList size={20} />} label="Questionnaire" status="Submitted" tone="ok" />
-          <Tile to="/patient/forms" icon={<FileCheck2 size={20} />} label="Signed forms" status="4 of 5" tone="warn" />
-          <Tile icon={<Calendar size={20} />} label="Assessment visit" status="Not yet scheduled" tone="neutral" />
-          <Tile icon={<CreditCard size={20} />} label="Month 0 fee" status="Due at scheduling" tone="neutral" />
+          <Tile to="/patient/forms" icon={<FileCheck2 size={20} />} label="Signed forms" status="9 of 10" tone="warn" />
+          <Tile icon={<Calendar size={20} />} label="Assessment visit" status="Schedule with Marie" tone="teal" />
+          <Tile icon={<CreditCard size={20} />} label="Card on file" status="Add a card to book" tone="neutral" />
         </ul>
 
         <div className="mt-6 eyebrow">During your program</div>
         <ul className="mt-2 space-y-2">
-          {[['/patient/survey', 'Check-in survey', 'Due today · 1 day after red light'], ['/patient/crash', 'Report a crash or flare', 'Anytime · reviewed during clinic hours'], ['/patient/book', 'Book a session', 'Nano bath Thu Oct 9 · 9:00 AM confirmed'], ['/patient/agreement', 'Membership agreement & payment', 'Available once your program is offered'], ['/patient/payments', 'Payments & receipts', 'Next: $2,000 on Nov 1']].map(([to, t, d]) => (
+          {[['/patient/survey', 'Daily health check-in', 'About one minute · 3 recent treatments to review'], ['/patient/crash', 'Report a crash or flare', 'Anytime · reviewed during office hours'], ['/patient/book', 'Book a session', 'Nano bath Thu Oct 9 · 9:00 AM confirmed'], ['/patient/agreement', 'Membership agreement & payment', 'Available once your program is offered'], ['/patient/payments', 'Payments & receipts', 'Next: $2,000 on Nov 1']].map(([to, t, d]) => (
             <li key={t}><Link to={to} className="card flex items-center gap-3 p-3.5 hover:border-teal-300">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-teal-50 text-teal-700"><HeartPulse size={15} /></span>
               <span className="flex-1"><span className="block font-semibold text-sand-800">{t}</span><span className="block text-xs text-sand-500">{d}</span></span>
@@ -46,7 +47,7 @@ export default function PatientHome() {
   )
 }
 
-function Tile({ to, icon, label, status, tone }: { to?: string; icon: React.ReactNode; label: string; status: string; tone: 'ok' | 'warn' | 'neutral' }) {
+function Tile({ to, icon, label, status, tone }: { to?: string; icon: React.ReactNode; label: string; status: string; tone: 'ok' | 'warn' | 'neutral' | 'teal' }) {
   const inner = (
     <div className="card h-full p-3.5">
       <span className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-50 text-teal-700">{icon}</span>

@@ -60,7 +60,7 @@ export interface FormItem {
 export interface Inquiry {
   id: string
   receivedAt: string
-  pathway: 'Complex Chronic' | 'Insurance-covered NP care' | 'Self-directed care'
+  pathway: 'Complex Chronic' | 'Health Optimization (L2/L3)' | 'Insurance-covered NP care'
   source: string
   name: string
   city: string

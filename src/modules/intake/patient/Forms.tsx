@@ -5,6 +5,7 @@ import { PhoneFrame, PatientTopBar } from '../../../components/PhoneFrame'
 import { SignaturePad } from '../../../components/SignaturePad'
 import { Pill, ToConfirm, VersionTag } from '../../../components/ui'
 import { currentPatient } from '../../../mock/patients'
+import { consents } from '../../../mock/consentContent'
 import type { FormItem } from '../../../mock/types'
 
 export default function Forms() {
@@ -27,7 +28,7 @@ export default function Forms() {
       <div className="px-5 pb-8">
         <h1 className="font-display text-2xl font-semibold text-sand-900">Review and sign</h1>
         <p className="mt-1 text-[15px] text-sand-600">{signedCount} of {forms.length} signed. Each document opens fully before you sign. You'll receive a copy of everything by email.</p>
-        <div className="mt-3"><ToConfirm>final form list and signers from Shibani</ToConfirm></div>
+        <div className="mt-3"><ToConfirm>whether every consent is signed at intake or some at the first visit (Shibani)</ToConfirm></div>
         <ul className="mt-4 space-y-2">
           {forms.map((f) => (
             <li key={f.key}>
@@ -66,11 +67,12 @@ function FormViewer({ form, onBack, onSign }: { form: FormItem; onBack: () => vo
       <div className="px-5 pb-8">
         <article className="card p-4 text-[14px] leading-relaxed text-sand-700">
           <h2 className="font-display text-xl font-semibold text-sand-900">{form.title}</h2>
-          <p className="mt-1 text-xs text-sand-500">Helixona · Irvine, California · Document {form.version} · Effective Aug 1, 2026</p>
-          <p className="mt-3 rounded-lg bg-plum-100/60 px-3 py-2 text-xs text-plum-600"><strong>Placeholder text.</strong> The approved document supplied by Shibani and reviewed by counsel will appear here, word for word.</p>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <p key={i} className="mt-3"><strong>{i + 1}. Section heading.</strong> This paragraph stands in for the approved language of this document. It describes the purpose of the form, what the patient is agreeing to, how information is used and protected, and how the patient may ask questions or withdraw consent where applicable. Nothing in this placeholder is binding.</p>
-          ))}
+          <p className="mt-1 text-xs text-sand-500">Helixona · Irvine, California · Document {form.version} · as supplied Oct 22, 2026</p>
+          {(consents.find((c) => c.key === form.key)?.paragraphs ?? []).map((para, i) => para.h
+            ? <h3 key={i} className="mt-4 text-[14px] font-semibold text-sand-900">{para.t}</h3>
+            : para.b || /^[•\-]/.test(para.t)
+              ? <p key={i} className="mt-1 flex gap-2 pl-2"><span className="text-teal-500">•</span><span>{para.t}</span></p>
+              : <p key={i} className="mt-2">{para.t}</p>)}
           <div ref={endRef} className="mt-4 border-t border-sand-200 pt-3 text-xs text-sand-500">End of document.</div>
         </article>
 
@@ -78,8 +80,9 @@ function FormViewer({ form, onBack, onSign }: { form: FormItem; onBack: () => vo
           {!reachedEnd && <p className="mb-2 text-center text-sm text-sand-500">Scroll to the end of the document to sign.</p>}
           <label className="flex items-start gap-3 rounded-xl border border-sand-300 bg-white p-3.5 text-[15px]">
             <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-5 w-5 accent-teal-600" />
-            <span>I have read this document and agree to its terms.</span>
+            <span>I certify that I am the patient or the legally authorized representative of the patient and that I have read and understood this document.</span>
           </label>
+          <div className="mt-2 text-xs text-sand-500">Signing for someone else? <select className="ml-1 rounded-md border border-sand-300 bg-white px-2 py-1 text-xs"><option>I am the patient</option><option>Parent</option><option>Legal Guardian</option><option>Medical Power of Attorney</option><option>Other</option></select></div>
           <div className="mt-3"><SignaturePad onChange={setSig} /></div>
           <div className="mt-2 text-xs text-sand-500">Signing as <strong>Marisol Andrade</strong> · {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} · Document {form.version}{form.signer.includes('staff') ? ' · Helixona will countersign' : ''}</div>
           <button disabled={!sig || !agree} onClick={() => sig && onSign(sig.method)} className="btn-primary btn-lg mt-4 w-full">Sign document</button>
