@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Check } from 'lucide-react'
 import { PhoneFrame, PatientTopBar } from '../../../components/PhoneFrame'
-import { Choice, Field, MonitoringNotice, VersionTag } from '../../../components/ui'
+import { Choice, Field, MonitoringNotice, ScaleSlider, VersionTag } from '../../../components/ui'
 
 /** Daily health check-in. Redesigned per the Oct 20, 2026 review: sliders instead of 0–10 buttons,
  *  then a follow-up on the treatments the patient actually received (dates come from the booking records). */
@@ -21,14 +21,9 @@ const recentTreatments = [
 const treatmentOptions = ['Yes, I feel better', 'Some things improved, others worsened', 'No', 'Not sure yet']
 
 function Slider({ value, prev, onChange, low, high }: { value?: number; prev: number; onChange: (n: number) => void; low: string; high: string }) {
-  const v = value ?? prev
   return (
     <div>
-      <div className="flex items-center gap-3">
-        <input type="range" min={0} max={10} step={1} value={v} onChange={(e) => onChange(Number(e.target.value))} className="h-2 flex-1 cursor-pointer accent-teal-600" aria-valuemin={0} aria-valuemax={10} aria-valuenow={v} />
-        <span className={`w-9 text-center font-display text-2xl font-semibold ${value === undefined ? 'text-sand-400' : 'text-sand-900'}`}>{v}</span>
-      </div>
-      <div className="mt-1 flex justify-between text-xs text-sand-500"><span>{low}</span><span>{high}</span></div>
+      <ScaleSlider value={value} fallback={prev} onChange={onChange} min={0} max={10} minLabel={`0 · ${low}`} maxLabel={`10 · ${high}`} />
       <div className="mt-1 text-xs text-sand-400">Yesterday: {prev}{value === undefined ? ' · slide to update' : ''}</div>
     </div>
   )

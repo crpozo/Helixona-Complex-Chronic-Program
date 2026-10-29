@@ -262,14 +262,14 @@ export function Toast({ message }: { message: string | null }) {
 
 
 /** Touch-friendly 1-10 (or min-max) slider for patient screens. Shows the chosen value in a bubble above the thumb. */
-export function ScaleSlider({ value, onChange, min = 0, max = 10, minLabel, maxLabel, compact = false }: { value?: number; onChange: (n: number) => void; min?: number; max?: number; minLabel?: string; maxLabel?: string; compact?: boolean }) {
+export function ScaleSlider({ value, onChange, min = 0, max = 10, minLabel, maxLabel, compact = false, fallback }: { value?: number; onChange: (n: number) => void; min?: number; max?: number; minLabel?: string; maxLabel?: string; compact?: boolean; /** Where the thumb rests before the patient answers (e.g. yesterday's value); shown greyed. */ fallback?: number }) {
   const has = typeof value === 'number'
-  const v = has ? value : Math.round((min + max) / 2)
+  const v = has ? value : typeof fallback === 'number' ? fallback : Math.round((min + max) / 2)
   const pct = ((v - min) / (max - min)) * 100
   return (
     <div className={compact ? 'pt-6' : 'pt-7'}>
       <div className="relative">
-        <div className="pointer-events-none absolute -top-6 -translate-x-1/2 rounded-md px-2 py-0.5 text-[13px] font-semibold" style={{ left: `calc(${pct}% + ${(50 - pct) * 0.28}px)`, background: has ? '#141414' : '#e9e6e1', color: has ? '#fff' : '#7a736a' }}>{has ? v : '–'}</div>
+        <div className="pointer-events-none absolute -top-6 -translate-x-1/2 rounded-md px-2 py-0.5 text-[13px] font-semibold" style={{ left: `calc(${pct}% + ${(50 - pct) * 0.28}px)`, background: has ? '#141414' : '#e9e6e1', color: has ? '#fff' : '#7a736a' }}>{has || typeof fallback === 'number' ? v : '–'}</div>
         <input type="range" min={min} max={max} step={1} value={v} aria-valuetext={has ? String(v) : 'not answered'} onChange={(e) => onChange(Number(e.target.value))} className={`scale-slider w-full ${has ? '' : 'is-empty'}`} style={{ ['--pct' as string]: `${pct}%` }} />
       </div>
       <div className={`mt-1 flex justify-between text-sand-500 ${compact ? 'text-[11px]' : 'text-xs'}`}><span>{minLabel ?? min}</span><span>{maxLabel ?? max}</span></div>
