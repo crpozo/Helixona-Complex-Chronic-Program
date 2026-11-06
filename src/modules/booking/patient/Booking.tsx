@@ -55,7 +55,7 @@ export default function Booking() {
           <li className="card flex items-center gap-3 p-3.5"><span className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-50 text-teal-700"><CalendarDays size={16} /></span><span className="flex-1"><span className="block font-semibold text-sand-900">Nano bath · Thu Oct 9, 9:00 AM</span><span className="block text-xs text-sand-500">Nano bath room 1 · 45 min</span></span><Pill tone="ok">Confirmed</Pill></li>
           <li className="card flex items-center gap-3 p-3.5"><span className="flex h-9 w-9 items-center justify-center rounded-full bg-sand-100 text-sand-500"><Lock size={15} /></span><span className="flex-1"><span className="block font-semibold text-sand-900">Nurse practitioner visit · Thu Oct 9, 8:00 AM</span><span className="block text-xs text-sand-500">Insurance visit · booked by our office</span></span><Pill dot={false}>From clinic calendar</Pill></li>
         </ul>
-        <div className="mt-5 eyebrow">Book a session</div>
+        <div className="mt-5 eyebrow">Book a session for your plan of care</div>
         <ul className="mt-2 space-y-2">
           {modalities.filter((m) => m.active).map((m) => {
             const mode = plan[m.id]

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Calendar, ClipboardList, CreditCard, FileCheck2, HeartPulse } from 'lucide-react'
+import { Bell, Calendar, CalendarCheck, ClipboardList, CreditCard, FileCheck2, FileSignature, HeartPulse, Receipt, Siren } from 'lucide-react'
 import { PhoneFrame, Wordmark } from '../../../components/PhoneFrame'
 import { MonitoringNotice, Pill } from '../../../components/ui'
 import { getPathway, pathwayLabel } from '../../../mock/questionnaire'
@@ -26,22 +26,29 @@ export default function PatientHome() {
         <ul className="mt-2 grid grid-cols-2 gap-2">
           <Tile to="/patient/intake" icon={<ClipboardList size={20} />} label="Questionnaire" status="Submitted" tone="ok" />
           <Tile to="/patient/forms" icon={<FileCheck2 size={20} />} label="Signed forms" status="9 of 10" tone="warn" />
-          <Tile to="/patient/book" icon={<Calendar size={20} />} label="Assessment visit" status="Schedule with Marie" tone="teal" />
+          <Tile to="/patient/book" icon={<Calendar size={20} />} label="Scheduled visits" status="2 scheduled" tone="warn" />
           <Tile to="/patient/payments" icon={<CreditCard size={20} />} label="Card on file" status="Add a card to book" tone="neutral" />
         </ul>
 
         <div className="mt-6 eyebrow">During your program</div>
         <ul className="mt-2 space-y-2">
-          {[['/patient/survey', 'Daily health check-in', 'About one minute · 3 recent treatments to review'], ['/patient/crash', 'Report a crash or flare', 'Anytime · reviewed during office hours'], ['/patient/book', 'Book a session', 'Nano bath Thu Oct 9 · 9:00 AM confirmed'], ['/patient/agreement', 'Membership agreement & payment', 'Available once your program is offered'], ['/patient/payments', 'Payments & receipts', 'Next: $2,000 on Nov 1']].map(([to, t, d]) => (
+          {([
+            ['/patient/survey', 'Daily health check-in', 'About one minute · 3 recent treatments to review', <HeartPulse size={16} />],
+            ['/patient/crash', 'Report a crash or flare', 'Anytime · reviewed during office hours', <Siren size={16} />],
+            ['/patient/book', 'Book a session', 'Nano bath Thu Oct 9 · 9:00 AM confirmed', <CalendarCheck size={16} />],
+            ['/patient/agreement', 'Membership agreement & payment', 'Available once your program is offered', <FileSignature size={16} />],
+            ['/patient/payments', 'Payments & receipts', 'Next: $2,000 on Nov 1', <Receipt size={16} />],
+            ['/patient/settings', 'Notifications', 'Email and text message preferences', <Bell size={16} />],
+          ] as [string, string, string, React.ReactNode][]).map(([to, t, d, icon]) => (
             <li key={t}><Link to={to} className="card flex items-center gap-3 p-3.5 hover:border-teal-300">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-teal-50 text-teal-700"><HeartPulse size={15} /></span>
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-teal-50 text-teal-700">{icon}</span>
               <span className="flex-1"><span className="block font-semibold text-sand-800">{t}</span><span className="block text-xs text-sand-500">{d}</span></span>
             </Link></li>
           ))}
         </ul>
         <p className="mt-2 text-[11px] text-sand-500">For review: these are shown unlocked so every patient screen is reachable from here. In the real app they appear as the program progresses.</p>
         <div className="mt-6"><MonitoringNotice /></div>
-        <div className="mt-4 flex items-center justify-center gap-1 text-xs text-sand-500"><HeartPulse size={12} /> Helixona · Irvine, CA · (949) 555-0100</div>
+        <div className="mt-4 flex items-center justify-center gap-1 text-xs text-sand-500"><HeartPulse size={12} /> Helixona · Irvine, CA · (949) 257-2644</div>
       </div>
     </PhoneFrame>
   )

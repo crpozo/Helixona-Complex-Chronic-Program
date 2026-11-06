@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Check } from 'lucide-react'
 import { PhoneFrame, PatientTopBar } from '../../../components/PhoneFrame'
-import { Choice, Field, MonitoringNotice, ScaleSlider, VersionTag } from '../../../components/ui'
+import { Choice, MonitoringNotice, ScaleSlider, VersionTag } from '../../../components/ui'
 
 /** Daily health check-in. Redesigned per the Oct 20, 2026 review: sliders instead of 0–10 buttons,
  *  then a follow-up on the treatments the patient actually received (dates come from the booking records). */
@@ -33,7 +33,7 @@ export default function Survey() {
   const nav = useNavigate()
   const [a, setA] = useState<Record<string, number | undefined>>({})
   const [t, setT] = useState<Record<string, string>>({})
-  const [contact, setContact] = useState<string>()
+  const [fb, setFb] = useState<Record<string, string>>({})
   const [step, setStep] = useState<'snapshot' | 'treatments' | 'done'>('snapshot')
   const set = (k: string, v: number) => setA((x) => ({ ...x, [k]: v }))
   const answered = measures.filter((m) => a[m.key] !== undefined).length
@@ -44,7 +44,7 @@ export default function Survey() {
         <div className="flex flex-1 flex-col px-5 pt-16 pb-8 text-center">
           <span className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-ok-100 text-ok-700"><Check size={36} /></span>
           <h1 className="mt-5 font-display text-[26px] font-semibold text-sand-900">Thank you</h1>
-          <p className="mt-2 text-sand-600">Your check-in was saved at {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}. {contact === 'Yes' ? 'Your request to be contacted is in the care team queue; they reply during office hours.' : 'Your care team reviews check-ins during office hours. You can see your trend on your home screen.'}</p>
+          <p className="mt-2 text-sand-600">Your check-in was saved at {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}. Your care team reviews check-ins during office hours. You can see your trend on your home screen.</p>
           <div className="mt-6 text-left"><MonitoringNotice /></div>
           <Link to="/patient/home" className="btn-primary btn-lg mt-8 w-full">Back to my program</Link>
         </div>
@@ -66,11 +66,11 @@ export default function Survey() {
                 <div className="text-xs text-sand-500">{r.when}</div>
                 <div className="mt-3 text-[15px] font-medium text-sand-800">Do you feel this treatment helped?</div>
                 <div className="mt-2 space-y-2">{treatmentOptions.map((o) => <Choice key={o} label={o} selected={t[r.name] === o} onClick={() => setT({ ...t, [r.name]: o })} />)}</div>
+                <label className="mt-3 block"><span className="mb-1.5 block text-sm font-medium text-sand-700">Tell us more <span className="font-normal text-sand-500">(optional)</span></span><textarea rows={2} className="input text-[16px]" placeholder="How did you feel after this session?" value={fb[r.name] ?? ''} onChange={(e) => setFb({ ...fb, [r.name]: e.target.value })} /></label>
               </div>
             ))}
-            <Field label={<span className="text-[16px] font-semibold">Would you like someone from the care team to contact you?</span>} required><div className="grid grid-cols-2 gap-2">{['Yes', 'No'].map((o) => <Choice key={o} size="lg" label={o} selected={contact === o} onClick={() => setContact(o)} />)}</div></Field>
           </div>
-          <button disabled={!contact} onClick={() => setStep('done')} className="btn-primary btn-lg mt-8 w-full">Save my check-in</button>
+          <button onClick={() => setStep('done')} className="btn-primary btn-lg mt-8 w-full">Save my check-in</button>
           <button onClick={() => nav('/patient/crash')} className="btn-ghost mt-2 w-full text-sm">Feeling much worse? Report a crash or flare</button>
           <div className="mt-4"><MonitoringNotice /></div>
         </div>

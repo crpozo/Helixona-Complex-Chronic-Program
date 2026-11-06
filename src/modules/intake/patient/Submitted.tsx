@@ -16,7 +16,7 @@ export default function Submitted() {
             [UserRoundCheck, 'Ana reviews your package', 'Usually within 1 business day. If anything is missing, you\'ll get a text with a link to add it.'],
             [Stethoscope, 'Your chart is prepared', 'Your answers and documents are added to your medical record before your first visit.'],
             [CalendarCheck, 'Your Month 0 assessment', 'Karina will call to schedule your assessment with the Medical Director and confirm the one-time Month 0 fee.'],
-            [Mail, 'Stay in touch', 'Questions? Reply to any message from Helixona or call (949) 555-0100 during clinic hours.'],
+            [Mail, 'Stay in touch', 'Questions? Reply to any message from Helixona or call (949) 257-2644 during clinic hours.'],
           ].map(([Icon, t, d], i) => {
             const I = Icon as typeof Mail
             return (
