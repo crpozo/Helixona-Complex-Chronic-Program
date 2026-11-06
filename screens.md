@@ -23,7 +23,7 @@ All data is fictional. The intake questionnaire is the Medical Director's conten
 | 3 | `#/patient/uploads` | Required and optional document slots; take photo / choose file; inventory; **returned item** flow (advisor asks for a new copy). | Max file size and accepted types. Whether insurance card is already collected by the advisor. |
 | 4 | `#/patient/forms` | Assigned documents with version and signer; open → must scroll to end → agree → typed **or** drawn signature → timestamped. Patient gets a copy by email. | Final form list, versions, and who signs (Shibani). Which forms need staff countersign. |
 | 5 | `#/patient/submitted` | Confirmation + “what happens next” (advisor review → chart prep → Month 0 scheduling + fee). | Exact wording about Month 0 fee timing. |
-| — | `#/patient/home` | “My program” home: next step, package status tiles, locked future features, monitoring notice. | — |
+| — | `#/patient/home` | “My program” home: next step, Healing Roadmap with the current stage, actors being worked on (lead first), package status tiles, program links, notification preferences, monitoring notice. | — |
 
 ### Staff (desktop)
 

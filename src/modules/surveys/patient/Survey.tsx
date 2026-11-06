@@ -15,7 +15,7 @@ const measures = [
 ]
 const recentTreatments = [
   { name: 'Red light therapy', when: 'Oct 21 · 2 days ago' },
-  { name: 'Oxygen & hydrogen nano bath', when: 'Oct 19 · 4 days ago' },
+  { name: 'Hydrogen nano bath', when: 'Oct 19 · 4 days ago' },
   { name: 'IV therapy (glutathione)', when: 'Oct 16 · 7 days ago' },
 ]
 const treatmentOptions = ['Yes, I feel better', 'Some things improved, others worsened', 'No', 'Not sure yet']

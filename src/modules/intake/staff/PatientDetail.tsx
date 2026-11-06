@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { EyeOff, RefreshCw, Send } from 'lucide-react'
 import { AuditList, Breadcrumb, Card, Field, Notice, PageHeader, Pill, Row, Tabs, ToConfirm, VersionTag, toneFor } from '../../../components/ui'
+import { Actors, Roadmap } from '../../../components/Roadmap'
+import { planFor, stageLabel } from '../../../mock/roadmap'
 import { patientById } from '../../../mock/patients'
 import { inquiries } from '../../../mock/inquiries'
 import IntakeReviewPanel from './IntakeReviewPanel'
@@ -21,7 +23,7 @@ export default function PatientDetail() {
       <Breadcrumb items={[{ label: 'Patients', to: '/staff/patients' }, { label: p.id }]} />
       <PageHeader eyebrow={`${p.id} · eCW ${p.ecwId}`} title={`${p.firstName} ${p.lastName}`}
         description={<span>DOB {p.dob} · {p.city} · {p.phone} · {p.email}</span>}
-        meta={<><Pill tone={toneFor(p.status)}>{p.status}</Pill><Pill tone={toneFor(p.chartPrep)}>Chart prep: {p.chartPrep}</Pill><span>Advisor: {p.advisor}</span>{inquiry && <span>· From {inquiry.id} ({inquiry.source})</span>}</>}
+        meta={<><Pill tone={toneFor(p.status)}>{p.status}</Pill><Pill tone={toneFor(p.chartPrep)}>Chart prep: {p.chartPrep}</Pill><Pill tone="teal" dot={false}>{stageLabel(planFor(p.id).stage)}</Pill><span className="inline-flex items-center gap-2">Actors: <Actors size="sm" actors={planFor(p.id).actors} lead={planFor(p.id).leadActor} /></span><span className="hidden lg:block"><Roadmap current={planFor(p.id).stage} compact /></span><span>Advisor: {p.advisor}</span>{inquiry && <span>· From {inquiry.id} ({inquiry.source})</span>}</>}
         actions={<><button className="btn-secondary" onClick={() => nav(`/staff/chart-prep/${p.id}`)}>Chart prep view</button><button className="btn-primary">Update status</button></>} />
 
       <Tabs value={tab} onChange={setTab} tabs={[

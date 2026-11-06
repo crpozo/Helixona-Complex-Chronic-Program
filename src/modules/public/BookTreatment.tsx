@@ -8,7 +8,8 @@ import { consents } from '../../mock/consentContent'
 /** Public "Book a treatment" flow (treatment-only, no patient enrollment). Meeting of Oct 20, 2026. */
 const therapies = [
   { id: 'salt', name: 'Salt room', duration: 45, price: 45, group: true, clearance: false, consent: 'general-informed-consent-for-treatment' },
-  { id: 'nano', name: 'Oxygen & hydrogen nano bath', duration: 45, price: 95, group: false, clearance: false, consent: 'general-informed-consent-for-treatment' },
+  { id: 'nano-h2', name: 'Hydrogen nano bath', duration: 45, price: 95, group: false, clearance: false, consent: 'general-informed-consent-for-treatment' },
+  { id: 'nano-o2', name: 'Oxygen nano bath', duration: 45, price: 95, group: false, clearance: false, consent: 'general-informed-consent-for-treatment' },
   { id: 'red', name: 'Red light therapy', duration: 30, price: 65, group: false, clearance: false, consent: 'general-informed-consent-for-treatment' },
   { id: 'h2', name: 'Hydrogen inhalation', duration: 60, price: 55, group: false, clearance: false, consent: 'general-informed-consent-for-treatment' },
   { id: 'bemer', name: 'BEMER', duration: 20, price: 40, group: false, clearance: false, consent: 'general-informed-consent-for-treatment' },

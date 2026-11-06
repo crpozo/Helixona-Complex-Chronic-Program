@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { AuditList, Breadcrumb, Card, Field, Notice, PageHeader, Pill, Row, Tabs, toneFor } from '../../components/ui'
+import { Actors, Roadmap } from '../../components/Roadmap'
+import { planFor, stageLabel } from '../../mock/roadmap'
 import { memberNames, members, statusCatalog } from '../../mock/program'
 import { patientById } from '../../mock/patients'
 import { JourneyStrip } from '../intake/staff/PatientDetail'
@@ -16,7 +18,7 @@ export default function MemberDetail() {
   return (
     <>
       <Breadcrumb items={[{ label: 'Membership registry', to: '/staff/registry' }, { label: m.id }]} />
-      <PageHeader eyebrow={`${m.id}${p ? ` · eCW ${p.ecwId}` : ''}`} title={p ? `${p.firstName} ${p.lastName}` : memberNames[m.id] ?? m.id} meta={<><Pill tone={toneFor(m.status)}>{m.status}</Pill><span>{cat?.phase}</span><span>· {m.activeMonths} active months</span></>} actions={<button className="btn-primary">Update status</button>} />
+      <PageHeader eyebrow={`${m.id}${p ? ` · eCW ${p.ecwId}` : ''}`} title={p ? `${p.firstName} ${p.lastName}` : memberNames[m.id] ?? m.id} meta={<><Pill tone={toneFor(m.status)}>{m.status}</Pill><Pill tone="teal" dot={false}>{stageLabel(planFor(m.id).stage)}</Pill><span className="inline-flex items-center gap-2">Actors: <Actors size="sm" actors={planFor(m.id).actors} lead={planFor(m.id).leadActor} /></span><span className="hidden lg:block"><Roadmap current={planFor(m.id).stage} compact /></span><span>{cat?.phase}</span><span>· {m.activeMonths} active months</span></>} actions={<button className="btn-primary">Update status</button>} />
       <div className="grid gap-5 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <Tabs value={tab} onChange={setTab} tabs={[{ key: 'timeline', label: 'Status history' }, { key: 'dates', label: 'Dates & months' }, { key: 'transition', label: 'Change status' }, { key: 'rules', label: 'Lifecycle rules' }]} />

@@ -4,6 +4,8 @@ import { ArrowLeft, CalendarDays, Check, Clock, Lock } from 'lucide-react'
 import { PhoneFrame, PatientTopBar } from '../../../components/PhoneFrame'
 import { Notice, Pill } from '../../../components/ui'
 import { modalities } from '../../../mock/program'
+import { Roadmap } from '../../../components/Roadmap'
+import { myPlan, stageLabel } from '../../../mock/roadmap'
 
 /** Demo patient is treated here as an Active member (P-0031) so the booking flow is visible. */
 export default function Booking() {
@@ -50,6 +52,7 @@ export default function Booking() {
       <div className="px-5 pb-8">
         <h1 className="font-display text-2xl font-semibold text-sand-900">Your sessions</h1>
         <p className="mt-1 text-sm text-sand-600">Only services in your Plan of Care can be booked. Dr. D. updates your plan at each review.</p>
+        <div className="card mt-3 p-3"><div className="flex items-center justify-between gap-2"><span className="text-sm font-semibold text-sand-900">{stageLabel(myPlan.stage)}</span><span className="text-xs text-sand-500">Your stage</span></div><div className="mt-2"><Roadmap current={myPlan.stage} compact /></div><p className="mt-2 text-xs text-sand-500">Services shown match your stage and your Plan of Care.</p></div>
         <div className="mt-4 eyebrow">Coming up</div>
         <ul className="mt-2 space-y-2">
           <li className="card flex items-center gap-3 p-3.5"><span className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-50 text-teal-700"><CalendarDays size={16} /></span><span className="flex-1"><span className="block font-semibold text-sand-900">Nano bath · Thu Oct 9, 9:00 AM</span><span className="block text-xs text-sand-500">Nano bath room 1 · 45 min</span></span><Pill tone="ok">Confirmed</Pill></li>
@@ -58,12 +61,14 @@ export default function Booking() {
         <div className="mt-5 eyebrow">Book a session for your plan of care</div>
         <ul className="mt-2 space-y-2">
           {modalities.filter((m) => m.active).map((m) => {
-            const mode = plan[m.id]
+            const inStage = m.stages.includes(myPlan.stage)
+            const mode = plan[m.id] === 'not' || inStage ? plan[m.id] : 'stage'
+            const firstStage = Math.min(...m.stages.filter((n) => n > myPlan.stage), 99)
             return (
               <li key={m.id}>
-                <button disabled={mode === 'not'} onClick={() => { setSel(m); setSlot(undefined); setView('slots') }} className={`card flex w-full items-center gap-3 p-3.5 text-left ${mode === 'not' ? 'opacity-60' : 'hover:border-teal-300'}`}>
+                <button disabled={mode === 'not' || mode === 'stage'} onClick={() => { setSel(m); setSlot(undefined); setView('slots') }} className={`card flex w-full items-center gap-3 p-3.5 text-left ${mode === 'not' || mode === 'stage' ? 'opacity-60' : 'hover:border-teal-300'}`}>
                   <span className="flex-1 min-w-0"><span className="block font-semibold text-sand-900">{m.name}</span><span className="block text-xs text-sand-500">{m.duration} min · up to {m.maxPerWeek}/week · {m.minSpacingDays}+ days apart</span></span>
-                  {mode === 'book' && <Pill tone="ok" dot={false}>Book now</Pill>}{mode === 'request' && <Pill tone="warn" dot={false}>Request</Pill>}{mode === 'not' && <Pill dot={false}>Not in your care plan</Pill>}
+                  {mode === 'book' && <Pill tone="ok" dot={false}>Book now</Pill>}{mode === 'request' && <Pill tone="warn" dot={false}>Request</Pill>}{mode === 'not' && <Pill dot={false}>Not in your care plan</Pill>}{mode === 'stage' && <Pill dot={false}>{firstStage < 99 ? `From Step ${firstStage}` : 'Earlier stages only'}</Pill>}
                 </button>
               </li>
             )

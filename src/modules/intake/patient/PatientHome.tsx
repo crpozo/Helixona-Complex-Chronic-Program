@@ -3,6 +3,8 @@ import { Bell, Calendar, CalendarCheck, ClipboardList, CreditCard, FileCheck2, F
 import { PhoneFrame, Wordmark } from '../../../components/PhoneFrame'
 import { MonitoringNotice, Pill } from '../../../components/ui'
 import { getPathway, pathwayLabel } from '../../../mock/questionnaire'
+import { Actors, Roadmap } from '../../../components/Roadmap'
+import { myPlan } from '../../../mock/roadmap'
 
 export default function PatientHome() {
   return (
@@ -21,6 +23,9 @@ export default function PatientHome() {
             <Link to="/patient/uploads" className="btn-primary mt-3 w-full">Upload now</Link>
           </div>
         </div>
+
+        <div className="mt-5"><Roadmap current={myPlan.stage} to="/patient/book" /></div>
+        <div className="card mt-2 p-4"><div className="flex items-center justify-between"><span className="eyebrow">What we're working on</span><span className="text-xs text-sand-500">Set by {myPlan.updatedBy} · {myPlan.updatedAt}</span></div><div className="mt-2"><Actors actors={myPlan.actors} lead={myPlan.leadActor} /></div><p className="mt-2 text-xs text-sand-500">Your lead actor is treated first. Dr. D. updates this list at each review.</p></div>
 
         <div className="mt-6 eyebrow">Your program</div>
         <ul className="mt-2 grid grid-cols-2 gap-2">

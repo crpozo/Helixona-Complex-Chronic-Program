@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, Info, ShieldAlert } from 'lucide-react'
+import { Check, ChevronDown, ChevronRight, Info, ShieldAlert, X } from 'lucide-react'
 
 /* ---------- Status pill (state is text + tone, never color alone) ---------- */
 export type Tone = 'neutral' | 'teal' | 'ok' | 'warn' | 'bad' | 'info' | 'plum'
@@ -273,6 +273,37 @@ export function ScaleSlider({ value, onChange, min = 0, max = 10, minLabel, maxL
         <input type="range" min={min} max={max} step={1} value={v} aria-valuetext={has ? String(v) : 'not answered'} onChange={(e) => onChange(Number(e.target.value))} className={`scale-slider w-full ${has ? '' : 'is-empty'}`} style={{ ['--pct' as string]: `${pct}%` }} />
       </div>
       <div className={`mt-1 flex justify-between text-sand-500 ${compact ? 'text-[11px]' : 'text-xs'}`}><span>{minLabel ?? min}</span><span>{maxLabel ?? max}</span></div>
+    </div>
+  )
+}
+
+
+/** Dropdown with checkboxes. Selected values show as chips in the trigger; `allLabel` adds an "all" choice that clears the list. */
+export function MultiSelect({ options, value, onChange, placeholder = 'Select…', allLabel }: { options: { value: string; label: string; hint?: string }[]; value: string[]; onChange: (v: string[]) => void; placeholder?: string; allLabel?: string }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => { if (!open) return; const h = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setOpen(false) }; document.addEventListener('mousedown', h); return () => document.removeEventListener('mousedown', h) }, [open])
+  const toggle = (v: string) => onChange(value.includes(v) ? value.filter((x) => x !== v) : [...value, v])
+  const labelOf = (v: string) => options.find((o) => o.value === v)?.label ?? v
+  return (
+    <div ref={ref} className="relative">
+      <button type="button" onClick={() => setOpen(!open)} aria-haspopup="listbox" aria-expanded={open} className="input flex min-h-[46px] items-center gap-1.5 text-left">
+        <span className="flex flex-1 flex-wrap gap-1">
+          {value.length === 0 && <span className="text-sand-500">{allLabel ?? placeholder}</span>}
+          {value.map((v) => <span key={v} className="inline-flex items-center gap-1 rounded-md bg-teal-50 border border-teal-200 px-1.5 py-0.5 text-[13px] text-sand-900">{labelOf(v)}<span role="button" aria-label={`Remove ${labelOf(v)}`} onClick={(e) => { e.stopPropagation(); toggle(v) }} className="text-sand-500 hover:text-sand-900"><X size={12} /></span></span>)}
+        </span>
+        <ChevronDown size={16} className="shrink-0 text-sand-500" />
+      </button>
+      {open && (
+        <ul role="listbox" aria-multiselectable className="absolute z-20 mt-1 max-h-72 w-full overflow-auto rounded-xl border border-sand-300 bg-white p-1 shadow-lg">
+          {allLabel && <li role="option" aria-selected={value.length === 0} onClick={() => { onChange([]); setOpen(false) }} className={`flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 text-sm hover:bg-sand-100 ${value.length === 0 ? 'font-semibold text-sand-900' : 'text-sand-700'}`}><span className={`flex h-4 w-4 items-center justify-center rounded border ${value.length === 0 ? 'border-teal-600 bg-teal-600 text-white' : 'border-sand-300'}`}>{value.length === 0 && <Check size={11} />}</span>{allLabel}</li>}
+          {options.map((o) => { const on = value.includes(o.value); return (
+            <li key={o.value} role="option" aria-selected={on} onClick={() => toggle(o.value)} className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-sand-800 hover:bg-sand-100">
+              <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${on ? 'border-teal-600 bg-teal-600 text-white' : 'border-sand-300 bg-white'}`}>{on && <Check size={11} />}</span>
+              <span className="flex-1">{o.label}{o.hint && <span className="block text-xs text-sand-500">{o.hint}</span>}</span>
+            </li>) })}
+        </ul>
+      )}
     </div>
   )
 }
