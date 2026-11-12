@@ -64,6 +64,17 @@ All data is fictional. The intake questionnaire is the Medical Director's conten
 | 23 | `#/staff/config/messages` | Admin / Karina | Message templates: event, audience, channel, timing, max sends, stop rule, merge fields, preview and test-send, versions; delivery log with result per message. | Final copy for each message family (Helixona). |
 | 24 | `#/staff/dashboards` | Cassandra / Carlos | Tiles for intake completion, chart prep, alerts, booking exceptions, contract completion, payment failures, active members, Month 9 reviews; enrollment funnel; surveys and alerts by week; connector health; pilot defect log; audit & security summary. | Which numbers go on the weekly report. |
 
+## Added Nov 6–12, 2026
+
+| Route | Role | Purpose | Open questions |
+|---|---|---|---|
+| `#/patient/home` | Patient | Vertical, tappable Healing Roadmap with a figure on the current step; actors with the lead first; Scheduled visits tile with the count. | — |
+| `#/patient/settings` | Patient | Email and text message toggles per kind of message. | Which messages may never be switched off. |
+| `#/patient/book` | Patient | Bookable therapies first; unavailable ones below with **Request a review**; plan review request. | Who receives review requests. |
+| `#/patient/crash` | Patient | Severity slider, Other symptom, contact request notifies the care team in eCW, fixed 911 line for shortness of breath or chest pain. | Who in eCW receives the notification and in what form. |
+| `#/staff/patients/new` | Advisor / Marie | Website options (Chronic or Complex Chronic Recovery, Health Optimization) with their questions, for phone inquiries. | — |
+| `#/staff/patients/P-0043?tab=comms` | All staff | Communication log: channel, topic, direction, result, who, when; add an entry. | Topic list. |
+
 ## Shared patterns
 
 - **Queues** share one table pattern: severity stripe + status pill (text, never color alone), who/when/why on every row.

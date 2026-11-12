@@ -5,6 +5,13 @@ import { PageHeader, Pill, QueueTable, Stat, Tabs, toneFor, type Column } from '
 import { inquiries } from '../../../mock/inquiries'
 import type { Inquiry } from '../../../mock/types'
 
+/** Most recent logged contact per inquiry (sample). The full log is on the patient record, Communications tab. */
+const lastContact: Record<string, { channel: string; topic: string; when: string; who: string }> = {
+  'INQ-2208': { channel: 'Call', topic: 'Screening call', when: 'Oct 6 · 4:10 PM', who: 'Ana' },
+  'INQ-2205': { channel: 'Call', topic: 'First contact', when: 'Oct 5 · 11:20 AM', who: 'Ana' },
+  'INQ-2199': { channel: 'Text', topic: 'Invitation and intake', when: 'Oct 2 · 10:30 AM', who: 'System' },
+}
+
 export default function InquiryList() {
   const nav = useNavigate()
   const [tab, setTab] = useState('cc')
@@ -15,7 +22,7 @@ export default function InquiryList() {
   const owners = ['All', ...new Set(inquiries.map((i) => i.owner))]
   const sources = ['All', 'Website · Typeform', 'Referral', 'Campaign']
   const active = Object.values(f).filter((v) => v !== 'All').length
-  const rows = inquiries.filter((i) => (tab === 'all' ? true : tab === 'cc' ? i.pathway === 'Complex Chronic' : tab === 'ho' ? i.pathway === 'Health Optimization (L2/L3)' : i.pathway === 'Insurance-covered NP care'))
+  const rows = inquiries.filter((i) => (tab === 'all' ? true : tab === 'cc' ? i.pathway === 'Complex Chronic' : i.pathway === 'Health Optimization (L2/L3)'))
     .filter((i) => !q || `${i.name} ${i.id} ${i.reason} ${i.city}`.toLowerCase().includes(q.toLowerCase()))
     .filter((i) => f.status === 'All' || i.status === f.status)
     .filter((i) => f.owner === 'All' || i.owner === f.owner)
@@ -29,12 +36,13 @@ export default function InquiryList() {
     { key: 'reason', header: 'Reason for seeking care', render: (r) => <span className="text-sand-700">{r.reason}</span> },
     { key: 'status', header: 'Status', render: (r) => <Pill tone={toneFor(r.status)}>{r.status}</Pill> },
     { key: 'owner', header: 'Owner', render: (r) => <span className={r.owner === 'Unassigned' ? 'font-semibold text-bad-700' : ''}>{r.owner}</span> },
+    { key: 'last', header: 'Last contact', render: (r) => { const c = lastContact[r.id]; return c ? <><div className="text-sand-800">{c.channel} · {c.topic}</div><div className="text-xs text-sand-500">{c.when} · {c.who}</div></> : <span className="text-xs text-sand-400">None yet</span> } },
     { key: 'next', header: 'Next action', render: (r) => <span className="text-sand-600">{r.nextAction}</span> },
   ]
 
   return (
     <>
-      <PageHeader eyebrow="Intake · Patient advisor" title="Inquiries" description="Website inquiries arrive from the Typeform with the pathway the patient chose. Complex Chronic and Health Optimization (L2/L3) each get their own questionnaire package; NP care is routed to the front desk."
+      <PageHeader eyebrow="Intake · Patient advisor" title="Inquiries" description="Website inquiries arrive from the Typeform with the pathway the patient chose. Complex Chronic and Health Optimization (L2/L3) each get their own questionnaire package."
         actions={<><button onClick={() => setShowFilters((v) => !v)} className={`btn-secondary ${active ? 'bg-teal-50' : ''}`}><Filter size={16} /> Filters{active ? ` · ${active}` : ''}</button><button className="btn-primary" onClick={() => nav('/staff/patients/new')}>+ Add inquiry manually</button></>} />
       {showFilters && (
         <div className="card mb-5 flex flex-wrap items-end gap-4 p-4">
@@ -52,7 +60,7 @@ export default function InquiryList() {
         <Stat label="Accepted for Month 0 (30 d)" value={3} hint="2 intakes open" tone="ok" />
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Tabs value={tab} onChange={setTab} tabs={[{ key: 'cc', label: 'Complex Chronic', count: inquiries.filter((i) => i.pathway === 'Complex Chronic').length }, { key: 'ho', label: 'Health Optimization (L2/L3)', count: inquiries.filter((i) => i.pathway === 'Health Optimization (L2/L3)').length }, { key: 'np', label: 'NP care', count: inquiries.filter((i) => i.pathway === 'Insurance-covered NP care').length }, { key: 'all', label: 'All' }]} />
+        <Tabs value={tab} onChange={setTab} tabs={[{ key: 'cc', label: 'Complex Chronic', count: inquiries.filter((i) => i.pathway === 'Complex Chronic').length }, { key: 'ho', label: 'Health Optimization (L2/L3)', count: inquiries.filter((i) => i.pathway === 'Health Optimization (L2/L3)').length }, { key: 'all', label: 'All' }]} />
         <label className="relative mb-4"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-sand-400" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, ID, reason…" className="input w-72 pl-9 py-2" /></label>
       </div>
       <QueueTable rows={rows} columns={columns} rowKey={(r) => r.id} rowTone={(r) => (r.owner === 'Unassigned' ? 'bad' : toneFor(r.status))}

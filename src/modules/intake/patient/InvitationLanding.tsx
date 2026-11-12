@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { getPathway } from '../../../mock/questionnaire'
 import { KeyRound, Link2, ShieldCheck } from 'lucide-react'
 import { PhoneFrame, Wordmark } from '../../../components/PhoneFrame'
 import { Pill, ToConfirm } from '../../../components/ui'
@@ -15,7 +16,7 @@ export default function InvitationLanding() {
         <div className="bg-teal-800 px-6 pt-14 pb-10 text-white">
           <Wordmark light size="md" />
           <h1 className="mt-6 font-display text-[30px] leading-[1.1] font-semibold">You've been invited by Helixona</h1>
-          <p className="mt-3 text-teal-100 text-[15px]">Ana, your patient advisor, has set up your private intake for the Complex Chronic Program. Allow 45–90 minutes; you can stop and come back anytime.</p>
+          <p className="mt-3 text-teal-100 text-[15px]">Ana, your patient advisor, has set up your private intake for {getPathway() === 'chronic' ? 'the Complex Chronic Program. Allow 45–90 minutes; you' : 'Health Optimization. You'} can stop and come back anytime.</p>
         </div>
 
         <div className="-mt-5 flex-1 rounded-t-3xl bg-sand-50 px-5 pt-6 pb-8">
@@ -75,7 +76,7 @@ export default function InvitationLanding() {
               <h2 className="mt-4 text-xl font-semibold text-sand-900">Welcome, Marisol</h2>
               <p className="mt-2 text-sand-600">You're verified. Here's what we'll do together:</p>
               <ol className="mt-5 space-y-3 text-left">
-                {[['Health questionnaire', 'Allow 45–90 minutes · save and return anytime'], ['Upload documents', 'Insurance card, ID, medication list, recent labs'], ['Review and sign 10 consents', 'Takes about 15 minutes']].map(([t, d], i) => (
+                {[['Health questionnaire', getPathway() === 'chronic' ? 'Allow 45–90 minutes · save and return anytime' : 'Save and return anytime'], ['Upload documents', 'Insurance card, ID, medication list, recent labs'], ['Review and sign 10 consents', 'Takes about 15 minutes']].map(([t, d], i) => (
                   <li key={t} className="card flex items-center gap-3 p-3.5">
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal-600 text-sm font-bold text-white">{i + 1}</span>
                     <span><span className="block font-semibold text-sand-900">{t}</span><span className="block text-sm text-sand-500">{d}</span></span>

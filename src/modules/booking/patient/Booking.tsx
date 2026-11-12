@@ -12,7 +12,9 @@ export default function Booking() {
   const [view, setView] = useState<'list' | 'slots' | 'done'>('list')
   const [sel, setSel] = useState(modalities[0])
   const [slot, setSlot] = useState<string>()
-  const plan: Record<string, 'book' | 'request' | 'not'> = { 'MOD-01': 'book', 'MOD-02': 'book', 'MOD-03': 'book', 'MOD-04': 'not', 'MOD-05': 'request', 'MOD-06': 'book', 'MOD-07': 'not', 'MOD-08': 'not', 'MOD-09': 'not' }
+  const [reviews, setReviews] = useState<string[]>([])
+  const [planReview, setPlanReview] = useState(false)
+  const plan: Record<string, 'book' | 'request' | 'not'> = { 'MOD-01': 'book', 'MOD-02': 'book', 'MOD-03': 'book', 'MOD-04': 'not', 'MOD-05': 'request', 'MOD-06': 'book', 'MOD-07': 'not', 'MOD-08': 'not', 'MOD-09': 'not', 'MOD-10': 'book' }
   const slots = ['Thu Oct 9 · 11:00 AM', 'Thu Oct 9 · 2:30 PM', 'Sat Oct 11 · 9:00 AM', 'Mon Oct 13 · 10:30 AM', 'Mon Oct 13 · 4:00 PM']
 
   if (view === 'done') return (
@@ -59,22 +61,53 @@ export default function Booking() {
           <li className="card flex items-center gap-3 p-3.5"><span className="flex h-9 w-9 items-center justify-center rounded-full bg-sand-100 text-sand-500"><Lock size={15} /></span><span className="flex-1"><span className="block font-semibold text-sand-900">Nurse practitioner visit · Thu Oct 9, 8:00 AM</span><span className="block text-xs text-sand-500">Insurance visit · booked by our office</span></span><Pill dot={false}>From clinic calendar</Pill></li>
         </ul>
         <div className="mt-5 eyebrow">Book a session for your plan of care</div>
-        <ul className="mt-2 space-y-2">
-          {modalities.filter((m) => m.active).map((m) => {
+        {(() => {
+          const rows = modalities.filter((m) => m.active).map((m) => {
             const inStage = m.stages.includes(myPlan.stage)
-            const mode = plan[m.id] === 'not' || inStage ? plan[m.id] : 'stage'
-            const firstStage = Math.min(...m.stages.filter((n) => n > myPlan.stage), 99)
-            return (
-              <li key={m.id}>
-                <button disabled={mode === 'not' || mode === 'stage'} onClick={() => { setSel(m); setSlot(undefined); setView('slots') }} className={`card flex w-full items-center gap-3 p-3.5 text-left ${mode === 'not' || mode === 'stage' ? 'opacity-60' : 'hover:border-teal-300'}`}>
-                  <span className="flex-1 min-w-0"><span className="block font-semibold text-sand-900">{m.name}</span><span className="block text-xs text-sand-500">{m.duration} min · up to {m.maxPerWeek}/week · {m.minSpacingDays}+ days apart</span></span>
-                  {mode === 'book' && <Pill tone="ok" dot={false}>Book now</Pill>}{mode === 'request' && <Pill tone="warn" dot={false}>Request</Pill>}{mode === 'not' && <Pill dot={false}>Not in your care plan</Pill>}{mode === 'stage' && <Pill dot={false}>{firstStage < 99 ? `From Step ${firstStage}` : 'Earlier stages only'}</Pill>}
-                </button>
-              </li>
-            )
-          })}
-        </ul>
-        <div className="mt-5"><Notice tone="info">Spacing and weekly limits are part of your Plan of Care. If you need something different, ask your nurse.</Notice></div>
+            const mode: 'book' | 'request' | 'not' | 'stage' = (plan[m.id] ?? 'not') === 'not' ? 'not' : inStage ? plan[m.id] : 'stage'
+            return { m, mode, firstStage: Math.min(...m.stages.filter((n) => n > myPlan.stage), 99) }
+          })
+          const available = rows.filter((r) => r.mode === 'book' || r.mode === 'request')
+          const unavailable = rows.filter((r) => r.mode === 'not' || r.mode === 'stage')
+          return (
+            <>
+              <ul className="mt-2 space-y-2">
+                {available.map(({ m, mode }) => (
+                  <li key={m.id}>
+                    <button onClick={() => { setSel(m); setSlot(undefined); setView('slots') }} className="card flex w-full items-center gap-3 p-3.5 text-left hover:border-teal-300">
+                      <span className="flex-1 min-w-0"><span className="block font-semibold text-sand-900">{m.name}</span><span className="block text-xs text-sand-500">{m.duration} min · up to {m.maxPerWeek}/week · {m.minSpacingDays}+ days apart</span></span>
+                      {mode === 'book' ? <Pill tone="ok" dot={false}>Book now</Pill> : <Pill tone="warn" dot={false}>Request</Pill>}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              {unavailable.length > 0 && <>
+                <div className="mt-6 eyebrow">Not available to you right now</div>
+                <p className="mt-1 text-xs text-sand-500">Want one of these? Ask your care team to review it for your plan.</p>
+                <ul className="mt-2 space-y-2">
+                  {unavailable.map(({ m, mode, firstStage }) => { const asked = reviews.includes(m.id); return (
+                    <li key={m.id} className="card p-3.5">
+                      <div className="flex items-center gap-3">
+                        <span className="flex-1 min-w-0"><span className="block font-semibold text-sand-600">{m.name}</span><span className="block text-xs text-sand-500">{m.duration} min</span></span>
+                        <Pill dot={false}>{mode === 'not' ? 'Not in your care plan' : firstStage < 99 ? `From Step ${firstStage}` : 'Earlier steps only'}</Pill>
+                      </div>
+                      {asked
+                        ? <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-ok-700"><Check size={13} /> Review requested · your nurse replies within 1 business day</p>
+                        : <button onClick={() => setReviews([...reviews, m.id])} className="btn-secondary mt-2.5 w-full py-2 text-[11px]">Request a review</button>}
+                    </li>) })}
+                </ul>
+              </>}
+            </>
+          )
+        })()}
+        <div className="card mt-6 p-4">
+          <div className="font-semibold text-sand-900">Need something different?</div>
+          <p className="mt-1 text-sm text-sand-600">Ask for a review of your plan: another therapy, a different rhythm, or a check on how a therapy is going.</p>
+          {planReview
+            ? <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-ok-700"><Check size={15} /> Request sent · your nurse replies within 1 business day</p>
+            : <button onClick={() => setPlanReview(true)} className="btn-secondary mt-3 w-full">Request a plan review</button>}
+        </div>
+        <div className="mt-4"><Notice tone="info">Spacing and weekly limits are part of your Plan of Care. Dr. D. decides any change at your review.</Notice></div>
       </div>
     </PhoneFrame>
   )

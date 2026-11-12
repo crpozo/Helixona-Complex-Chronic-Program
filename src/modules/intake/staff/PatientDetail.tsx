@@ -7,6 +7,7 @@ import { planFor, stageLabel } from '../../../mock/roadmap'
 import { patientById } from '../../../mock/patients'
 import { inquiries } from '../../../mock/inquiries'
 import IntakeReviewPanel from './IntakeReviewPanel'
+import CommunicationLog from './CommunicationLog'
 
 export default function PatientDetail() {
   const { id = '' } = useParams()
@@ -28,7 +29,7 @@ export default function PatientDetail() {
 
       <Tabs value={tab} onChange={setTab} tabs={[
         { key: 'overview', label: 'Overview' }, { key: 'invitation', label: 'Invitation' }, { key: 'interview', label: 'Advisor interview (internal)' },
-        { key: 'admissions', label: 'Admissions outcome' }, { key: 'intake', label: 'Intake review' }, { key: 'history', label: 'History' },
+        { key: 'admissions', label: 'Admissions outcome' }, { key: 'intake', label: 'Intake review' }, { key: 'comms', label: 'Communications' }, { key: 'history', label: 'History' },
       ]} />
 
       {tab === 'overview' && (
@@ -54,6 +55,7 @@ export default function PatientDetail() {
       {tab === 'interview' && <InterviewTab />}
       {tab === 'admissions' && <AdmissionsTab p={p} />}
       {tab === 'intake' && <IntakeReviewPanel patient={p} />}
+      {tab === 'comms' && <CommunicationLog />}
       {tab === 'history' && <Card title="Full history" subtitle="Every status change, action, and reason code. Exportable for audit."><AuditList entries={p.history} /></Card>}
     </>
   )

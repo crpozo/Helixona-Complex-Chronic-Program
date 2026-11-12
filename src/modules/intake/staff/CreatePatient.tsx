@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { Mail, MessageSquareText, Send } from 'lucide-react'
+import { Mail, MessageSquareText, Send, TrendingUp, Blend } from 'lucide-react'
 import { Breadcrumb, Card, Field, Notice, PageHeader, Pill, ToConfirm } from '../../../components/ui'
 import { inquiries } from '../../../mock/inquiries'
 
@@ -9,7 +9,7 @@ export default function CreatePatient() {
   const [sp] = useSearchParams()
   const inquiry = inquiries.find((i) => i.id === sp.get('inquiry'))
   const [first, last] = (inquiry?.name ?? ' ').split(' ')
-  const [form, setForm] = useState({ first: first ?? '', last: last ?? '', dob: '', phone: '', email: '', ecwId: '', method: 'Magic link', channels: { email: true, sms: true }, expires: '14' })
+  const [form, setForm] = useState({ first: first ?? '', last: last ?? '', dob: '', phone: '', email: '', ecwId: '', method: 'Magic link', channels: { email: true, sms: true }, expires: '14', path: inquiry ? (inquiry.pathway === 'Complex Chronic' ? 'chronic' : 'optimization') : '', concerns: inquiry?.reason ?? '', ppo: '', office: '', goal: '', source: inquiry ? inquiry.source : 'Phone call' })
   const [sent, setSent] = useState(false)
   const set = (k: string, v: unknown) => setForm((f) => ({ ...f, [k]: v }))
 
@@ -39,13 +39,38 @@ export default function CreatePatient() {
       {inquiry && <div className="mb-4"><Notice tone="teal" title={`Pre-filled from inquiry ${inquiry.id}`}>{inquiry.pathway} · {inquiry.source} · received {inquiry.receivedAt}. Source and pathway are kept on the patient record.</Notice></div>}
       <div className="grid gap-5 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-5">
+          <Card title="What brings them to Helixona?" subtitle="The same two options and questions as the website's Become a patient form, so a phone inquiry is recorded the same way.">
+            <div className="grid gap-3 sm:grid-cols-2">
+              {([['chronic', 'Chronic or Complex Chronic Recovery', 'I am living with an ongoing or complex health condition and want to explore a deeper, treatment-focused approach.', <Blend size={20} />], ['optimization', 'Health Optimization', 'I want to improve or protect my health through individual therapies, thoughtfully designed experiences, or targeted treatment programs.', <TrendingUp size={20} />]] as [string, string, string, React.ReactNode][]).map(([k, t, d, icon]) => (
+                <button key={k} type="button" onClick={() => set('path', k)} aria-pressed={form.path === k} className={`rounded-xl border p-4 text-left transition-colors ${form.path === k ? 'border-teal-500 bg-teal-50' : 'border-sand-300 bg-white hover:border-sand-400'}`}>
+                  <span className="text-teal-700">{icon}</span>
+                  <span className="mt-2 block font-display text-xl font-semibold text-sand-900">{t}</span>
+                  <span className="mt-1 block text-sm text-sand-600">{d}</span>
+                </button>
+              ))}
+            </div>
+            {form.path === 'chronic' && <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div className="sm:col-span-2"><Field label="What are the main health concerns they need help with?" required><textarea rows={3} className="input" value={form.concerns} onChange={(e) => set('concerns', e.target.value)} /></Field></div>
+              <Field label="Do they have PPO insurance?" required><div className="flex gap-2">{['Yes', 'No', 'Not sure'].map((o) => <button key={o} type="button" onClick={() => set('ppo', o)} className={`flex-1 rounded-xl border px-3 py-2.5 text-sm font-medium ${form.ppo === o ? 'border-teal-500 bg-teal-50 text-teal-900' : 'border-sand-300 bg-white text-sand-700'}`}>{o}</button>)}</div></Field>
+              <Field label="Can they come to the Irvine office on a regular basis?" required><div className="flex gap-2">{['Yes', 'Sometimes', 'No'].map((o) => <button key={o} type="button" onClick={() => set('office', o)} className={`flex-1 rounded-xl border px-3 py-2.5 text-sm font-medium ${form.office === o ? 'border-teal-500 bg-teal-50 text-teal-900' : 'border-sand-300 bg-white text-sand-700'}`}>{o}</button>)}</div></Field>
+              <div className="sm:col-span-2"><Notice tone="info">Complex Chronic always goes through a screening call before the questionnaire link is sent.</Notice></div>
+            </div>}
+            {form.path === 'optimization' && <div className="mt-4 grid gap-4">
+              <Field label="What are they looking for?" required><div className="grid gap-2 sm:grid-cols-2">{['Provider visit to build an optimization plan', 'Diagnostics and lab work', 'Therapies (IV, red light, nano bath, salt room…)', 'Not sure yet'].map((o) => <button key={o} type="button" onClick={() => set('goal', o)} className={`rounded-xl border px-3 py-2.5 text-left text-sm font-medium ${form.goal === o ? 'border-teal-500 bg-teal-50 text-teal-900' : 'border-sand-300 bg-white text-sand-700'}`}>{o}</button>)}</div></Field>
+              <Notice tone="info">Health Optimization receives its secure link right away; no screening call.</Notice>
+            </div>}
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <Field label="How did they reach us?"><select className="input" value={form.source} onChange={(e) => set('source', e.target.value)}>{[...new Set([form.source, 'Phone call', 'Walk-in', 'Website', 'Referral'])].map((o) => <option key={o}>{o}</option>)}</select></Field>
+              <Field label="How did they hear about us?"><input className="input" placeholder="Friend, physician, Instagram…" /></Field>
+            </div>
+          </Card>
           <Card title="Patient" subtitle="Identity details used to match the eCW chart and confirm the patient during intake.">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="First name" required><input className="input" value={form.first} onChange={(e) => set('first', e.target.value)} /></Field>
               <Field label="Last name" required><input className="input" value={form.last} onChange={(e) => set('last', e.target.value)} /></Field>
               <Field label="Date of birth" required><input type="date" className="input" value={form.dob} onChange={(e) => set('dob', e.target.value)} /></Field>
               <Field label="eCW chart number" hint="Leave blank if the chart doesn't exist yet; Charlene will add it."><input className="input" placeholder="ECW-…" value={form.ecwId} onChange={(e) => set('ecwId', e.target.value)} /></Field>
-              <Field label="Mobile phone" required><input className="input" placeholder="(949) 555-0100" value={form.phone} onChange={(e) => set('phone', e.target.value)} /></Field>
+              <Field label="Mobile phone" required><input className="input" placeholder="(949) 000-0000" value={form.phone} onChange={(e) => set('phone', e.target.value)} /></Field>
               <Field label="Email" required><input className="input" placeholder="name@example.com" value={form.email} onChange={(e) => set('email', e.target.value)} /></Field>
             </div>
           </Card>

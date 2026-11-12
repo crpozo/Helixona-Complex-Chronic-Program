@@ -1,15 +1,15 @@
 /* ---------------- Healing Roadmap: the seven stages every patient moves through ----------------
    Shared by patient screens (home, booking), staff screens (patient detail, registry) and configuration
    (which stages a modality is permitted in). Wording as supplied by the clinic's Healing Roadmap graphic. */
-export interface Stage { n: number; title: string; blurb: string }
+export interface Stage { n: number; title: string; blurb: string; /** Colour of this step in the clinic's Healing Roadmap graphic. */ color: string }
 export const stages: Stage[] = [
-  { n: 1, title: 'What is your Why?', blurb: 'Your Why guides every step of your journey and keeps you grounded when healing gets difficult.' },
-  { n: 2, title: 'Stabilization', blurb: 'Before starting treatments we must stabilize your body so it can tolerate the deeper therapies more effectively and safely.' },
-  { n: 3, title: 'Identify Lead Actors', blurb: 'Identify the sources of your illness. Begin with the lead actor, then address other factors in order of severity.' },
-  { n: 4, title: 'Resolve Lead Actor', blurb: 'Treat the Lead Actor first. Your doctor will know which needs to be addressed in order of importance.' },
-  { n: 5, title: 'Resolve Next Actors', blurb: 'After the Lead Actor is cleared, treat additional actors until all root causes are resolved.' },
-  { n: 6, title: 'Rewiring Resilience', blurb: 'Rebalance the nervous system and reinforce resilience for lasting stability.' },
-  { n: 7, title: 'Graduate to Maintenance & Longevity', blurb: 'Keep the gains with a lighter rhythm of care and the habits that hold them.' },
+  { n: 1, title: 'What is your Why?', blurb: 'Your Why guides every step of your journey and keeps you grounded when healing gets difficult.', color: '#D2A679' },
+  { n: 2, title: 'Stabilization', blurb: 'Before starting treatments we must stabilize your body so it can tolerate the deeper therapies more effectively and safely.', color: '#8B9279' },
+  { n: 3, title: 'Identify Lead Actors', blurb: 'Identify the sources of your illness. Begin with the lead actor, then address other factors in order of severity.', color: '#EADFBF' },
+  { n: 4, title: 'Resolve Lead Actor', blurb: 'Treat the Lead Actor first. Your doctor will know which needs to be addressed in order of importance.', color: '#BFAE9F' },
+  { n: 5, title: 'Resolve Next Actors', blurb: 'After the Lead Actor is cleared, treat additional actors until all root causes are resolved.', color: '#D6CDC6' },
+  { n: 6, title: 'Rewiring Resilience', blurb: 'Rebalance the nervous system and reinforce resilience for lasting stability.', color: '#6B4226' },
+  { n: 7, title: 'Graduate to Maintenance & Longevity', blurb: 'Keep the gains with a lighter rhythm of care and the habits that hold them.', color: '#D9BE82' },
 ]
 export const stageLabel = (n: number) => { const s = stages.find((x) => x.n === n); return s ? `Step ${s.n} · ${s.title}` : `Step ${n}` }
 

@@ -24,7 +24,7 @@ export default function PatientHome() {
           </div>
         </div>
 
-        <div className="mt-5"><Roadmap current={myPlan.stage} to="/patient/book" /></div>
+        <div className="mt-5"><Roadmap current={myPlan.stage} /></div>
         <div className="card mt-2 p-4"><div className="flex items-center justify-between"><span className="eyebrow">What we're working on</span><span className="text-xs text-sand-500">Set by {myPlan.updatedBy} · {myPlan.updatedAt}</span></div><div className="mt-2"><Actors actors={myPlan.actors} lead={myPlan.leadActor} /></div><p className="mt-2 text-xs text-sand-500">Your lead actor is treated first. Dr. D. updates this list at each review.</p></div>
 
         <div className="mt-6 eyebrow">Your program</div>

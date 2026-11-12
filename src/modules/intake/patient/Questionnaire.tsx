@@ -54,7 +54,7 @@ export default function Questionnaire() {
         <div className="-mt-5 flex-1 rounded-t-3xl bg-white px-5 pt-6 pb-8">
           <div className="space-y-3 text-[15px] leading-relaxed text-sand-700">
             <p>At Helixona, we believe understanding your health begins with understanding you. This is more than a typical medical questionnaire. It's the foundation for connecting the pieces, recognizing patterns, and exploring the root causes of your health challenges.</p>
-            <p>Please allow 45–90 minutes to complete your health story. Find a quiet space and answer each question as thoughtfully and honestly as you can. The details matter, and if you're unsure of an answer, it's okay to say so.</p>
+            <p>{pathway === 'chronic' ? 'Please allow 45–90 minutes to complete your health story. ' : ''}Find a quiet space and answer each question as thoughtfully and honestly as you can. The details matter, and if you're unsure of an answer, it's okay to say so.</p>
             <p>Your physician personally reviews all of your answers before your first appointment, taking time to understand your unique health journey and prepare for your visit.</p>
             <p>We know this takes time and energy, especially when you're not feeling your best. Take your time. Your progress is automatically saved, so you can pause, rest, and return whenever you're ready.</p>
             <p>Every piece you share helps us see the bigger picture.</p>
