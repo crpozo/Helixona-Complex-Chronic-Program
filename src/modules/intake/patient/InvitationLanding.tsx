@@ -4,6 +4,7 @@ import { getPathway } from '../../../mock/questionnaire'
 import { KeyRound, Link2, ShieldCheck } from 'lucide-react'
 import { PhoneFrame, Wordmark } from '../../../components/PhoneFrame'
 import { Pill, ToConfirm } from '../../../components/ui'
+import { notify } from '../../../mock/store'
 
 export default function InvitationLanding() {
   const nav = useNavigate()
@@ -66,7 +67,7 @@ export default function InvitationLanding() {
                 ))}
               </div>
               <button onClick={() => setStep('verified')} className="btn-primary btn-lg mt-8 w-full">Continue</button>
-              <button className="btn-ghost mt-2 w-full">Resend code</button>
+              <button className="btn-ghost mt-2 w-full" onClick={() => notify('A new code was sent by text')}>Resend code</button>
             </div>
           )}
 

@@ -39,9 +39,11 @@ import Registry from './modules/registry/Registry'
 import MemberDetail from './modules/registry/MemberDetail'
 import Booking from './modules/booking/patient/Booking'
 import ResourceCalendar from './modules/booking/staff/ResourceCalendar'
+import StaffBooking from './modules/booking/staff/StaffBooking'
 import Agreement from './modules/payments/patient/Agreement'
 import PaymentsPatient from './modules/payments/patient/PaymentsPatient'
 import FailedPayments from './modules/payments/staff/FailedPayments'
+import Reconciliation from './modules/payments/staff/Reconciliation'
 import Dashboards from './modules/dashboards/Dashboards'
 
 export default function App() {
@@ -87,7 +89,9 @@ export default function App() {
           <Route path="/staff/registry" element={<Registry />} />
           <Route path="/staff/registry/:id" element={<MemberDetail />} />
           <Route path="/staff/calendar" element={<ResourceCalendar />} />
+          <Route path="/staff/calendar/new" element={<StaffBooking />} />
           <Route path="/staff/payments" element={<FailedPayments />} />
+          <Route path="/staff/payments/reconciliation" element={<Reconciliation />} />
           <Route path="/staff/config/surveys" element={<SurveyBuilder />} />
           <Route path="/staff/config/modalities" element={<ModalityConfig />} />
           <Route path="/staff/config/alerts" element={<AlertRules />} />

@@ -3,6 +3,7 @@ import { Send } from 'lucide-react'
 import { Card, Field, PageHeader, Pill, QueueTable, Tabs, Toast, VersionTag, type Column } from '../../components/ui'
 import { deliveryLog, messageTemplates, type DeliveryLog, type MessageTemplate } from '../../mock/program'
 import { stateTone, StateFlow } from '../config/SurveyBuilder'
+import { notify } from '../../mock/store'
 
 export default function MessageTemplates() {
   const [tab, setTab] = useState('templates')
@@ -28,7 +29,7 @@ export default function MessageTemplates() {
   return (
     <>
       <Toast message={toast} />
-      <PageHeader eyebrow="Configuration · Program admin" title="Message templates" description="Every email and text is a configuration record: event, audience, channel, timing, template with merge fields, stop rule. Patient messages carry the minimum information needed." actions={<button className="btn-primary">+ New template</button>} />
+      <PageHeader eyebrow="Configuration · Program admin" title="Message templates" description="Every email and text is a configuration record: event, audience, channel, timing, template with merge fields, stop rule. Patient messages carry the minimum information needed." actions={<button className="btn-primary" onClick={() => notify('New message template started as a draft')}>+ New template</button>} />
       <Tabs value={tab} onChange={setTab} tabs={[{ key: 'templates', label: 'Templates', count: messageTemplates.length }, { key: 'log', label: 'Delivery log' }]} />
       {tab === 'templates' ? (
         <div className="grid gap-5 xl:grid-cols-5">
@@ -43,7 +44,7 @@ export default function MessageTemplates() {
                 <Field label="Body" hint="Merge fields: {{first_name}} {{secure_link}} {{payment_link}} {{survey_link}} {{physician}} — no diagnoses or clinical details."><textarea rows={4} className="input font-mono text-[13px]" defaultValue={sel.body} /></Field>
                 <div className="grid grid-cols-2 gap-3"><Field label="Reply-to"><select className="input"><option>care@helixona.com (monitored)</option><option>No-reply</option></select></Field><Field label="Escalation on failure"><select className="input"><option>Create advisor task</option><option>None</option></select></Field></div>
                 <div className="rounded-xl bg-sand-100 p-3 text-sm text-sand-700"><div className="eyebrow mb-1">Preview · {sel.channel.includes('SMS') ? 'text message' : 'email'}</div>{sel.subject !== '—' && <div className="font-semibold">{sel.subject}</div>}<div>{preview}</div></div>
-                <div className="flex gap-2"><button onClick={() => show('Test message sent to ap@helixona.com')} className="btn-secondary"><Send size={14} /> Test-send to me</button><button className="btn-primary">Save as v{sel.version + 1}</button></div>
+                <div className="flex gap-2"><button onClick={() => show('Test message sent to ap@helixona.com')} className="btn-secondary"><Send size={14} /> Test-send to me</button><button className="btn-primary" onClick={() => notify('Saved as a new version · goes live when published')}>Save as v{sel.version + 1}</button></div>
               </div>
             </Card>
           </div>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, Field, Notice, PageHeader, Pill, QueueTable, Tabs, VersionTag, type Column } from '../../components/ui'
 import { alertRules, levelTone, type AlertRule } from '../../mock/program'
 import { stateTone } from './SurveyBuilder'
+import { notify } from '../../mock/store'
 
 const layers: AlertRule['layer'][] = ['Global', 'Program', 'Stage', 'Modality', 'Physician', 'Patient override']
 
@@ -17,7 +18,7 @@ export default function AlertRules() {
   ]
   return (
     <>
-      <PageHeader eyebrow="Configuration · Physician" title="Alert rules" description="What creates an alert, how urgent it is, who is notified, and how fast a response is expected. Rules are layered; the most specific layer wins and the applied layer is always shown on the alert." actions={<button className="btn-primary">+ New rule</button>} />
+      <PageHeader eyebrow="Configuration · Physician" title="Alert rules" description="What creates an alert, how urgent it is, who is notified, and how fast a response is expected. Rules are layered; the most specific layer wins and the applied layer is always shown on the alert." actions={<button className="btn-primary" onClick={() => notify('New alert rule started as a draft')}>+ New rule</button>} />
       <Tabs value={tab} onChange={setTab} tabs={[{ key: 'rules', label: 'Rules', count: alertRules.length }, { key: 'precedence', label: 'Precedence view' }, { key: 'levels', label: 'Levels & labels' }]} />
       {tab === 'rules' && (
         <div className="grid gap-5 xl:grid-cols-5">
@@ -34,7 +35,7 @@ export default function AlertRules() {
                 <Field label="Escalation timer"><input className="input" defaultValue={sel.escalation} /></Field>
                 <Field label="After-hours behavior"><input className="input" defaultValue={sel.afterHours} /></Field>
                 <Field label="Patient-facing emergency language"><select className="input"><option>Show standard notice (not continuously monitored · call 911)</option><option>Show notice + call-us-now banner</option></select></Field>
-                <div className="flex gap-2 pt-1"><button className="btn-secondary">Save draft</button><button className="btn-primary">Send for clinical publish</button></div>
+                <div className="flex gap-2 pt-1"><button className="btn-secondary" onClick={() => notify('Draft saved · not active until it is published')}>Save draft</button><button className="btn-primary" onClick={() => notify('Sent to Dr. D. for clinical review and publish')}>Send for clinical publish</button></div>
                 <p className="help">Changes to clinical alert rules require an authorized clinical publisher. Every version and every alert action is audited.</p>
               </div>
             </Card>
@@ -44,7 +45,7 @@ export default function AlertRules() {
       {tab === 'precedence' && (
         <div className="grid gap-5 xl:grid-cols-3">
           <div className="xl:col-span-2">
-            <Card title="Which rule applies, and why" subtitle="Example: crash report from P-0041 (Dr. D.'s patient, Active care, after nano bath) with severity 7.">
+            <Card title="Which rule applies, and why" subtitle="Example: crash report from Priya Raman (Dr. D.'s patient, Active care, after nano bath) with severity 7.">
               <ol className="space-y-2">
                 {layers.map((l, i) => {
                   const rule = alertRules.find((r) => r.layer === l && (l !== 'Modality' || r.scope.includes('laser')) )
@@ -66,7 +67,7 @@ export default function AlertRules() {
           </div>
           <Card title="Order of precedence" subtitle="Most specific wins. Lower layers fill in whatever the winning layer does not set, so there are no hidden contradictions.">
             <ol className="space-y-1.5 text-sm">{layers.map((l, i) => <li key={l} className="flex items-center gap-2"><span className="w-5 text-right text-xs text-sand-400">{i + 1}</span><span className="rounded-md bg-sand-100 px-2 py-1">{l}</span>{i < layers.length - 1 && <span className="text-sand-300">→ overridden by</span>}</li>)}</ol>
-            <div className="mt-4"><Field label="Try another scenario"><select className="input"><option>P-0041 · crash severity 7 · after nano bath</option><option>P-0044 · contact requested · after red light</option><option>P-0019 · pain +3 · after laser</option></select></Field></div>
+            <div className="mt-4"><Field label="Try another scenario"><select className="input"><option>Priya Raman · crash severity 7 · after nano bath</option><option>Devon Okafor · contact requested · after red light</option><option>Sophia Marchetti · pain +3 · after laser</option></select></Field></div>
           </Card>
         </div>
       )}

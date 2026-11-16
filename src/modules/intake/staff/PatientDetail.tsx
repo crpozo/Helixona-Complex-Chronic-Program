@@ -211,7 +211,7 @@ function InvitationTab({ p }: { p: NonNullable<ReturnType<typeof patientById>> }
     <div className="grid gap-5 lg:grid-cols-3">
       <div className="lg:col-span-2 space-y-5">
         <Card title="Invitation status" subtitle={inv ? `${inv.method} · sent ${inv.sentAt} · expires ${inv.expiresAt}` : 'No invitation sent yet.'}
-          actions={<div className="flex gap-2"><button className="btn-secondary px-3 py-1.5 text-xs"><RefreshCw size={14} /> Reissue</button><button className="btn-secondary px-3 py-1.5 text-xs"><Send size={14} /> Send reminder</button></div>}>
+          actions={<div className="flex gap-2"><button className="btn-secondary px-3 py-1.5 text-xs" onClick={() => notify('A new invitation was sent · the old link no longer works')}><RefreshCw size={14} /> Reissue</button><button className="btn-secondary px-3 py-1.5 text-xs" onClick={() => notify('Reminder sent to the patient')}><Send size={14} /> Send reminder</button></div>}>
           <ol className="flex items-center">
             {states.map((s, i) => (
               <li key={s} className="flex flex-1 items-center">
@@ -253,7 +253,7 @@ function InterviewTab() {
             </div>
             <div className="mt-4"><Field label="Advisor notes"><textarea rows={5} className="input" value={v.notes} onChange={(e) => setV({ ...v, notes: e.target.value })} /></Field></div>
             <div className="mt-3"><ToConfirm>interview question set from the advisor team</ToConfirm></div>
-            <div className="mt-4 flex gap-2"><button className="btn-primary">Save interview</button><button className="btn-secondary">Mark interview completed</button></div>
+            <div className="mt-4 flex gap-2"><button className="btn-primary" onClick={() => notify('Interview notes saved · internal only')}>Save interview</button><button className="btn-secondary" onClick={() => notify('Interview marked as completed')}>Mark interview completed</button></div>
           </Card>
         </div>
         <Card title="Insurance (collected during interview)">

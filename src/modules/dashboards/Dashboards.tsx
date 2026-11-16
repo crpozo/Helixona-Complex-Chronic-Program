@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Card, Notice, PageHeader, Pill, Stat, ToConfirm } from '../../components/ui'
+import { notify } from '../../mock/store'
 
 const tiles = [
   { label: 'Intake completion', value: '3 / 5', hint: 'median 4.2 d', tone: 'teal', to: '/staff/patients?view=intake' },
@@ -24,7 +25,7 @@ export default function Dashboards() {
   const max = 22
   return (
     <>
-      <PageHeader eyebrow="System · Program admin (Cassandra)" title="Dashboards" description="Operational view of the pilot. Every tile opens the queue behind it. Exports are available to program admins and are logged." meta={<ToConfirm>which numbers Cassandra wants on the weekly report</ToConfirm>} actions={<button className="btn-secondary">Export weekly report (logged)</button>} />
+      <PageHeader eyebrow="System · Program admin (Cassandra)" title="Dashboards" description="Operational view of the pilot. Every tile opens the queue behind it. Exports are available to program admins and are logged." meta={<ToConfirm>which numbers Cassandra wants on the weekly report</ToConfirm>} actions={<button className="btn-secondary" onClick={() => notify('Weekly report exported · logged with your name and time')}>Export weekly report (logged)</button>} />
       <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4">{tiles.map((t) => <Stat key={t.label} label={t.label} value={t.value} hint={t.hint} tone={t.tone} to={t.to} />)}</div>
       <div className="grid gap-5 xl:grid-cols-3">
         <Card title="Enrollment funnel · last 30 days" subtitle="From website inquiry to active membership.">

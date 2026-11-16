@@ -75,6 +75,21 @@ All data is fictional. The intake questionnaire is the Medical Director's conten
 | `#/staff/patients/new` | Advisor / Marie | Website options (Chronic or Complex Chronic Recovery, Health Optimization) with their questions, for phone inquiries. | — |
 | `#/staff/patients/P-0043?tab=comms` | All staff | Communication log: channel, topic, direction, result, who, when; add an entry. | Topic list. |
 
+## Changed Nov 16, 2026
+
+| Route | Role | Purpose | Open questions |
+|---|---|---|---|
+| `#/staff/patients` | All staff | The one patients screen. Views: all, intake review, chart prep, eCW exceptions, waitlist & pending. Search and filters, metric tiles each user arranges, latest-note column (mine / anyone). Replaces `#/staff/intake-review` and `#/staff/chart-prep`, which redirect here. | — |
+| `#/staff/patients/P-0043` | All staff | Patient record with photo. Tabs: Overview (dashboard), Invitation, Advisor interview, Admissions outcome (incl. Waitlist, Pending information), Intake review, Chart prep, Notes / Communication, Scores & check-ins, History. Update status works. | Photo source. |
+| `#/staff/patients/P-0041?tab=scores` | Nursing / physician | Scores over time: period buttons (1W to All) and custom dates; crash and pain-flare icons; prescription-change overlay; therapy filters; progress badges; history with crash, therapy and prescription columns; Quality of Life questionnaire every 3 months. | Source of prescription changes. |
+| `#/staff/alerts` | Nursing | Names; outcome Resolved or Pending with the pending action; escalate confirmation; dictation on the note; AI Agent documents in eCW by default. | Pending-action list. |
+| `#/staff/registry/P-0031?tab=transition` | Karina | New statuses, start and end date, updated agreement sent for e-signature, agreement status card. | E-signature provider; agreement text. |
+| `#/staff/payments` | Karina | Order-style list: patient, plan, charge, period, amount, date, payment status, membership, last processed, next action. Filters, custom dates, saved views, details with retry and receipt. Family plans tab. | Family pricing. |
+| `#/staff/payments/reconciliation` | Karina | Charged vs paid out vs bank, by payout and month; items to check; export. | Bank feed source. |
+| `#/staff/calendar` | Karina / nursing | Time on the left, treatments on top; time steps; day, week, month, year; read eCW again. | — |
+| `#/staff/calendar/new` | Front desk / nursing | Staff booking: patient, treatment, length with price, date, time, room; checked against eCW. | Prices. |
+| `#/patient/messages`, `#/patient/assistant` | Patient | Chat and email with the clinic; AI assistant for program questions. | Who answers; assistant scope. |
+
 ## Shared patterns
 
 - **Queues** share one table pattern: severity stripe + status pill (text, never color alone), who/when/why on every row.

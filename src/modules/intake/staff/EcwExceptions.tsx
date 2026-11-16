@@ -3,6 +3,7 @@ import { Camera, CheckCheck, RotateCw } from 'lucide-react'
 import { Card, Field, Notice, PageHeader, Pill, QueueTable, Row, Stat, Tabs, Toast, type Column } from '../../../components/ui'
 import { ecwJobs } from '../../../mock/ecwJobs'
 import type { EcwJob } from '../../../mock/types'
+import { nameOf } from '../../../mock/names'
 
 export default function EcwExceptions() {
   const [jobs, setJobs] = useState(ecwJobs)
@@ -15,7 +16,7 @@ export default function EcwExceptions() {
   const columns: Column<EcwJob>[] = [
     { key: 'id', header: 'Job', render: (r) => <><div className="font-semibold text-sand-900">{r.id}</div><div className="text-xs text-sand-500">{r.queuedAt}</div></>, width: '150px' },
     { key: 'type', header: 'Job type', render: (r) => <span className="text-sand-800">{r.type}</span> },
-    { key: 'p', header: 'Patient', render: (r) => <span className="font-medium">{r.patientId}</span> },
+    { key: 'p', header: 'Patient', render: (r) => <span className="font-medium">{nameOf(r.patientId)}</span> },
     { key: 'step', header: 'Failed step', render: (r) => r.failedStep },
     { key: 'sev', header: 'Severity', render: (r) => <Pill tone={r.severity === 'critical' ? 'bad' : 'warn'}>{r.severity === 'critical' ? 'Critical · no auto-retry' : 'Warning'}</Pill> },
     { key: 'att', header: 'Attempts', render: (r) => r.attempts },

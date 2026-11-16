@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { GitBranch, GripVertical, Plus, Send } from 'lucide-react'
 import { Card, Field, Notice, PageHeader, Pill, QueueTable, Row, Tabs, Toast, VersionTag, type Column, type Tone } from '../../components/ui'
 import { questionBank, surveyTemplates, type ContentState, type SurveyTemplate } from '../../mock/program'
+import { notify } from '../../mock/store'
 
 export const stateTone: Record<ContentState, Tone> = { Draft: 'neutral', 'In review': 'warn', Approved: 'info', Published: 'ok', Retired: 'neutral' }
 export function StateFlow({ state }: { state: ContentState }) {
@@ -28,7 +29,7 @@ export default function SurveyBuilder() {
   return (
     <>
       <Toast message={toast} />
-      <PageHeader eyebrow="Configuration · Physician / program admin" title="Survey templates" description="Build surveys from the question bank, add scoring and branching, and publish versions. Publishing clinical content requires an authorized clinical publisher (Dr. D.)." actions={<button className="btn-primary"><Plus size={16} /> New template</button>} />
+      <PageHeader eyebrow="Configuration · Physician / program admin" title="Survey templates" description="Build surveys from the question bank, add scoring and branching, and publish versions. Publishing clinical content requires an authorized clinical publisher (Dr. D.)." actions={<button className="btn-primary" onClick={() => notify('New template started as a draft')}><Plus size={16} /> New template</button>} />
       <div className="grid gap-5 xl:grid-cols-5">
         <div className="xl:col-span-2"><QueueTable rows={surveyTemplates} columns={columns} rowKey={(r) => r.id + r.version} rowTone={(r) => stateTone[r.state]} onRowClick={setSel} /></div>
         <div className="xl:col-span-3">
@@ -40,13 +41,13 @@ export default function SurveyBuilder() {
               <div className="space-y-4">
                 {sections.map((s) => (
                   <div key={s.title} className="rounded-xl border border-sand-200">
-                    <div className="flex items-center justify-between bg-sand-50 px-3 py-2"><span className="text-sm font-semibold">{s.title}</span><button className="btn-ghost px-2 py-1 text-xs">Rename</button></div>
+                    <div className="flex items-center justify-between bg-sand-50 px-3 py-2"><span className="text-sm font-semibold">{s.title}</span><button className="btn-ghost px-2 py-1 text-xs" onClick={() => notify('Rename the section, then save')}>Rename</button></div>
                     <ul className="divide-y divide-sand-100">{s.questions.map((q) => { const b = questionBank.find((x) => x.id === q.ref)!; return (
                       <li key={q.ref} className="flex items-center gap-3 px-3 py-2.5 text-sm"><GripVertical size={14} className="text-sand-300" /><span className="flex-1"><span className="text-sand-900">{b.text}</span><span className="block text-xs text-sand-500">{b.type} · {q.required ? 'Required' : 'Optional'}{q.showIf && <span className="ml-2 inline-flex items-center gap-1 text-plum-600"><GitBranch size={11} /> show if {q.showIf}</span>}</span></span><Pill dot={false}>{q.ref}</Pill></li>) })}</ul>
-                    <div className="px-3 py-2"><button className="btn-ghost px-2 py-1 text-xs"><Plus size={13} /> Add question from bank</button></div>
+                    <div className="px-3 py-2"><button className="btn-ghost px-2 py-1 text-xs" onClick={() => notify('Choose a question from the bank to add it')}><Plus size={13} /> Add question from bank</button></div>
                   </div>
                 ))}
-                <button className="btn-secondary w-full"><Plus size={15} /> Add section</button>
+                <button className="btn-secondary w-full" onClick={() => notify('New section added')}><Plus size={15} /> Add section</button>
                 <Notice tone="plum">Clinical wording comes from the Medical Director and is not edited by the software team. Editing is locked for Published versions; create a new draft version instead.</Notice>
               </div>
             )}
