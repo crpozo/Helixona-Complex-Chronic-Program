@@ -20,8 +20,6 @@ import InquiryList from './modules/intake/staff/InquiryList'
 import PatientsList from './modules/intake/staff/PatientsList'
 import CreatePatient from './modules/intake/staff/CreatePatient'
 import PatientDetail from './modules/intake/staff/PatientDetail'
-import IntakeReviewQueue from './modules/intake/staff/IntakeReviewQueue'
-import ChartPrepQueue from './modules/intake/staff/ChartPrepQueue'
 import ChartPrepDetail from './modules/intake/staff/ChartPrepDetail'
 import EcwExceptions from './modules/intake/staff/EcwExceptions'
 import BecomePatient from './modules/public/BecomePatient'
@@ -68,8 +66,8 @@ export default function App() {
           <Route path="/staff/patients" element={<PatientsList />} />
           <Route path="/staff/patients/new" element={<CreatePatient />} />
           <Route path="/staff/patients/:id" element={<PatientDetail />} />
-          <Route path="/staff/intake-review" element={<IntakeReviewQueue />} />
-          <Route path="/staff/chart-prep" element={<ChartPrepQueue />} />
+          <Route path="/staff/intake-review" element={<Navigate to="/staff/patients?view=intake" replace />} />
+          <Route path="/staff/chart-prep" element={<Navigate to="/staff/patients?view=chart" replace />} />
           <Route path="/staff/chart-prep/:id" element={<ChartPrepDetail />} />
           <Route path="/staff/ecw-exceptions" element={<EcwExceptions />} />
           {/* Patient · surveys, booking, payments */}

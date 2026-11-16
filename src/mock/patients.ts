@@ -118,6 +118,24 @@ export const patients: Patient[] = [
       { actor: 'Ana (advisor)', when: 'Oct 6, 2026 · 11:40 AM', action: 'Status → Advisor interview completed', reason: 'Qualified · pending insurance review' },
     ],
   },
+  {
+    id: 'P-0047', ecwId: '—', firstName: 'Naomi', lastName: 'Castellanos', dob: '02/11/1979', phone: '(949) 555-0121', email: 'n.castellanos@example.com', city: 'Irvine, CA', advisor: 'Ana',
+    status: 'Waitlist', chartPrep: 'Awaiting intake',
+    uploads: uploads({ 'ins-front': { status: 'missing', files: [] }, 'ins-back': { status: 'missing', files: [] }, 'photo-id': { status: 'missing', files: [] }, meds: { status: 'missing', files: [] }, labs: { status: 'missing', files: [] }, records: { status: 'optional', files: [] } }),
+    forms: standardForms(0),
+    history: [
+      { actor: 'Ana (advisor)', when: 'Oct 7, 2026 · 3:05 PM', action: 'Status → Waitlist', reason: 'WL-01 · Qualified · waiting for the next program opening' },
+    ],
+  },
+  {
+    id: 'P-0048', ecwId: '—', firstName: 'Owen', lastName: 'Fitzgerald', dob: '06/30/1968', phone: '(949) 555-0176', email: 'o.fitzgerald@example.com', city: 'Irvine, CA', advisor: 'Ana',
+    status: 'Pending information', chartPrep: 'Awaiting intake',
+    uploads: uploads({ 'ins-front': { status: 'missing', files: [] }, 'ins-back': { status: 'missing', files: [] }, 'photo-id': { status: 'missing', files: [] }, meds: { status: 'missing', files: [] }, labs: { status: 'missing', files: [] }, records: { status: 'optional', files: [] } }),
+    forms: standardForms(0),
+    history: [
+      { actor: 'Ana (advisor)', when: 'Oct 7, 2026 · 10:00 AM', action: 'Status → Pending information', reason: 'PI-01 · Waiting for prior medical records · follow up Oct 14' },
+    ],
+  },
 ]
 
 export const patientById = (id: string) => patients.find((p) => p.id === id)

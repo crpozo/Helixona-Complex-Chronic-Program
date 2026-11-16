@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom'
 import { Card, Notice, PageHeader, Pill, Stat, ToConfirm } from '../../components/ui'
 
 const tiles = [
-  { label: 'Intake completion', value: '3 / 5', hint: 'median 4.2 d', tone: 'teal', to: '/staff/intake-review' },
-  { label: 'Chart prep', value: '1 ready', hint: '1 exception', tone: 'bad', to: '/staff/chart-prep' },
+  { label: 'Intake completion', value: '3 / 5', hint: 'median 4.2 d', tone: 'teal', to: '/staff/patients?view=intake' },
+  { label: 'Chart prep', value: '1 ready', hint: '1 exception', tone: 'bad', to: '/staff/patients?view=chart' },
   { label: 'Open alerts', value: 4, hint: '1 escalated', tone: 'bad', to: '/staff/alerts' },
   { label: 'Booking exceptions', value: 2, hint: '1 request', tone: 'warn', to: '/staff/calendar' },
   { label: 'Contract completion', value: '1 / 2', hint: '1 pending', tone: 'warn', to: '/staff/registry' },

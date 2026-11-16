@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CheckCircle2, CornerUpLeft, FileText, StickyNote } from 'lucide-react'
-import { AuditList, Card, Field, Pill, Row, Toast, VersionTag, toneFor } from '../../../components/ui'
+import { CheckCircle2, CornerUpLeft, FileText } from 'lucide-react'
+import { Card, Field, Pill, Row, Toast, VersionTag, toneFor } from '../../../components/ui'
 import type { Patient, UploadItem } from '../../../mock/types'
+import { NotesPanel } from '../../../components/NotesPanel'
 
 /** Completeness checklist + actions. Shared by the Intake review queue and the patient detail tab. */
 export default function IntakeReviewPanel({ patient }: { patient: Patient }) {
@@ -12,7 +13,6 @@ export default function IntakeReviewPanel({ patient }: { patient: Patient }) {
   const [reason, setReason] = useState('Document is incomplete or unreadable')
   const [note, setNote] = useState('')
   const [toast, setToast] = useState<string | null>(null)
-  const [followUp, setFollowUp] = useState('')
   const [ready, setReady] = useState(patient.chartPrep === 'Ready for chart prep' || patient.chartPrep === 'Placed in eCW')
 
   const show = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2200) }
@@ -61,17 +61,15 @@ export default function IntakeReviewPanel({ patient }: { patient: Patient }) {
           </Card>
         )}
 
-        <Card title="Non-clinical follow-up note" subtitle="Operational notes only (scheduling, documents, contact). Never part of the medical record." actions={<StickyNote size={16} className="text-sand-400" />}>
-          <textarea rows={3} className="input" placeholder="e.g., Called patient about lab pages; will re-upload tonight." value={followUp} onChange={(e) => setFollowUp(e.target.value)} />
-          <div className="mt-2 flex items-center justify-between"><span className="help">Saved as Ana (advisor) · {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span><button onClick={() => { if (followUp) { show('Note saved'); setFollowUp('') } }} className="btn-secondary px-3 py-1.5 text-xs">Save note</button></div>
-          <div className="mt-4"><AuditList compact entries={[{ actor: 'Ana (advisor)', when: 'Oct 1, 2026 · 9:04 AM', action: 'Texted patient about lab pages; she will re-upload this week.' }]} /></div>
+        <Card title="Intake notes" subtitle="Saved to the patient's notes; the most recent note shows on the overview.">
+          <NotesPanel patientId={patient.id} defaultCategory="Intake" limit={4} showFilter={false} />
         </Card>
       </div>
 
       <div className="space-y-5">
         <Card title="Mark ready for chart prep">
           {ready ? (
-            <div className="rounded-xl bg-ok-100 p-3 text-sm text-ok-700"><div className="flex items-center gap-2 font-semibold"><CheckCircle2 size={16} /> Ready for chart prep</div><div className="mt-1">Charlene's queue has this patient. The eCW connector job is queued.</div><button onClick={() => nav(`/staff/chart-prep/${patient.id}`)} className="btn-secondary mt-3 w-full">Open chart prep view</button></div>
+            <div className="rounded-xl bg-ok-100 p-3 text-sm text-ok-700"><div className="flex items-center gap-2 font-semibold"><CheckCircle2 size={16} /> Ready for chart prep</div><div className="mt-1">Charlene's queue has this patient. The eCW connector job is queued.</div><button onClick={() => nav(`/staff/patients/${patient.id}?tab=chart`)} className="btn-secondary mt-3 w-full">Open chart prep view</button></div>
           ) : (
             <>
               {blockers.length > 0 ? (

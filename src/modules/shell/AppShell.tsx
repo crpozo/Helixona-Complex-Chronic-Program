@@ -1,3 +1,4 @@
+import ToastHost from '../../components/ToastHost'
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronDown, LayoutGrid, Smartphone, UserRound } from 'lucide-react'
@@ -54,6 +55,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           )}
         </header>
         <main className={`flex-1 ${isPatient ? '' : 'mx-auto w-full max-w-[1400px] px-4 py-6'}`}>{children}</main>
+        <ToastHost />
         <footer className="border-t border-sand-200 bg-white/60 px-4 py-3 text-xs text-sand-500">
           <div className="mx-auto max-w-[1400px] flex flex-wrap justify-between gap-2">
             <span>Helixona · Complex Chronic Program · MVP mockups. No real patient data. Viewing as <strong className="text-sand-700">{def.label} ({def.person})</strong>.</span>

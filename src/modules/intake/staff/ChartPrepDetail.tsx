@@ -1,12 +1,20 @@
 import { useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 import { Bot, Check, ClipboardCopy, Download, FileText, Hand } from 'lucide-react'
-import { AuditList, Breadcrumb, Card, Notice, PageHeader, Pill, Row, Tabs, ToConfirm, Toast, VersionTag, toneFor } from '../../../components/ui'
+import { AuditList, Card, Notice, Pill, Row, Tabs, ToConfirm, Toast, VersionTag, toneFor } from '../../../components/ui'
 import { patientById } from '../../../mock/patients'
+import { NotesPanel } from '../../../components/NotesPanel'
+import { notify } from '../../../mock/store'
 import { sampleAnswers, sections, questionnaireMeta } from '../../../mock/questionnaire'
 
+/** Old address of the chart prep screen: it now lives inside the patient record. */
 export default function ChartPrepDetail() {
   const { id = '' } = useParams()
+  return <Navigate to={`/staff/patients/${id}?tab=chart`} replace />
+}
+
+/** Chart prep for one patient: the note, the PDF, the two ways to place them in eCW, and chart prep notes. */
+export function ChartPrepPanel({ id }: { id: string }) {
   const p = patientById(id)
   const [path, setPath] = useState<'auto' | 'manual'>('auto')
   const [toast, setToast] = useState<string | null>(null)
@@ -30,10 +38,7 @@ export default function ChartPrepDetail() {
   return (
     <>
       <Toast message={toast} />
-      <Breadcrumb items={[{ label: 'Chart prep', to: '/staff/chart-prep' }, { label: p.id }]} />
-      <PageHeader eyebrow={`${p.id} · eCW ${p.ecwId} · DOB ${p.dob}`} title={`${p.firstName} ${p.lastName}`}
-        meta={<><Pill tone={toneFor(status)}>{status}</Pill><VersionTag>Questionnaire v{p.intake?.version ?? 1} · as supplied by the Medical Director · pending publish</VersionTag><span>Submitted {p.intake?.submittedAt ?? '—'}</span></>}
-        actions={<><button onClick={copy} className="btn-primary"><ClipboardCopy size={16} /> Copy note to clipboard</button><button onClick={() => { setToast(`Downloading Helixona_Intake_${p.id.slice(2)}_v${p.intake?.version ?? 3}.pdf`); setTimeout(() => setToast(null), 2000) }} className="btn-secondary"><Download size={16} /> Download PDF</button></>} />
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3"><div className="flex flex-wrap items-center gap-2 text-sm text-sand-600"><Pill tone={toneFor(status)}>{status}</Pill><VersionTag>Questionnaire v{p.intake?.version ?? 1} · as supplied by the Medical Director · pending publish</VersionTag><span>Submitted {p.intake?.submittedAt ?? '—'}</span></div><div className="flex gap-2"><button onClick={copy} className="btn-primary"><ClipboardCopy size={16} /> Copy note to clipboard</button><button onClick={() => { setToast(`Downloading Helixona_Intake_${p.id.slice(2)}_v${p.intake?.version ?? 3}.pdf`); setTimeout(() => setToast(null), 2000) }} className="btn-secondary"><Download size={16} /> Download PDF</button></div></div>
 
       <div className="grid gap-5 lg:grid-cols-5">
         <div className="lg:col-span-3 space-y-5">
@@ -71,7 +76,7 @@ export default function ChartPrepDetail() {
                   <Row label="State">{status === 'Placed in eCW' ? <Pill tone="ok">Verified</Pill> : status === 'Exception' ? <Pill tone="bad">Exception · needs you</Pill> : status === 'Ready for chart prep' ? <Pill tone="teal">Queued · waiting for confirmation</Pill> : <Pill>Not queued</Pill>}</Row>
                 </div>
                 {status === 'Ready for chart prep' && <button onClick={() => { setStatus('Placed in eCW'); setToast('Connector finished · verified in eCW'); setTimeout(() => setToast(null), 2200) }} className="btn-primary mt-4 w-full"><Bot size={16} /> Run connector now (demo)</button>}
-                {status === 'Placed in eCW' && <button className="btn-secondary mt-4 w-full"><Check size={16} /> Reviewed in eCW · close task</button>}
+                {status === 'Placed in eCW' && <button onClick={() => notify('Review task closed · recorded with your name and time')} className="btn-secondary mt-4 w-full"><Check size={16} /> Reviewed in eCW · close task</button>}
                 {status === 'Exception' && <a href="#/staff/ecw-exceptions" className="btn-danger mt-4 w-full">Open exception queue</a>}
               </>
             ) : (
@@ -86,6 +91,7 @@ export default function ChartPrepDetail() {
               </>
             )}
           </Card>
+          <Card title="Chart prep notes" subtitle="What you write here is saved to the patient's notes and shows on the overview."><NotesPanel patientId={p.id} defaultCategory="Chart prep" limit={4} showFilter={false} /></Card>
           <Card title="History" subtitle="Who · when · why"><AuditList compact entries={[...p.history].reverse().slice(0, 5)} /></Card>
         </div>
       </div>

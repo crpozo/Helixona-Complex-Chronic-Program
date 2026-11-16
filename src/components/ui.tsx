@@ -33,7 +33,7 @@ export function Pill({ tone = 'neutral', children, dot = true, className = '' }:
 export function toneFor(status: string): Tone {
   const s = status.toLowerCase()
   if (/(exception|denied|failed|overdue|escalated|critical|discharged|missing|expired)/.test(s)) return 'bad'
-  if (/(returned|pending|awaiting|outreach|review|retry|warning|paused|fell off|partial|viewed|started|not offered|declined)/.test(s)) return 'warn'
+  if (/(returned|pending|waitlist|awaiting|outreach|review|retry|warning|paused|fell off|partial|viewed|started|not offered|declined)/.test(s)) return 'warn'
   if (/(placed|active|accepted|signed|complete|verified|uploaded|closed|submitted|synced|delivered|graduated|resolved)/.test(s)) return 'ok'
   if (/(ready|offered|scheduled|in progress|opened|sent|reissued)/.test(s)) return 'teal'
   if (/(inquiry|received|optional|not started|maintenance)/.test(s)) return 'neutral'

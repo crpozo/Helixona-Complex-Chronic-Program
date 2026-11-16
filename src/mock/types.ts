@@ -11,7 +11,7 @@ export type InvitationState = 'sent' | 'delivered' | 'opened' | 'started' | 'sub
 
 export type RegistryStatus =
   | 'Inquiry received' | 'Advisor outreach' | 'Advisor interview completed' | 'Insurance benefits review'
-  | 'Admissions review' | 'Accepted for Month 0' | 'Denied' | 'Patient fell off' | 'Month 0 scheduled'
+  | 'Admissions review' | 'Waitlist' | 'Pending information' | 'Accepted for Month 0' | 'Denied' | 'Patient fell off' | 'Month 0 scheduled'
   | 'Month 0 in progress' | 'Plan of Care completed' | 'Program offered' | 'Program not offered'
   | 'Patient declined' | 'Contract pending' | 'Payment pending' | 'Active member' | 'Temporarily paused'
   | 'Month 9 review' | 'Continued active care' | 'Maintenance' | 'Graduated' | 'Withdrawn' | 'Discharged'

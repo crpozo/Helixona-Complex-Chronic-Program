@@ -11,6 +11,8 @@ export const stages: Stage[] = [
   { n: 6, title: 'Rewiring Resilience', blurb: 'Rebalance the nervous system and reinforce resilience for lasting stability.', color: '#6B4226' },
   { n: 7, title: 'Graduate to Maintenance & Longevity', blurb: 'Keep the gains with a lighter rhythm of care and the habits that hold them.', color: '#D9BE82' },
 ]
+/** When each completed step was reached (sample). Index 0 = Step 1. */
+export const stageDates = ['Jun 10, 2026', 'Jul 6, 2026', 'Aug 17, 2026', 'Sep 21, 2026', 'Oct 19, 2026', 'Nov 16, 2026', 'Dec 14, 2026']
 export const stageLabel = (n: number) => { const s = stages.find((x) => x.n === n); return s ? `Step ${s.n} · ${s.title}` : `Step ${n}` }
 
 /* Actors: the root causes a patient is fighting. The lead actor is treated first. */
