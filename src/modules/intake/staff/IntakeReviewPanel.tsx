@@ -69,7 +69,7 @@ export default function IntakeReviewPanel({ patient }: { patient: Patient }) {
       <div className="space-y-5">
         <Card title="Mark ready for chart prep">
           {ready ? (
-            <div className="rounded-xl bg-ok-100 p-3 text-sm text-ok-700"><div className="flex items-center gap-2 font-semibold"><CheckCircle2 size={16} /> Ready for chart prep</div><div className="mt-1">Charlene's queue has this patient. The eCW connector job is queued.</div><button onClick={() => nav(`/staff/patients/${patient.id}?tab=chart`)} className="btn-secondary mt-3 w-full">Open chart prep view</button></div>
+            <div className="rounded-xl bg-ok-100 p-3 text-sm text-ok-700"><div className="flex items-center gap-2 font-semibold"><CheckCircle2 size={16} /> Ready for chart prep</div><div className="mt-1">Charlene's queue has this patient. The AI Agent job is queued.</div><button onClick={() => nav(`/staff/patients/${patient.id}?tab=chart`)} className="btn-secondary mt-3 w-full">Open chart prep view</button></div>
           ) : (
             <>
               {blockers.length > 0 ? (

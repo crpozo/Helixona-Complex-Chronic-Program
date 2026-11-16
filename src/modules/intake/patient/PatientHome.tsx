@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Bell, Calendar, CalendarCheck, ClipboardList, CreditCard, FileCheck2, FileSignature, HeartPulse, Receipt, Siren } from 'lucide-react'
+import { Bell, MessageCircle, Sparkles, Calendar, CalendarCheck, ClipboardList, CreditCard, FileCheck2, FileSignature, HeartPulse, Receipt, Siren } from 'lucide-react'
 import { PhoneFrame, Wordmark } from '../../../components/PhoneFrame'
 import { MonitoringNotice, Pill } from '../../../components/ui'
 import { getPathway, pathwayLabel } from '../../../mock/questionnaire'
@@ -43,6 +43,8 @@ export default function PatientHome() {
             ['/patient/book', 'Book a session', 'Nano bath Thu Oct 9 · 9:00 AM confirmed', <CalendarCheck size={16} />],
             ['/patient/agreement', 'Membership agreement & payment', 'Available once your program is offered', <FileSignature size={16} />],
             ['/patient/payments', 'Payments & receipts', 'Next: $2,000 on Nov 1', <Receipt size={16} />],
+            ['/patient/messages', 'Message the clinic', 'Chat or email your care team · answered in office hours', <MessageCircle size={16} />],
+            ['/patient/assistant', 'Ask Helixona', 'AI assistant · ask anything about your program', <Sparkles size={16} />],
             ['/patient/settings', 'Notifications', 'Email and text message preferences', <Bell size={16} />],
           ] as [string, string, string, React.ReactNode][]).map(([to, t, d, icon]) => (
             <li key={t}><Link to={to} className="card flex items-center gap-3 p-3.5 hover:border-teal-300">

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Check, ChevronDown, GraduationCap, PersonStanding } from 'lucide-react'
-import { stages } from '../mock/roadmap'
+import { stageDates, stages } from '../mock/roadmap'
 
 const ROAD = '#3B2218'      // road colour from the clinic graphic
 const AHEAD = '#D9D2C9'     // road not travelled yet
@@ -22,6 +22,8 @@ function RoadPiece({ side, top, bottom }: { side: 'left' | 'right'; top: string;
  *  `compact`: one-line stepper for staff headers and tight spaces. */
 export function Roadmap({ current, compact = false }: { current: number; compact?: boolean }) {
   const [open, setOpen] = useState<number | null>(current)
+  const [folded, setFolded] = useState(false)
+  const cur = stages.find((s) => s.n === current) ?? stages[0]
 
   if (compact) return (
     <ol className="flex min-w-[220px] items-center" aria-label="Healing Roadmap">
@@ -39,9 +41,14 @@ export function Roadmap({ current, compact = false }: { current: number; compact
 
   return (
     <div className="card p-4">
-      <div className="flex items-center justify-between"><span className="eyebrow">Your healing roadmap</span><span className="text-xs text-sand-500">Step {current} of {stages.length}</span></div>
-      <p className="mt-1 text-xs text-sand-500">Tap a step to read what happens there.</p>
-      <ol className="mt-3" aria-label="Healing Roadmap">
+      <button type="button" onClick={() => setFolded(!folded)} aria-expanded={!folded} className="flex w-full items-center justify-between gap-2 text-left">
+        <span className="eyebrow">Your healing roadmap</span>
+        <span className="flex items-center gap-1.5 text-xs text-sand-500">Step {current} of {stages.length}<ChevronDown size={16} className={`text-sand-500 transition-transform ${folded ? '' : 'rotate-180'}`} /></span>
+      </button>
+      {folded
+        ? <div className="mt-2 flex items-center gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-400 text-sand-900"><PersonStanding size={24} strokeWidth={2.2} /></span><span><span className="block text-[15px] font-semibold text-sand-900">Step {cur.n} · {cur.title}</span><span className="block text-xs text-sand-500">Tap to see the whole roadmap</span></span></div>
+        : <p className="mt-1 text-xs text-sand-500">Tap a step to read what happens there.</p>}
+      {!folded && <ol className="mt-3" aria-label="Healing Roadmap">
         {stages.map((s, i) => {
           const state = s.n < current ? 'done' : s.n === current ? 'current' : 'next'
           const side = i % 2 === 0 ? 'left' : 'right'
@@ -60,7 +67,7 @@ export function Roadmap({ current, compact = false }: { current: number; compact
                 className={`my-1 flex-1 rounded-xl border bg-white px-3 py-2.5 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 ${state === 'current' ? 'border-teal-500' : 'border-sand-200 hover:border-sand-300'}`} style={{ borderLeft: `6px solid ${s.color}` }}>
                 <span className="flex items-start gap-2">
                   <span className="flex-1">
-                    <span className="block text-[11px] font-medium uppercase tracking-[0.14em] text-sand-500">Step {s.n}{state === 'current' ? ' · You are here' : state === 'done' ? ' · Done' : ''}</span>
+                    <span className="block text-[11px] font-medium uppercase tracking-[0.14em] text-sand-500">Step {s.n}{state === 'current' ? ` · You are here · since ${stageDates[s.n - 1].replace(', 2026', '')}` : state === 'done' ? ` · Done ${stageDates[s.n - 1].replace(', 2026', '')}` : ''}</span>
                     <span className={`block text-[15px] leading-snug ${state === 'next' ? 'font-medium text-sand-600' : 'font-semibold text-sand-900'}`}>{s.title}</span>
                   </span>
                   <ChevronDown size={16} className={`mt-1 shrink-0 text-sand-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -70,7 +77,7 @@ export function Roadmap({ current, compact = false }: { current: number; compact
             </li>
           )
         })}
-      </ol>
+      </ol>}
     </div>
   )
 }

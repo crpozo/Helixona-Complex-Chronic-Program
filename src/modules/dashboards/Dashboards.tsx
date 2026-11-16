@@ -43,7 +43,7 @@ export default function Dashboards() {
           </svg>
           <div className="mt-1 text-xs text-sand-500">Response rate 89% · median time to acknowledge 2.1 h</div>
         </Card>
-        <Card title="eCW connector · 7 days" subtitle="Every write is read back and verified.">
+        <Card title="AI Agent · 7 days" subtitle="Every write is read back and verified.">
           <div className="grid grid-cols-3 gap-2 text-center">
             <div className="rounded-xl bg-ok-100 p-3"><div className="text-2xl font-semibold text-ok-700">41</div><div className="text-xs text-ok-700">verified</div></div>
             <div className="rounded-xl bg-bad-100 p-3"><div className="text-2xl font-semibold text-bad-700">2</div><div className="text-xs text-bad-700">exceptions</div></div>

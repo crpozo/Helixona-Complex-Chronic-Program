@@ -77,7 +77,7 @@ export const patients: Patient[] = [
     uploads: uploads(),
     forms: standardForms(10),
     history: [
-      { actor: 'eCW connector', when: 'Sep 16, 2026 · 6:04 AM', action: 'Note + PDF placed in eCW · verified', reason: 'Marker HLX:INT-2041:v2' },
+      { actor: 'AI Agent', when: 'Sep 16, 2026 · 6:04 AM', action: 'Note + PDF placed in eCW · verified', reason: 'Marker HLX:INT-2041:v2' },
       { actor: 'Charlene', when: 'Sep 16, 2026 · 8:30 AM', action: 'Chart prep reviewed · closed' },
     ],
   },
@@ -106,7 +106,7 @@ export const patients: Patient[] = [
     uploads: uploads(),
     forms: standardForms(10),
     history: [
-      { actor: 'eCW connector', when: 'Oct 5, 2026 · 6:02 AM', action: 'Exception · PDF read-back failed', reason: 'Document not found after upload · no automatic retry' },
+      { actor: 'AI Agent', when: 'Oct 5, 2026 · 6:02 AM', action: 'Exception · PDF read-back failed', reason: 'Document not found after upload · no automatic retry' },
     ],
   },
   {

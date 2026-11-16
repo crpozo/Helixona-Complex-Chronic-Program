@@ -56,10 +56,10 @@ export function ChartPrepPanel({ id }: { id: string }) {
 
         <div className="lg:col-span-2 space-y-5">
           <Card title="Place in eCW" subtitle="Two ways to get the same result. Both end with a verified note and PDF in the chart.">
-            <Tabs value={path} onChange={(k) => setPath(k as 'auto')} tabs={[{ key: 'auto', label: <span className="flex items-center gap-1.5"><Bot size={14} /> eCW connector</span> }, { key: 'manual', label: <span className="flex items-center gap-1.5"><Hand size={14} /> Copy & paste</span> }]} />
+            <Tabs value={path} onChange={(k) => setPath(k as 'auto')} tabs={[{ key: 'auto', label: <span className="flex items-center gap-1.5"><Bot size={14} /> AI Agent</span> }, { key: 'manual', label: <span className="flex items-center gap-1.5"><Hand size={14} /> Copy & paste</span> }]} />
             {path === 'auto' ? (
               <>
-                <p className="text-sm text-sand-600">The connector signs in to eCW as its own user, places the note and PDF, and reads everything back before marking the chart as done. If any check fails after a write, it stops and creates an exception. It never retries on its own.</p>
+                <p className="text-sm text-sand-600">The AI Agent signs in to eCW as its own user, places the note and PDF, and reads everything back before marking the chart as done. If any check fails after a write, it stops and creates an exception. It never retries on its own.</p>
                 <ol className="mt-4 space-y-2">
                   {steps.map(([label, st], i) => (
                     <li key={i} className="flex items-center gap-3 text-sm">
@@ -75,7 +75,7 @@ export function ChartPrepPanel({ id }: { id: string }) {
                   <Row label="Scheduled">Nightly 6:00 AM · or run now</Row>
                   <Row label="State">{status === 'Placed in eCW' ? <Pill tone="ok">Verified</Pill> : status === 'Exception' ? <Pill tone="bad">Exception · needs you</Pill> : status === 'Ready for chart prep' ? <Pill tone="teal">Queued · waiting for confirmation</Pill> : <Pill>Not queued</Pill>}</Row>
                 </div>
-                {status === 'Ready for chart prep' && <button onClick={() => { setStatus('Placed in eCW'); setToast('Connector finished · verified in eCW'); setTimeout(() => setToast(null), 2200) }} className="btn-primary mt-4 w-full"><Bot size={16} /> Run connector now (demo)</button>}
+                {status === 'Ready for chart prep' && <button onClick={() => { setStatus('Placed in eCW'); setToast('AI Agent finished · verified in eCW'); setTimeout(() => setToast(null), 2200) }} className="btn-primary mt-4 w-full"><Bot size={16} /> Run the AI Agent now (demo)</button>}
                 {status === 'Placed in eCW' && <button onClick={() => notify('Review task closed · recorded with your name and time')} className="btn-secondary mt-4 w-full"><Check size={16} /> Reviewed in eCW · close task</button>}
                 {status === 'Exception' && <a href="#/staff/ecw-exceptions" className="btn-danger mt-4 w-full">Open exception queue</a>}
               </>
@@ -87,7 +87,7 @@ export function ChartPrepPanel({ id }: { id: string }) {
                   <li className="flex gap-3"><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal-600 text-[11px] font-bold text-white">3</span><span>Confirm below. Your confirmation is recorded with your name and time.</span></li>
                 </ol>
                 <button onClick={() => { setStatus('Placed in eCW'); setToast('Marked “Placed in eCW” by Charlene'); setTimeout(() => setToast(null), 2200) }} disabled={status === 'Placed in eCW'} className="btn-primary mt-5 w-full"><Check size={16} /> I placed the note and PDF in eCW</button>
-                <p className="help mt-2">The connector will skip this patient because the note marker already exists.</p>
+                <p className="help mt-2">The AI Agent will skip this patient because the note marker already exists.</p>
               </>
             )}
           </Card>

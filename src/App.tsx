@@ -33,6 +33,8 @@ import ModalityConfig from './modules/config/ModalityConfig'
 import AlertRules from './modules/config/AlertRules'
 import MessageTemplates from './modules/notifications/MessageTemplates'
 import NotificationSettings from './modules/notifications/patient/NotificationSettings'
+import Assistant from './modules/messages/patient/Assistant'
+import Messages from './modules/messages/patient/Messages'
 import Registry from './modules/registry/Registry'
 import MemberDetail from './modules/registry/MemberDetail'
 import Booking from './modules/booking/patient/Booking'
@@ -77,6 +79,8 @@ export default function App() {
           <Route path="/patient/agreement" element={<Agreement />} />
           <Route path="/patient/payments" element={<PaymentsPatient />} />
           <Route path="/patient/settings" element={<NotificationSettings />} />
+          <Route path="/patient/assistant" element={<Assistant />} />
+          <Route path="/patient/messages" element={<Messages />} />
           {/* Staff · surveys & alerts, registry, booking, payments, config, dashboards */}
           <Route path="/staff/alerts" element={<AlertQueue />} />
           <Route path="/staff/alerts/patient/:id" element={<PatientLongitudinal />} />

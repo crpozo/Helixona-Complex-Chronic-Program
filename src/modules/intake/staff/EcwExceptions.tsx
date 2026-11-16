@@ -27,11 +27,11 @@ export default function EcwExceptions() {
   return (
     <>
       <Toast message={toast} />
-      <PageHeader eyebrow="System · Chart prep & technical admin" title="eCW connector exceptions" description="Anything the connector could not complete and verify. A failure after a write is critical and is never retried automatically — a person decides." />
+      <PageHeader eyebrow="System · Chart prep & technical admin" title="AI Agent exceptions" description="Anything the AI Agent could not complete and verify. A failure after a write is critical and is never retried automatically — a person decides." />
       <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat label="Open exceptions" value={jobs.filter((j) => j.status !== 'closed').length} hint="1 critical" tone="bad" />
         <Stat label="Jobs last 24 h" value={14} hint="12 verified" tone="ok" />
-        <Stat label="Connector health" value="Healthy" hint="signed in · 6:02 AM" tone="ok" />
+        <Stat label="AI Agent health" value="Healthy" hint="signed in · 6:02 AM" tone="ok" />
         <Stat label="eCW client" value="Web" hint="to confirm" tone="warn" />
       </div>
       <Tabs value={tab} onChange={setTab} tabs={[{ key: 'open', label: 'Open', count: jobs.filter((j) => j.status !== 'closed').length }, { key: 'closed', label: 'Closed', count: jobs.filter((j) => j.status === 'closed').length }]} />
@@ -54,7 +54,7 @@ export default function EcwExceptions() {
                 <div className="mt-4 space-y-3">
                   <Field label="Resolution note" required><textarea rows={2} className="input" placeholder="What did you check or do?" /></Field>
                   <div className="grid grid-cols-2 gap-2">
-                    <button onClick={() => act(sel.id, 'retrying', 'Retry queued · connector will re-verify before writing')} className="btn-secondary"><RotateCw size={16} /> Retry</button>
+                    <button onClick={() => act(sel.id, 'retrying', 'Retry queued · AI Agent will re-verify before writing')} className="btn-secondary"><RotateCw size={16} /> Retry</button>
                     <button onClick={() => act(sel.id, 'closed', 'Closed · done manually by Charlene')} className="btn-primary"><CheckCheck size={16} /> Done manually · close</button>
                   </div>
                   <p className="help">Retry re-checks the chart first so nothing is duplicated. Closing records your name, time, and note.</p>

@@ -12,19 +12,20 @@ export const roles: RoleDef[] = [
   { key: 'admin', label: 'Program / technical admin', person: 'Cassandra · Carlos', home: '/staff/dashboards', surface: 'staff' },
 ]
 
-export interface NavItem { label: string; to: string; roles: Role[]; module: 'Intake' | 'Registry' | 'Surveys & alerts' | 'Booking' | 'Payments' | 'Configuration' | 'System'; phase: 1 | 2 | 3 }
+export type NavGroup = 'Patients' | 'Care' | 'Membership' | 'Reports' | 'Admin setup'
+export interface NavItem { label: string; to: string; group: NavGroup; roles: Role[]; module: 'Intake' | 'Registry' | 'Surveys & alerts' | 'Booking' | 'Payments' | 'Configuration' | 'System'; phase: 1 | 2 | 3 }
 
 export const nav: NavItem[] = [
-  { label: 'Inquiries', to: '/staff/inquiries', roles: ['advisor', 'karina', 'admin'], module: 'Intake', phase: 1 },
-  { label: 'Patients', to: '/staff/patients', roles: ['advisor', 'karina', 'charlene', 'nursing', 'physician', 'admin'], module: 'Intake', phase: 1 },
-  { label: 'Registry', to: '/staff/registry', roles: ['karina', 'advisor', 'physician', 'admin'], module: 'Registry', phase: 2 },
-  { label: 'Alerts', to: '/staff/alerts', roles: ['nursing', 'physician', 'admin'], module: 'Surveys & alerts', phase: 2 },
-  { label: 'Calendar', to: '/staff/calendar', roles: ['karina', 'nursing', 'admin'], module: 'Booking', phase: 3 },
-  { label: 'Payments', to: '/staff/payments', roles: ['karina', 'admin'], module: 'Payments', phase: 3 },
-  { label: 'Surveys', to: '/staff/config/surveys', roles: ['physician', 'admin'], module: 'Configuration', phase: 2 },
-  { label: 'Modalities', to: '/staff/config/modalities', roles: ['physician', 'karina', 'admin'], module: 'Configuration', phase: 2 },
-  { label: 'Alert rules', to: '/staff/config/alerts', roles: ['physician', 'admin'], module: 'Configuration', phase: 2 },
-  { label: 'Messages', to: '/staff/config/messages', roles: ['admin', 'karina'], module: 'Configuration', phase: 3 },
-  { label: 'eCW exceptions', to: '/staff/ecw-exceptions', roles: ['charlene', 'karina', 'admin'], module: 'System', phase: 1 },
-  { label: 'Dashboards', to: '/staff/dashboards', roles: ['karina', 'physician', 'admin'], module: 'System', phase: 3 },
+  { label: 'Inquiries', to: '/staff/inquiries', group: 'Patients', roles: ['advisor', 'karina', 'admin'], module: 'Intake', phase: 1 },
+  { label: 'Patients', to: '/staff/patients', group: 'Patients', roles: ['advisor', 'karina', 'charlene', 'nursing', 'physician', 'admin'], module: 'Intake', phase: 1 },
+  { label: 'Registry', to: '/staff/registry', group: 'Membership', roles: ['karina', 'advisor', 'physician', 'admin'], module: 'Registry', phase: 2 },
+  { label: 'Alerts', to: '/staff/alerts', group: 'Care', roles: ['nursing', 'physician', 'admin'], module: 'Surveys & alerts', phase: 2 },
+  { label: 'Calendar', to: '/staff/calendar', group: 'Care', roles: ['karina', 'nursing', 'admin'], module: 'Booking', phase: 3 },
+  { label: 'Payments', to: '/staff/payments', group: 'Membership', roles: ['karina', 'admin'], module: 'Payments', phase: 3 },
+  { label: 'Surveys & check-ins', to: '/staff/config/surveys', group: 'Admin setup', roles: ['physician', 'admin'], module: 'Configuration', phase: 2 },
+  { label: 'Modalities', to: '/staff/config/modalities', group: 'Admin setup', roles: ['physician', 'karina', 'admin'], module: 'Configuration', phase: 2 },
+  { label: 'Alert rules', to: '/staff/config/alerts', group: 'Admin setup', roles: ['physician', 'admin'], module: 'Configuration', phase: 2 },
+  { label: 'Messages', to: '/staff/config/messages', group: 'Admin setup', roles: ['admin', 'karina'], module: 'Configuration', phase: 3 },
+  { label: 'AI Agent exceptions', to: '/staff/ecw-exceptions', group: 'Admin setup', roles: ['charlene', 'karina', 'admin'], module: 'System', phase: 1 },
+  { label: 'Dashboards', to: '/staff/dashboards', group: 'Reports', roles: ['karina', 'physician', 'admin'], module: 'System', phase: 3 },
 ]

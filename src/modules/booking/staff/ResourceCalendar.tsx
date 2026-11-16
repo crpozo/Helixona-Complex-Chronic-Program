@@ -76,15 +76,15 @@ function BookingCard({ b, show }: { b: Booking; show: (m: string) => void }) {
       <Row label="Booked by">{b.source}</Row>
       <Row label="Rule checks">Plan of Care ✓ · spacing ✓ · weekly limit ✓ · resource ✓</Row>
       {b.ecw === 'Conflict' && <div className="mt-3"><Notice tone="bad" title="eCW slot taken by a manual booking">The patient's reservation in this app is valid and the room is held. Move the other eCW appointment or free the slot, then retry the mirror. The patient sees “Reserved” until verified.</Notice></div>}
-      {b.ecw === 'Mirror failed' && <div className="mt-3"><Notice tone="bad" title="Mirror appointment could not be created">Connector could not find resource “BEMER” in eCW. Create the appointment manually with reason HLX:{b.id}, then mark as done.</Notice></div>}
+      {b.ecw === 'Mirror failed' && <div className="mt-3"><Notice tone="bad" title="Mirror appointment could not be created">AI Agent could not find resource “BEMER” in eCW. Create the appointment manually with reason HLX:{b.id}, then mark as done.</Notice></div>}
       {b.status === 'Requested' && <div className="mt-3"><Notice tone="warn" title="Laser request · needs nurse review">Last laser Sep 22 · spacing rule ≥ 5 days ✓ · consent v1.1 signed ✓.</Notice></div>}
-      {b.ecw === 'Waiting for confirmation' && <div className="mt-3"><Notice tone="teal">Reserved in the app. The connector is creating the mirror appointment (reason HLX:{b.id}) and will read it back before marking “Confirmed”.</Notice></div>}
+      {b.ecw === 'Waiting for confirmation' && <div className="mt-3"><Notice tone="teal">Reserved in the app. The AI Agent is creating the mirror appointment (reason HLX:{b.id}) and will read it back before marking “Confirmed”.</Notice></div>}
       {b.ecw === 'Read-only from eCW' && <div className="mt-3"><Notice tone="info">Insurance visit booked in eCW by staff. Shown here for context only; edit it in eCW.</Notice></div>}
       {(b.status === 'Exception' || b.status === 'Requested') && (
         <div className="mt-4 space-y-2">
           <Field label="Note" required><input className="input" placeholder="What you checked or changed" /></Field>
           <div className="grid grid-cols-2 gap-2">
-            {b.status === 'Requested' ? <><button onClick={() => show('Request approved · booking reserved · mirror queued')} className="btn-primary">Approve</button><button onClick={() => show('Request declined · patient notified')} className="btn-secondary">Decline</button></> : <><button onClick={() => show('Retry queued · connector will re-check the slot first')} className="btn-secondary">Retry mirror</button><button onClick={() => show('Closed · done manually in eCW by Karina')} className="btn-primary">Done manually · close</button></>}
+            {b.status === 'Requested' ? <><button onClick={() => show('Request approved · booking reserved · mirror queued')} className="btn-primary">Approve</button><button onClick={() => show('Request declined · patient notified')} className="btn-secondary">Decline</button></> : <><button onClick={() => show('Retry queued · AI Agent will re-check the slot first')} className="btn-secondary">Retry mirror</button><button onClick={() => show('Closed · done manually in eCW by Karina')} className="btn-primary">Done manually · close</button></>}
           </div>
         </div>
       )}
