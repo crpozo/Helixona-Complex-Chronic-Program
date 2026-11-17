@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowUpRight, Check, Clock, Mic, RotateCcw, UserPlus } from 'lucide-react'
 import { nameOf } from '../../../mock/names'
-import { AuditList, Card, Field, Notice, PageHeader, Pill, QueueTable, Row, Stat, Tabs, Toast, type Column, type Tone } from '../../../components/ui'
+import { AuditList, Card, Field, Notice, PageHeader, Pill, Row, Stat, Tabs, Toast, type Tone } from '../../../components/ui'
+import { Avatar } from '../../../components/Avatar'
 import { alerts, levelTone, type Alert, type AlertStatus } from '../../../mock/program'
 
 /** What staff read for each status. 'Acknowledged' is kept in the data and shown as pending. */
 const statusLabel: Record<AlertStatus, string> = { Unassigned: 'Unassigned', Assigned: 'Assigned', Acknowledged: 'Pending', Overdue: 'Overdue', Escalated: 'Escalated', Resolved: 'Resolved', Reopened: 'Reopened' }
+const stripe: Record<string, string> = { bad: '#B4382E', warn: '#B06A12', info: '#3A5F8F', plum: '#6F4B8A', neutral: '#D6D1C9', ok: '#2F7A4F', teal: '#C4A368' }
 const pendingActions = ['Patient callback', 'Waiting for physician', 'Visit to be scheduled', 'Waiting on lab result']
 const statusTone: Record<AlertStatus, Tone> = { Unassigned: 'bad', Assigned: 'teal', Acknowledged: 'info', Overdue: 'bad', Escalated: 'bad', Resolved: 'ok', Reopened: 'warn' }
 
@@ -31,14 +33,6 @@ export default function AlertQueue() {
     setSel((s) => (s && s.id === id ? { ...s, status, history: [...s.history, { actor: 'Jen (nursing)', when: 'Just now', action: note, reason }] } : s))
     show(note)
   }
-  const columns: Column<Alert>[] = [
-    { key: 'level', header: 'Level', render: (r) => <Pill tone={levelTone[r.level]}>{r.level}</Pill>, width: '170px' },
-    { key: 'id', header: 'Patient', render: (r) => <><div className="font-semibold text-sand-900">{nameOf(r.patientId)}</div><div className="text-xs text-sand-500">{r.createdAt}</div></> },
-    { key: 'summary', header: 'Source · summary', render: (r) => <><div className="text-xs text-sand-500">{r.source}</div><div className="text-sand-800">{r.summary}</div></> },
-    { key: 'status', header: 'Status', render: (r) => <Pill tone={statusTone[r.status]}>{label(r)}</Pill> },
-    { key: 'due', header: 'Respond by', render: (r) => <span className={r.status === 'Overdue' || r.status === 'Escalated' ? 'font-semibold text-bad-700' : ''}>{r.dueBy}</span> },
-    { key: 'assignee', header: 'Assigned', render: (r) => r.assignee },
-  ]
   return (
     <>
       <Toast message={toast} />
@@ -52,11 +46,39 @@ export default function AlertQueue() {
       </div>
       <Tabs value={tab} onChange={setTab} tabs={[{ key: 'open', label: 'Open', count: list.filter((a) => a.status !== 'Resolved').length }, { key: 'mine', label: 'Assigned to me (Jen)', count: list.filter((a) => a.assignee.includes('Jen')).length }, { key: 'resolved', label: 'Resolved' }]} />
       <div className="grid gap-5 xl:grid-cols-5">
-        <div className="xl:col-span-3"><QueueTable rows={rows} columns={columns} rowKey={(r) => r.id} rowTone={(r) => levelTone[r.level]} onRowClick={setSel} /></div>
+        <div className="xl:col-span-3">
+          <ul className="card divide-y divide-sand-200 overflow-hidden">
+            {rows.map((r) => { const t = levelTone[r.level]; const late = r.status === 'Overdue' || r.status === 'Escalated'; const on = sel?.id === r.id; return (
+              <li key={r.id}>
+                <button onClick={() => setSel(r)} aria-current={on} className={`flex w-full gap-4 px-5 py-4 text-left transition-colors ${on ? 'bg-teal-50' : 'hover:bg-sand-50'}`} style={{ boxShadow: `inset 4px 0 0 ${stripe[t]}` }}>
+                  <Avatar name={nameOf(r.patientId)} size={40} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <span className="text-[16px] font-semibold text-sand-900">{nameOf(r.patientId)}</span>
+                      <Pill tone={t}>{r.level}</Pill>
+                      <Pill tone={statusTone[r.status]} dot={false}>{label(r)}</Pill>
+                    </div>
+                    <p className="mt-1.5 text-[15px] leading-snug text-sand-800">{r.summary}</p>
+                    <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-xs text-sand-500">
+                      <span>{r.source}</span>
+                      <span>Received {r.createdAt}</span>
+                      <span>Assigned to <strong className="font-medium text-sand-700">{r.assignee}</strong></span>
+                    </div>
+                  </div>
+                  <div className="w-28 shrink-0 text-right">
+                    <div className="text-[11px] uppercase tracking-[0.14em] text-sand-500">Respond by</div>
+                    <div className={`mt-0.5 text-sm ${late ? 'font-semibold text-bad-700' : 'font-medium text-sand-800'}`}>{r.dueBy.split(' · ')[0]}<br />{r.dueBy.split(' · ')[1]}</div>
+                    {late && <div className="mt-1 text-[11px] font-medium text-bad-700">Past due</div>}
+                  </div>
+                </button>
+              </li>) })}
+            {rows.length === 0 && <li className="px-5 py-8 text-center text-sm text-sand-500">Nothing here right now.</li>}
+          </ul>
+        </div>
         <div className="xl:col-span-2">
           {sel && (
-            <Card title={<span className="flex items-center gap-2">{nameOf(sel.patientId)} <Pill tone={levelTone[sel.level]}>{sel.level}</Pill></span>} subtitle={`${nameOf(sel.patientId)} · ${sel.source} · ${sel.createdAt}`}
-              actions={<button onClick={() => nav(`/staff/alerts/patient/${sel.patientId}`)} className="btn-secondary px-3 py-1.5 text-xs"><ArrowUpRight size={14} /> Patient history</button>}>
+            <Card title={<span className="flex flex-wrap items-center gap-2">{nameOf(sel.patientId)} <Pill tone={levelTone[sel.level]}>{sel.level}</Pill></span>} subtitle={`${sel.source} · received ${sel.createdAt}`}
+              actions={<button onClick={() => nav(`/staff/alerts/patient/${sel.patientId}`)} className="btn-secondary shrink-0 whitespace-nowrap px-3 py-1.5 text-[11px]"><ArrowUpRight size={14} /> Scores</button>}>
               <Notice tone={levelTone[sel.level]}>{sel.summary}</Notice>
               <div className="mt-3 text-sm">
                 <Row label="Rule applied">{sel.rule}</Row>
@@ -66,7 +88,7 @@ export default function AlertQueue() {
                 <Row label="Status"><Pill tone={statusTone[sel.status]}>{label(sel)}</Pill></Row>
               </div>
               {sel.status !== 'Resolved' && (
-                <div className="mt-4 space-y-3">
+                <div className="mt-5 space-y-4">
                   <div className="grid grid-cols-2 gap-2">
                     {sel.status === 'Unassigned' && <button onClick={() => update(sel.id, 'Assigned', 'Assigned to Jen (nursing)')} className="btn-secondary"><UserPlus size={15} /> Take it</button>}
                     <button onClick={() => setEscalating(true)} className="btn-secondary"><ArrowUpRight size={15} /> Escalate</button>
@@ -78,10 +100,10 @@ export default function AlertQueue() {
                     </div>
                     {listening && <p className="mt-1 text-xs font-medium text-bad-700">Listening… tap the microphone again when you finish.</p>}
                   </Field>
-                  <Field label="Outcome" required>
-                    <div className="grid grid-cols-2 gap-2">{(['Resolved', 'Pending'] as const).map((o) => <button key={o} type="button" onClick={() => setOutcome(o)} aria-pressed={outcome === o} className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium ${outcome === o ? 'border-teal-500 bg-teal-50 text-sand-900' : 'border-sand-300 bg-white text-sand-600'}`}>{o === 'Resolved' ? <Check size={15} /> : <Clock size={15} />}{o === 'Resolved' ? 'Resolved' : 'Pending · action still needed'}</button>)}</div>
+                  <Field label="Outcome" required hint="Pending keeps the alert open with the action still needed.">
+                    <div className="grid grid-cols-2 gap-2">{(['Resolved', 'Pending'] as const).map((o) => <button key={o} type="button" onClick={() => setOutcome(o)} aria-pressed={outcome === o} className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium ${outcome === o ? 'border-teal-500 bg-teal-50 text-sand-900' : 'border-sand-300 bg-white text-sand-600'}`}>{o === 'Resolved' ? <Check size={15} /> : <Clock size={15} />}{o === 'Resolved' ? 'Resolved' : 'Pending'}</button>)}</div>
                   </Field>
-                  <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="grid gap-3">
                     {outcome === 'Resolved'
                       ? <Field label="Resolution reason"><select className="input" value={reason} onChange={(e) => setReason(e.target.value)}><option>RES-01 · Advised, no further action</option><option>RES-02 · Expected response, patient reassured</option><option>RES-03 · Visit scheduled</option><option>RES-04 · Physician reviewed</option><option>RES-05 · Referred to emergency care</option></select></Field>
                       : <Field label="Pending action"><select className="input" value={action} onChange={(e) => setAction(e.target.value)}>{pendingActions.map((a) => <option key={a}>{a}</option>)}</select></Field>}
