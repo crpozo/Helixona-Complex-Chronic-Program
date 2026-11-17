@@ -62,9 +62,9 @@ export default function PatientDetail() {
       {updating && <UpdateStatus current={status} onClose={() => setUpdating(false)} onSave={(st, why) => { changeStatus(p.id, st, why); setUpdating(false); notify(`Status changed to ${st}`) }} />}
 
       <Tabs value={tab} onChange={setTab} tabs={[
-        { key: 'overview', label: 'Overview' }, { key: 'info', label: 'Patient information' }, { key: 'invitation', label: 'Invitation' }, { key: 'interview', label: 'Advisor interview (internal)' },
-        { key: 'admissions', label: 'Admissions outcome' }, { key: 'intake', label: 'Intake review' }, { key: 'chart', label: 'Chart prep' },
-        { key: 'notes', label: 'Notes / Communication', count: notesFor(p.id).length }, { key: 'scores', label: 'Scores & check-ins' }, { key: 'history', label: 'History' },
+        { key: 'overview', label: 'Overview' }, { key: 'info', label: 'Information' }, { key: 'invitation', label: 'Invitation' }, { key: 'interview', label: 'Interview' },
+        { key: 'admissions', label: 'Admission' }, { key: 'intake', label: 'Intake' }, { key: 'chart', label: 'Chart prep' },
+        { key: 'notes', label: 'Notes', count: notesFor(p.id).length }, { key: 'scores', label: 'Scores' }, { key: 'history', label: 'History' },
       ]} />
 
       {tab === 'overview' && (

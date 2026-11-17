@@ -94,3 +94,7 @@ h1, h2, h3 { @apply tracking-normal; }
 .scale-slider.is-empty::-moz-range-thumb { background: #fff; border-color: #a8a197; }
 .scale-slider:focus-visible { outline: none; }
 .scale-slider:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgb(212 183 122 / 0.45); }
+
+/* Tab rows stay on one line; if they ever exceed the width they scroll sideways without a visible bar. */
+.tabs-row { scrollbar-width: none; }
+.tabs-row::-webkit-scrollbar { display: none; }

@@ -216,10 +216,10 @@ export function Choice({ label, selected, onClick, multiple = false, size = 'md'
 /* ---------- Tabs ---------- */
 export function Tabs({ tabs, value, onChange }: { tabs: { key: string; label: ReactNode; count?: number }[]; value: string; onChange: (k: string) => void }) {
   return (
-    <div className="flex flex-wrap gap-1 border-b border-sand-200 mb-4">
+    <div role="tablist" className="tabs-row mb-4 flex gap-0.5 overflow-x-auto border-b border-sand-200">
       {tabs.map((t) => (
-        <button key={t.key} onClick={() => onChange(t.key)}
-          className={`-mb-px flex items-center gap-2 border-b-2 px-3 py-2 text-sm font-medium ${value === t.key ? 'border-teal-600 text-teal-800' : 'border-transparent text-sand-500 hover:text-sand-800'}`}>
+        <button key={t.key} role="tab" aria-selected={value === t.key} onClick={() => onChange(t.key)}
+          className={`-mb-px flex shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium ${value === t.key ? 'border-teal-600 text-teal-800' : 'border-transparent text-sand-500 hover:text-sand-800'}`}>
           {t.label}
           {t.count !== undefined && <span className={`rounded-full px-1.5 text-xs ${value === t.key ? 'bg-teal-100 text-teal-800' : 'bg-sand-100 text-sand-600'}`}>{t.count}</span>}
         </button>
