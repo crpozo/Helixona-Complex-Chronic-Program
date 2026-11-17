@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { Camera, ChevronDown, EyeOff, RefreshCw, Send } from 'lucide-react'
+import { Camera, Check, CheckCircle2, ChevronDown, EyeOff, FileQuestion, Hourglass, RefreshCw, Send, UserMinus, XCircle } from 'lucide-react'
 import { AuditList, Breadcrumb, Card, Field, Notice, Pill, Row, Tabs, ToConfirm, VersionTag, toneFor } from '../../../components/ui'
 import { Actors, Roadmap } from '../../../components/Roadmap'
 import { planFor, stageDates, stageLabel, stages } from '../../../mock/roadmap'
@@ -282,13 +282,13 @@ function AdmissionsTab({ p }: { p: NonNullable<ReturnType<typeof patientById>> }
     <div className="grid gap-5 lg:grid-cols-3">
       <div className="lg:col-span-2">
         <Card title="Admissions outcome" subtitle="Recorded once the interview and insurance review are complete. Every outcome stores the reason code, date, and staff member.">
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-            {([['accepted', 'Accepted for Month 0', 'ok', 'Enables Month 0 payment, intake, and scheduling.'], ['waitlist', 'Waitlist', 'warn', 'Qualified; keeps contact active until a place opens.'], ['pending', 'Pending information', 'warn', 'Decision on hold; sets a follow-up date.'], ['denied', 'Denied', 'bad', 'Records reason and alternate pathway.'], ['fell-off', 'Patient fell off', 'warn', 'Stops reminders; keeps history.']] as const).map(([k, l, t, d]) => (
-              <button key={k} onClick={() => setOutcome(k)} className={`rounded-xl border p-3.5 text-left ${outcome === k ? 'border-teal-500 bg-teal-50' : 'border-sand-300 bg-white hover:bg-sand-50'}`}>
-                <Pill tone={t}>{l}</Pill>
-                <div className="mt-2 text-xs text-sand-500">{d}</div>
-              </button>
-            ))}
+          <div role="radiogroup" aria-label="Admissions outcome" className="divide-y divide-sand-200 overflow-hidden rounded-2xl border border-sand-300">
+            {([['accepted', 'Accepted for Month 0', 'ok', 'Enables Month 0 payment, intake and scheduling.', CheckCircle2], ['waitlist', 'Waitlist', 'warn', 'Qualified. Contact stays active until a place opens.', Hourglass], ['pending', 'Pending information', 'warn', 'Decision on hold. Sets a follow-up date.', FileQuestion], ['denied', 'Denied', 'bad', 'Records the reason and an alternate pathway.', XCircle], ['fell-off', 'Patient fell off', 'neutral', 'Stops reminders and keeps the history.', UserMinus]] as const).map(([k, l, t, d, Icon]) => { const on = outcome === k; const tint = t === 'ok' ? 'bg-ok-100 text-ok-700' : t === 'bad' ? 'bg-bad-100 text-bad-700' : t === 'warn' ? 'bg-warn-100 text-warn-700' : 'bg-sand-100 text-sand-600'; return (
+              <button key={k} type="button" role="radio" aria-checked={on} onClick={() => setOutcome(k)} className={`flex w-full items-center gap-3.5 px-4 py-3 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-400 ${on ? 'bg-teal-50 shadow-[inset_4px_0_0_#141414]' : 'bg-white hover:bg-sand-50'}`}>
+                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${tint}`}><Icon size={18} /></span>
+                <span className="min-w-0 flex-1"><span className="block text-[15px] font-semibold text-sand-900">{l}</span><span className="block text-[13px] text-sand-600">{d}</span></span>
+                <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${on ? 'border-sand-900 bg-sand-900 text-white' : 'border-sand-300 bg-white'}`}>{on && <Check size={12} />}</span>
+              </button>) })}
           </div>
           {outcome && (
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
