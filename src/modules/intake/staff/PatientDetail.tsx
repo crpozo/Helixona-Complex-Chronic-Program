@@ -11,6 +11,7 @@ import CommunicationLog from './CommunicationLog'
 import { ChartPrepPanel } from './ChartPrepDetail'
 import { NoteRow, NotesPanel } from '../../../components/NotesPanel'
 import { Avatar } from '../../../components/Avatar'
+import { ageOf, demographicsFor } from '../../../mock/demographics'
 import { ScoresPanel } from '../../surveys/staff/PatientLongitudinal'
 import { alerts, bookings, levelTone } from '../../../mock/program'
 import { addedHistory, changeStatus, currentUser, latestNote, notesFor, notify, statusOf, useStore } from '../../../mock/store'
@@ -31,6 +32,8 @@ export default function PatientDetail() {
   const name = `${p.firstName} ${p.lastName}`
   const status = statusOf(p)
   const plan = planFor(p.id)
+  const demo = demographicsFor(p.id)
+  const age = ageOf(p.dob)
   const history = [...p.history, ...addedHistory(p.id)]
   const note = latestNote(p.id)
   const visits = bookings.filter((b) => b.patientId === p.id)
@@ -45,7 +48,8 @@ export default function PatientDetail() {
           <div className="min-w-0">
             <div className="eyebrow">eCW {p.ecwId} · {p.id}</div>
             <h1 className="font-display text-3xl font-semibold text-sand-900">{name}</h1>
-            <p className="mt-0.5 text-sand-600">DOB {p.dob} · {p.city} · {p.phone} · {p.email}</p>
+            <p className="mt-0.5 text-sand-600"><strong className="font-semibold text-sand-800">{age} years old</strong>{demo ? ` · ${demo.sex}` : ''} · born {p.dob} · {p.phone} · {p.email}</p>
+            <p className="text-sm text-sand-600">{demo ? `${demo.street}, ${demo.cityStateZip}` : p.city}</p>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-sand-600">
               <Pill tone={toneFor(status)}>{status}</Pill><Pill tone={toneFor(p.chartPrep)}>Chart prep: {p.chartPrep}</Pill><Pill tone="teal" dot={false}>{stageLabel(plan.stage)}</Pill>
               <span className="inline-flex items-center gap-2">Actors: <Actors size="sm" actors={plan.actors} lead={plan.leadActor} /></span>
@@ -58,7 +62,7 @@ export default function PatientDetail() {
       {updating && <UpdateStatus current={status} onClose={() => setUpdating(false)} onSave={(st, why) => { changeStatus(p.id, st, why); setUpdating(false); notify(`Status changed to ${st}`) }} />}
 
       <Tabs value={tab} onChange={setTab} tabs={[
-        { key: 'overview', label: 'Overview' }, { key: 'invitation', label: 'Invitation' }, { key: 'interview', label: 'Advisor interview (internal)' },
+        { key: 'overview', label: 'Overview' }, { key: 'info', label: 'Patient information' }, { key: 'invitation', label: 'Invitation' }, { key: 'interview', label: 'Advisor interview (internal)' },
         { key: 'admissions', label: 'Admissions outcome' }, { key: 'intake', label: 'Intake review' }, { key: 'chart', label: 'Chart prep' },
         { key: 'notes', label: 'Notes / Communication', count: notesFor(p.id).length }, { key: 'scores', label: 'Scores & check-ins' }, { key: 'history', label: 'History' },
       ]} />
@@ -108,6 +112,34 @@ export default function PatientDetail() {
         </div>
       )}
 
+      {tab === 'info' && (
+        <div className="grid gap-5 lg:grid-cols-3">
+          <Card title="Personal" actions={<button onClick={() => notify('Edit the fields and save · changes are recorded with your name')} className="text-xs text-teal-700 underline">Edit</button>}>
+            <Row label="Full name">{name}</Row>
+            <Row label="Date of birth">{p.dob}</Row>
+            <Row label="Age">{age} years</Row>
+            <Row label="Sex">{demo?.sex ?? '—'}</Row>
+            <Row label="Language">{demo?.language ?? '—'}</Row>
+            <Row label="eCW chart number">{p.ecwId}</Row>
+          </Card>
+          <Card title="Contact" actions={<button onClick={() => notify('Edit the fields and save · changes are recorded with your name')} className="text-xs text-teal-700 underline">Edit</button>}>
+            <Row label="Address">{demo ? <span className="text-right">{demo.street}<br />{demo.cityStateZip}</span> : p.city}</Row>
+            <Row label="Mobile phone">{p.phone}</Row>
+            <Row label="Email">{p.email}</Row>
+            <Row label="Prefers">{demo?.prefers ?? '—'}</Row>
+            <Row label="Emergency contact">{demo ? <span className="text-right">{demo.emergency.name} · {demo.emergency.relation}<br />{demo.emergency.phone}</span> : '—'}</Row>
+          </Card>
+          <Card title="Insurance and care" actions={<button onClick={() => notify('Edit the fields and save · changes are recorded with your name')} className="text-xs text-teal-700 underline">Edit</button>}>
+            <Row label="Insurance plan">{demo?.insurance.plan ?? '—'}</Row>
+            <Row label="Plan type">{demo?.insurance.type ?? '—'}</Row>
+            <Row label="Member number">{demo?.insurance.memberId ?? '—'}</Row>
+            <Row label="Primary care physician">{demo?.pcp ?? '—'}</Row>
+            <Row label="Pharmacy">{demo?.pharmacy ?? '—'}</Row>
+            <Row label="Advisor">{p.advisor}</Row>
+          </Card>
+          <p className="lg:col-span-3 text-xs text-sand-500">These details come from the patient’s intake and from eCW. When they differ, eCW is the record of reference and the difference is flagged for chart prep.</p>
+        </div>
+      )}
       {tab === 'invitation' && <InvitationTab p={p} />}
       {tab === 'interview' && <InterviewTab />}
       {tab === 'admissions' && <AdmissionsTab p={p} />}

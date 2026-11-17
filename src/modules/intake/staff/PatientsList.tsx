@@ -6,6 +6,7 @@ import { MetricBoard, type Metric } from '../../../components/MetricBoard'
 import { Avatar } from '../../../components/Avatar'
 import { patients } from '../../../mock/patients'
 import { planFor } from '../../../mock/roadmap'
+import { ageOf, demographicsFor } from '../../../mock/demographics'
 import { currentUser, latestNote, statusOf, useStore } from '../../../mock/store'
 import type { Patient } from '../../../mock/types'
 
@@ -43,7 +44,7 @@ export default function PatientsList() {
 
   const rows = useMemo(() => patients
     .filter((p) => view.test(p, statusOf(p)))
-    .filter((p) => !q || `${p.firstName} ${p.lastName} ${p.id} ${p.ecwId} ${p.email} ${p.phone}`.toLowerCase().includes(q.toLowerCase()))
+    .filter((p) => !q || `${p.firstName} ${p.lastName} ${p.id} ${p.ecwId} ${p.email} ${p.phone} ${p.city} ${demographicsFor(p.id)?.street ?? ''}`.toLowerCase().includes(q.toLowerCase()))
     .filter((p) => f.status === 'All' || statusOf(p) === f.status)
     .filter((p) => f.chart === 'All' || p.chartPrep === f.chart)
     .filter((p) => f.advisor === 'All' || p.advisor === f.advisor)
@@ -69,7 +70,7 @@ export default function PatientsList() {
   const defaults = me.role === 'charlene' ? ['ready', 'placed', 'exceptions', 'agentRun'] : me.role === 'advisor' ? ['awaiting', 'waitingPatient', 'waitlist', 'pending'] : ['total', 'awaiting', 'ready', 'exceptions']
 
   const columns: Column<Patient>[] = [
-    { key: 'who', header: 'Patient', width: '230px', render: (r) => { const n = `${r.firstName} ${r.lastName}`; return <div className="flex items-center gap-2.5"><Avatar name={n} size={34} /><div><div className="font-semibold text-sand-900">{n}</div><div className="text-xs text-sand-500">eCW {r.ecwId} · {r.advisor}</div></div></div> } },
+    { key: 'who', header: 'Patient', width: '230px', render: (r) => { const n = `${r.firstName} ${r.lastName}`; return <div className="flex items-center gap-2.5"><Avatar name={n} size={34} /><div><div className="font-semibold text-sand-900">{n}</div><div className="text-xs text-sand-500">{ageOf(r.dob)} yrs · {r.city} · eCW {r.ecwId}</div></div></div> } },
     { key: 'status', header: 'Status', render: (r) => { const s = statusOf(r); return <><Pill tone={toneFor(s)}>{s}</Pill><div className="mt-1 text-xs text-sand-500">Step {planFor(r.id).stage} of 7</div></> } },
     { key: 'inv', header: 'Invitation', render: (r) => r.invitation ? <><Pill tone={invTone(r.invitation.state)} dot={false} className="capitalize">{r.invitation.state}</Pill><div className="mt-1 text-xs text-sand-500">expires {r.invitation.expiresAt}</div></> : <span className="text-sand-400">Not sent</span> },
     { key: 'intake', header: 'Intake', render: (r) => { if (!r.intake) return <span className="text-sand-400">—</span>; const req = r.uploads.filter((u) => u.required); const o = openItems(r); return <div className="w-40"><div className="flex justify-between text-xs"><span>Questionnaire</span><span className="font-semibold">{r.intake.progress}%</span></div><div className="mt-1 h-1.5 rounded-full bg-sand-200"><div className="h-1.5 rounded-full bg-teal-600" style={{ width: `${r.intake.progress}%` }} /></div><div className="mt-1 text-xs text-sand-500">{req.filter((u) => u.status === 'uploaded').length}/{req.length} documents · {r.forms.filter((x) => x.status === 'signed').length}/{r.forms.length} forms</div>{o.length > 0 && <div className="mt-1 flex flex-wrap gap-1">{o.map((x) => <Pill key={x} tone={x === 'returned item' ? 'warn' : 'bad'} dot={false}>{x}</Pill>)}</div>}</div> } },
@@ -89,7 +90,7 @@ export default function PatientsList() {
       <MetricBoard id="patients" metrics={metrics} defaults={defaults} />
       <Tabs value={view.key} onChange={(k) => setSp(k === 'all' ? {} : { view: k })} tabs={views.map((v) => ({ key: v.key, label: v.label, count: count(v.test) }))} />
       <div className="mb-3 flex flex-wrap items-center gap-3">
-        <label className="relative"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-sand-400" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, ID, eCW number, phone…" className="input w-72 py-2 pl-9" /></label>
+        <label className="relative"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-sand-400" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, address, eCW number, phone…" className="input w-72 py-2 pl-9" /></label>
         {sel('Status', 'status', [...new Set(patients.map((p) => statusOf(p)))])}
         {sel('Chart prep', 'chart', chartOrder)}
         {sel('Advisor', 'advisor', [...new Set(patients.map((p) => p.advisor))])}
