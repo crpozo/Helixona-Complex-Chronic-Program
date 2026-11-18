@@ -47,7 +47,7 @@ export function PageHeader({ eyebrow, title, description, actions, meta }: { eye
       <div className="min-w-0">
         {eyebrow && <div className="eyebrow mb-1">{eyebrow}</div>}
         <h1 className="font-display text-[28px] leading-tight font-semibold text-sand-900">{title}</h1>
-        {description && <p className="mt-1.5 max-w-2xl text-[15px] text-sand-600">{description}</p>}
+        {description && <p className="mt-1.5 max-w-3xl text-[15px] leading-relaxed text-sand-600">{description}</p>}
         {meta && <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-sand-500">{meta}</div>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
@@ -99,7 +99,7 @@ export function QueueTable<T>({ rows, columns, rowTone, onRowClick, rowKey, empt
           <thead>
             <tr className="bg-sand-50 text-left">
               {columns.map((c) => (
-                <th key={c.key} style={{ width: c.width }} className={`px-4 py-2.5 eyebrow font-semibold ${c.className ?? ''}`}>{c.header}</th>
+                <th key={c.key} style={{ width: c.width }} className={`whitespace-nowrap px-4 py-3 eyebrow font-semibold ${c.className ?? ''}`}>{c.header}</th>
               ))}
             </tr>
           </thead>
@@ -114,7 +114,7 @@ export function QueueTable<T>({ rows, columns, rowTone, onRowClick, rowKey, empt
                 className={`border-t border-sand-100 ${onRowClick ? 'cursor-pointer hover:bg-teal-50/50' : ''}`}
               >
                 {columns.map((c, i) => (
-                  <td key={c.key} style={i === 0 ? { boxShadow: `inset 4px 0 0 ${rowTone ? stripeColor[rowTone(r)] : 'transparent'}` } : undefined} className={`px-4 py-3 align-top ${i === 0 ? 'pl-5' : ''} ${c.className ?? ''}`}>{c.render(r)}</td>
+                  <td key={c.key} style={i === 0 ? { boxShadow: `inset 4px 0 0 ${rowTone ? stripeColor[rowTone(r)] : 'transparent'}` } : undefined} className={`px-4 py-3.5 align-middle ${i === 0 ? 'pl-5' : ''} ${c.className ?? ''}`}>{c.render(r)}</td>
                 ))}
               </tr>
             ))}

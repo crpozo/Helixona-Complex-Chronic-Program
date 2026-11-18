@@ -51,7 +51,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="flex min-h-full">
           <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col bg-teal-800 text-white md:flex">
             <Link to={def.home} className="block px-5 pb-4 pt-5"><Wordmark size="sm" light /><span className="mt-1.5 block text-[10px] uppercase tracking-[0.22em] text-white/50">Complex Chronic Program</span></Link>
-            <nav className="flex-1 overflow-y-auto px-3 pb-4" aria-label="Main">
+            <nav className="tabs-row flex-1 overflow-y-auto px-3 pb-4" aria-label="Main">
               {groups.map((g) => { const its = items.filter((n) => n.group === g); if (!its.length) return null; const closed = collapsed.includes(g); return (
                 <div key={g} className="mt-3">
                   <button onClick={() => setCollapsed(closed ? collapsed.filter((x) => x !== g) : [...collapsed, g])} aria-expanded={!closed} className="flex w-full items-center justify-between px-2 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-white/45 hover:text-white/80">{g}<ChevronDown size={12} className={`transition-transform ${closed ? '-rotate-90' : ''}`} /></button>
