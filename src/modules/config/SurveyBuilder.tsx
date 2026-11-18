@@ -58,7 +58,7 @@ export default function SurveyBuilder() {
             {tab === 'scoring' && (
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Calculated field"><input className="input" defaultValue="symptom_load = pain + (10 − energy) + (10 − sleep)" /></Field>
-                <Field label="Change vs. baseline"><select className="input"><option>Compare each score to Month 0 baseline</option><option>Compare to previous survey</option></select></Field>
+                <Field label="Change vs. baseline"><select className="input"><option>Compare each score to A&P baseline</option><option>Compare to previous survey</option></select></Field>
                 <Field label="Branch rule"><input className="input" defaultValue="If Q-REACTION = Yes → show Q-REACTION-TXT" /></Field>
                 <Field label="Flag"><input className="input" defaultValue="If Q-CONTACT = Yes → flag contact_requested (used by AR-01)" /></Field>
                 <div className="sm:col-span-2"><Notice tone="info">Scores and flags feed the alert rules. Rules are configured separately so thresholds can change without re-publishing the survey.</Notice></div>

@@ -15,7 +15,7 @@ const sample: Entry[] = [
   { id: 'C-5', channel: 'Call', direction: 'Outgoing', topic: 'Missing documents', summary: 'Asked for pages 3–4 of the lab report. Patient will upload tonight.', who: 'Ana', when: 'Oct 7, 2026 · 2:15 PM', outcome: 'Spoke with patient' },
   { id: 'C-4', channel: 'Text', direction: 'Incoming', topic: 'Scheduling', summary: 'Asked whether Thursday mornings are possible for the assessment visit.', who: 'Patient', when: 'Oct 6, 2026 · 9:02 AM', outcome: 'Patient replied' },
   { id: 'C-3', channel: 'Email', direction: 'Outgoing', topic: 'Invitation and intake', summary: 'Secure invitation sent (template Invitation v2).', who: 'System', when: 'Oct 2, 2026 · 10:30 AM', outcome: 'Delivered', automatic: true },
-  { id: 'C-2', channel: 'Call', direction: 'Outgoing', topic: 'Screening call', summary: 'Qualification interview completed. Understands Month 0 fee. Prefers texting.', who: 'Ana', when: 'Sep 30, 2026 · 11:00 AM', outcome: 'Spoke with patient' },
+  { id: 'C-2', channel: 'Call', direction: 'Outgoing', topic: 'Screening call', summary: 'Qualification interview completed. Understands A&P fee. Prefers texting.', who: 'Ana', when: 'Sep 30, 2026 · 11:00 AM', outcome: 'Spoke with patient' },
   { id: 'C-1', channel: 'Call', direction: 'Outgoing', topic: 'First contact', summary: 'First call after website inquiry.', who: 'Marie', when: 'Sep 29, 2026 · 4:40 PM', outcome: 'Left voicemail' },
 ]
 

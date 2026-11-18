@@ -5,18 +5,24 @@ import { AuditList, Breadcrumb, Card, Field, Notice, Pill, Row, Tabs, ToConfirm,
 import { Actors, Roadmap } from '../../../components/Roadmap'
 import { planFor, stageDates, stageLabel, stages } from '../../../mock/roadmap'
 import { patientById } from '../../../mock/patients'
-import { inquiries } from '../../../mock/inquiries'
 import IntakeReviewPanel from './IntakeReviewPanel'
 import CommunicationLog from './CommunicationLog'
+import HealthStory from './HealthStory'
 import { ChartPrepPanel } from './ChartPrepDetail'
 import { NoteRow, NotesPanel } from '../../../components/NotesPanel'
 import { Avatar } from '../../../components/Avatar'
 import { ageOf, demographicsFor } from '../../../mock/demographics'
 import { ScoresPanel } from '../../surveys/staff/PatientLongitudinal'
 import { alerts, bookings, levelTone } from '../../../mock/program'
-import { addedHistory, changeStatus, currentUser, latestNote, notesFor, notify, statusOf, useStore } from '../../../mock/store'
+import { addedHistory, changeStatus, currentUser, inJourneyOrder, latestNote, notesFor, notify, patientOwner, patientProgram, setProgram, statusOf, takePatient, useStore } from '../../../mock/store'
 
-const admissionStatuses = ['Advisor outreach', 'Advisor interview completed', 'Insurance benefits review', 'Admissions review', 'Waitlist', 'Pending information', 'Accepted for Month 0', 'Month 0 scheduled', 'Month 0 in progress', 'Plan of Care completed', 'Denied', 'Patient fell off']
+const admissionStatuses = ['Pending information', 'Accepted for A&P', 'A&P scheduled', 'A&P in progress', 'A&P complete']
+/** What the system does when a status is recorded (from the clinic's status sheet). */
+const programs: Record<string, string[]> = {
+  '9-month program': ['Send the contract and payment setup for the program', 'Create a flag in eCW with the program and its end date'],
+  'Stabilization program': ['Send the contract and payment setup for the program', 'Create a flag in eCW with the program and its end date'],
+  'À la carte': ['Send the standard patient paperwork'],
+}
 
 export default function PatientDetail() {
   useStore()
@@ -28,7 +34,6 @@ export default function PatientDetail() {
   const setTab = (t: string) => setSp({ tab: t })
   const [updating, setUpdating] = useState(false)
   if (!p) return <Notice tone="bad">Patient {id} not found in sample data.</Notice>
-  const inquiry = inquiries.find((i) => i.patientId === p.id)
   const name = `${p.firstName} ${p.lastName}`
   const status = statusOf(p)
   const plan = planFor(p.id)
@@ -36,6 +41,8 @@ export default function PatientDetail() {
   const age = ageOf(p.dob)
   const history = [...p.history, ...addedHistory(p.id)]
   const note = latestNote(p.id)
+  const owner = patientOwner(p.id, p.advisor)
+  const program = patientProgram(p.id)
   const visits = bookings.filter((b) => b.patientId === p.id)
   const openAlerts = alerts.filter((a) => a.patientId === p.id && a.status !== 'Resolved')
 
@@ -46,25 +53,25 @@ export default function PatientDetail() {
         <div className="flex min-w-0 items-start gap-4">
           <div className="relative"><Avatar name={name} size={72} /><button onClick={() => notify('Choose a photo to upload · photos stay inside Helixona')} aria-label="Change patient photo" className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-sand-300 bg-white text-sand-600 shadow-sm hover:text-sand-900"><Camera size={14} /></button></div>
           <div className="min-w-0">
-            <div className="eyebrow">eCW {p.ecwId} · {p.id}</div>
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-ok-700">Patient<span className="font-normal tracking-normal text-sand-500 normal-case">eCW {p.ecwId}</span></div>
             <h1 className="font-display text-3xl font-semibold text-sand-900">{name}</h1>
             <p className="mt-0.5 text-sand-600"><strong className="font-semibold text-sand-800">{age} years old</strong>{demo ? ` · ${demo.sex}` : ''} · born {p.dob} · {p.phone} · {p.email}</p>
             <p className="text-sm text-sand-600">{demo ? `${demo.street}, ${demo.cityStateZip}` : p.city}</p>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-sand-600">
-              <Pill tone={toneFor(status)}>{status}</Pill><Pill tone={toneFor(p.chartPrep)}>Chart prep: {p.chartPrep}</Pill><Pill tone="teal" dot={false}>{stageLabel(plan.stage)}</Pill>
+              <Pill tone={toneFor(status)}>{status}{program ? ` · ${program}` : ''}</Pill>{demo && <Pill tone={demo.payer === 'Cash' ? 'warn' : 'info'} dot={false}>{demo.payer} patient</Pill>}<Pill tone={toneFor(p.chartPrep)}>Chart prep: {p.chartPrep}</Pill><Pill tone="teal" dot={false}>{stageLabel(plan.stage)}</Pill>
               <span className="inline-flex items-center gap-2">Actors: <Actors size="sm" actors={plan.actors} lead={plan.leadActor} /></span>
-              <span>Advisor: {p.advisor}</span>{inquiry && <span>· From {inquiry.source}</span>}
+              <span className="inline-flex items-center gap-1.5">Owner: <strong className="text-sand-800">{owner}</strong>{owner !== currentUser().name && <button onClick={() => { takePatient(p.id); notify('You now own this patient · recorded') }} className="text-xs text-teal-700 underline">take ownership</button>}</span>
             </div>
           </div>
         </div>
         <button className="btn-primary" onClick={() => setUpdating(true)}>Update status</button>
       </div>
-      {updating && <UpdateStatus current={status} onClose={() => setUpdating(false)} onSave={(st, why) => { changeStatus(p.id, st, why); setUpdating(false); notify(`Status changed to ${st}`) }} />}
+      {updating && <UpdateStatus current={status} onClose={() => setUpdating(false)} onSave={(st, why, prog) => { changeStatus(p.id, st, prog ? `${prog} · ${why}` : why); if (prog) setProgram(p.id, prog); setUpdating(false); notify(prog ? `A&P complete · ${prog} · ${prog === 'À la carte' ? 'standard paperwork sent' : 'contract and payment sent, flag set in eCW'}` : `Status changed to ${st}`) }} />}
 
       <Tabs value={tab} onChange={setTab} tabs={[
-        { key: 'overview', label: 'Overview' }, { key: 'info', label: 'Information' }, { key: 'invitation', label: 'Invitation' }, { key: 'interview', label: 'Interview' },
+        { key: 'overview', label: 'Overview' }, { key: 'info', label: 'Information' }, { key: 'story', label: 'Health story' }, { key: 'invitation', label: 'Invitation' }, { key: 'interview', label: 'Interview' },
         { key: 'admissions', label: 'Admission' }, { key: 'intake', label: 'Intake' }, { key: 'chart', label: 'Chart prep' },
-        { key: 'notes', label: 'Notes', count: notesFor(p.id).length }, { key: 'scores', label: 'Scores' }, { key: 'history', label: 'History' },
+        { key: 'notes', label: 'Notes', count: notesFor(p.id).length }, { key: 'scores', label: 'Data' }, { key: 'history', label: 'History' },
       ]} />
 
       {tab === 'overview' && (
@@ -130,6 +137,7 @@ export default function PatientDetail() {
             <Row label="Emergency contact">{demo ? <span className="text-right">{demo.emergency.name} · {demo.emergency.relation}<br />{demo.emergency.phone}</span> : '—'}</Row>
           </Card>
           <Card title="Insurance and care" actions={<button onClick={() => notify('Edit the fields and save · changes are recorded with your name')} className="text-xs text-teal-700 underline">Edit</button>}>
+            <Row label="Pays with">{demo ? `${demo.payer} patient` : '—'}</Row>
             <Row label="Insurance plan">{demo?.insurance.plan ?? '—'}</Row>
             <Row label="Plan type">{demo?.insurance.type ?? '—'}</Row>
             <Row label="Member number">{demo?.insurance.memberId ?? '—'}</Row>
@@ -140,6 +148,7 @@ export default function PatientDetail() {
           <p className="lg:col-span-3 text-xs text-sand-500">These details come from the patient’s intake and from eCW. When they differ, eCW is the record of reference and the difference is flagged for chart prep.</p>
         </div>
       )}
+      {tab === 'story' && <HealthStory patient={p} />}
       {tab === 'invitation' && <InvitationTab p={p} />}
       {tab === 'interview' && <InterviewTab />}
       {tab === 'admissions' && <AdmissionsTab p={p} />}
@@ -157,19 +166,24 @@ export default function PatientDetail() {
   )
 }
 
-function UpdateStatus({ current, onClose, onSave }: { current: string; onClose: () => void; onSave: (status: string, reason: string) => void }) {
+function UpdateStatus({ current, onClose, onSave }: { current: string; onClose: () => void; onSave: (status: string, reason: string, program?: string) => void }) {
   const [st, setSt] = useState('')
   const [why, setWhy] = useState('')
+  const [prog, setProg] = useState('')
+  const needsProg = st === 'A&P complete'
+  const triggers = needsProg ? programs[prog] ?? [] : st === 'A&P in progress' ? ['Create a flag in eCW with the program and its end date'] : []
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-label="Update status">
       <div className="card w-full max-w-md p-5 shadow-xl">
         <h2 className="font-display text-2xl font-semibold text-sand-900">Update status</h2>
         <p className="mt-1 text-sm text-sand-600">Now: <strong>{current}</strong>. Membership changes (pause, graduate, withdraw) are made in the Registry.</p>
         <div className="mt-4 space-y-4">
-          <Field label="New status" required><select className="input" value={st} onChange={(e) => setSt(e.target.value)}><option value="">Select…</option>{admissionStatuses.filter((x) => x !== current).map((x) => <option key={x}>{x}</option>)}</select></Field>
+          <Field label="New status" required><select className="input" value={st} onChange={(e) => setSt(e.target.value)}><option value="">Select…</option>{inJourneyOrder(admissionStatuses).filter((x) => x !== current).map((x) => <option key={x}>{x}</option>)}</select></Field>
+          {needsProg && <Field label="Program after the A&P" required><div className="grid gap-2">{Object.keys(programs).map((k) => <button key={k} type="button" onClick={() => setProg(k)} aria-pressed={prog === k} className={`rounded-xl border px-3 py-2.5 text-left text-sm font-medium ${prog === k ? 'border-teal-500 bg-teal-50 text-sand-900' : 'border-sand-300 bg-white text-sand-700'}`}>{k}</button>)}</div></Field>}
+          {triggers.length > 0 && <div className="rounded-xl bg-sand-100 px-3 py-2.5 text-sm text-sand-700"><div className="text-xs font-semibold uppercase tracking-[0.14em] text-sand-500">The system will</div><ul className="mt-1 list-disc space-y-0.5 pl-5">{triggers.map((t) => <li key={t}>{t}</li>)}</ul></div>}
           <Field label="Reason" required><input className="input" value={why} onChange={(e) => setWhy(e.target.value)} placeholder="Why this change" /></Field>
         </div>
-        <div className="mt-5 flex items-center justify-between gap-3"><span className="text-xs text-sand-500">Recorded as {currentUser().name} · now</span><div className="flex gap-2"><button onClick={onClose} className="btn-ghost">Cancel</button><button disabled={!st || !why.trim()} onClick={() => onSave(st, why.trim())} className="btn-primary">Save status</button></div></div>
+        <div className="mt-5 flex items-center justify-between gap-3"><span className="text-xs text-sand-500">Recorded as {currentUser().name} · now</span><div className="flex gap-2"><button onClick={onClose} className="btn-ghost">Cancel</button><button disabled={!st || !why.trim() || (needsProg && !prog)} onClick={() => onSave(st, why.trim(), needsProg ? prog : undefined)} className="btn-primary">Save status</button></div></div>
       </div>
     </div>
   )
@@ -178,7 +192,7 @@ function UpdateStatus({ current, onClose, onSave }: { current: string; onClose: 
 /* Journey: phases made of steps. A finished phase folds into one line with the date it was completed. */
 const phases: { name: string; steps: string[] }[] = [
   { name: 'Admission', steps: ['Inquiry', 'Advisor interview', 'Insurance & admissions'] },
-  { name: 'Month 0 assessment', steps: ['Month 0', 'Plan of Care'] },
+  { name: 'A&P assessment', steps: ['A&P', 'Plan of Care'] },
   { name: 'Enrollment', steps: ['Program offered', 'Contract & payment'] },
   { name: 'Active care', steps: ['Active care'] },
   { name: 'Month 9 review', steps: ['Month 9 review'] },
@@ -188,8 +202,8 @@ function stageIndex(status: string) {
   if (/inquiry|outreach/i.test(status)) return 0
   if (/interview/i.test(status)) return 1
   if (/insurance|admissions|denied|fell off|waitlist|pending information/i.test(status)) return 2
-  if (/month 0/i.test(status)) return 3
-  if (/plan of care/i.test(status)) return 4
+  if (/A&P complete|plan of care/i.test(status)) return 4
+  if (/A&P/i.test(status)) return 3
   if (/offered|declined/i.test(status)) return 5
   if (/contract|payment/i.test(status)) return 6
   if (/active|paused/i.test(status)) return 7
@@ -270,7 +284,7 @@ function InvitationTab({ p }: { p: NonNullable<ReturnType<typeof patientById>> }
 }
 
 function InterviewTab() {
-  const [v, setV] = useState({ readiness: 'High', support: 'Spouse helps with appointments', budget: 'Understands Month 0 fee and $2,000/mo; asked about ACH', redflags: 'None noted', notes: 'Patient is articulate about goals. Has tried PT and 2 rheumatologists. Prefers texting. Available Tue/Thu mornings.' })
+  const [v, setV] = useState({ readiness: 'High', support: 'Spouse helps with appointments', budget: 'Understands A&P fee and $2,000/mo; asked about ACH', redflags: 'None noted', notes: 'Patient is articulate about goals. Has tried PT and 2 rheumatologists. Prefers texting. Available Tue/Thu mornings.' })
   return (
     <>
       <div className="mb-4"><Notice tone="plum" icon={<EyeOff size={16} />} title="Internal advisor record — never visible to the patient">This interview is stored separately from the medical record and is not included in the eCW note or PDF.</Notice></div>
@@ -302,7 +316,7 @@ function InterviewTab() {
 }
 
 function AdmissionsTab({ p }: { p: NonNullable<ReturnType<typeof patientById>> }) {
-  const [outcome, setOutcome] = useState<'accepted' | 'waitlist' | 'pending' | 'denied' | 'fell-off' | null>(p.status === 'Denied' ? 'denied' : p.status === 'Patient fell off' ? 'fell-off' : p.status === 'Waitlist' ? 'waitlist' : p.status === 'Pending information' ? 'pending' : /month 0|offered|active/i.test(p.status) ? 'accepted' : null)
+  const [outcome, setOutcome] = useState<'accepted' | 'waitlist' | 'pending' | 'denied' | 'fell-off' | null>(p.status === 'Denied' ? 'denied' : p.status === 'Patient fell off' ? 'fell-off' : p.status === 'Waitlist' ? 'waitlist' : p.status === 'Pending information' ? 'pending' : /A&P|offered|active/i.test(p.status) ? 'accepted' : null)
   const reasons: Record<string, string[]> = {
     accepted: ['ADM-01 · Meets program criteria', 'ADM-02 · Meets criteria with physician review note'],
     waitlist: ['WL-01 · Qualified · waiting for a program opening', 'WL-02 · Qualified · patient asked to start later', 'WL-03 · Waiting for physician availability'],
@@ -315,7 +329,7 @@ function AdmissionsTab({ p }: { p: NonNullable<ReturnType<typeof patientById>> }
       <div className="lg:col-span-2">
         <Card title="Admissions outcome" subtitle="Recorded once the interview and insurance review are complete. Every outcome stores the reason code, date, and staff member.">
           <div role="radiogroup" aria-label="Admissions outcome" className="divide-y divide-sand-200 overflow-hidden rounded-2xl border border-sand-300">
-            {([['accepted', 'Accepted for Month 0', 'ok', 'Enables Month 0 payment, intake and scheduling.', CheckCircle2], ['waitlist', 'Waitlist', 'warn', 'Qualified. Contact stays active until a place opens.', Hourglass], ['pending', 'Pending information', 'warn', 'Decision on hold. Sets a follow-up date.', FileQuestion], ['denied', 'Denied', 'bad', 'Records the reason and an alternate pathway.', XCircle], ['fell-off', 'Patient fell off', 'neutral', 'Stops reminders and keeps the history.', UserMinus]] as const).map(([k, l, t, d, Icon]) => { const on = outcome === k; const tint = t === 'ok' ? 'bg-ok-100 text-ok-700' : t === 'bad' ? 'bg-bad-100 text-bad-700' : t === 'warn' ? 'bg-warn-100 text-warn-700' : 'bg-sand-100 text-sand-600'; return (
+            {([['accepted', 'Accepted for A&P', 'ok', 'Enables A&P payment, intake and scheduling.', CheckCircle2], ['waitlist', 'Waitlist', 'warn', 'Qualified. Contact stays active until a place opens.', Hourglass], ['pending', 'Pending information', 'warn', 'Decision on hold. Sets a follow-up date.', FileQuestion], ['denied', 'Denied', 'bad', 'Records the reason and an alternate pathway.', XCircle], ['fell-off', 'Patient fell off', 'neutral', 'Stops reminders and keeps the history.', UserMinus]] as const).map(([k, l, t, d, Icon]) => { const on = outcome === k; const tint = t === 'ok' ? 'bg-ok-100 text-ok-700' : t === 'bad' ? 'bg-bad-100 text-bad-700' : t === 'warn' ? 'bg-warn-100 text-warn-700' : 'bg-sand-100 text-sand-600'; return (
               <button key={k} type="button" role="radio" aria-checked={on} onClick={() => setOutcome(k)} className={`flex w-full items-center gap-3.5 px-4 py-3 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-400 ${on ? 'bg-teal-50 shadow-[inset_4px_0_0_#141414]' : 'bg-white hover:bg-sand-50'}`}>
                 <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${tint}`}><Icon size={18} /></span>
                 <span className="min-w-0 flex-1"><span className="block text-[15px] font-semibold text-sand-900">{l}</span><span className="block text-[13px] text-sand-600">{d}</span></span>
@@ -329,11 +343,11 @@ function AdmissionsTab({ p }: { p: NonNullable<ReturnType<typeof patientById>> }
               {outcome === 'waitlist' && <Field label="Hoped-for start"><input className="input" defaultValue="Next opening · est. January 2027" /></Field>}
               {outcome === 'pending' && <><Field label="What we are waiting for" required><input className="input" defaultValue="Records from prior rheumatologist" /></Field><Field label="Follow up on" required><input type="date" className="input" defaultValue="2026-10-14" /></Field></>}
               {outcome === 'denied' && <Field label="Alternate pathway"><select className="input"><option>Insurance-covered NP care</option><option>Self-directed care</option><option>External referral</option><option>None</option></select></Field>}
-              <div className="sm:col-span-2"><Field label="Notes"><textarea rows={3} className="input" defaultValue={outcome === 'accepted' ? 'Reviewed with Karina. Patient ready to schedule Month 0 in October.' : ''} /></Field></div>
+              <div className="sm:col-span-2"><Field label="Notes"><textarea rows={3} className="input" defaultValue={outcome === 'accepted' ? 'Reviewed with Karina. Patient ready to schedule A&P in October.' : ''} /></Field></div>
             </div>
           )}
           <div className="mt-4 flex items-center gap-3">
-            <button className="btn-primary" disabled={!outcome} onClick={() => { const l = ({ accepted: 'Accepted for Month 0', waitlist: 'Waitlist', pending: 'Pending information', denied: 'Denied', 'fell-off': 'Patient fell off' })[outcome!]; changeStatus(p.id, l, 'Admissions outcome'); notify(`Outcome recorded: ${l}`) }}>Record outcome</button>
+            <button className="btn-primary" disabled={!outcome} onClick={() => { const l = ({ accepted: 'Accepted for A&P', waitlist: 'Waitlist', pending: 'Pending information', denied: 'Denied', 'fell-off': 'Patient fell off' })[outcome!]; changeStatus(p.id, l, 'Admissions outcome'); notify(`Outcome recorded: ${l}`) }}>Record outcome</button>
             <span className="help">Recorded as <strong>{currentUser().name}</strong> · {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
           </div>
         </Card>
@@ -343,7 +357,7 @@ function AdmissionsTab({ p }: { p: NonNullable<ReturnType<typeof patientById>> }
         <Row label="Recorded by">Ana (advisor)</Row>
         <Row label="When">Sep 26, 2026 · 1:58 PM</Row>
         <Row label="Reason">ADM-01</Row>
-        <p className="help mt-3">After “Accepted for Month 0”, the next steps are <Link className="text-teal-700 underline" to={`/staff/patients/${p.id}?tab=invitation`}>send the invitation</Link> and Month 0 payment (Karina).</p>
+        <p className="help mt-3">After “Accepted for A&P”, the next steps are <Link className="text-teal-700 underline" to={`/staff/patients/${p.id}?tab=invitation`}>send the invitation</Link> and A&P payment (Karina).</p>
       </Card>
     </div>
   )

@@ -49,13 +49,19 @@ export default function BecomePatient() {
                   <Field label="What are the main health concerns you need help with?" required><textarea rows={3} className="input text-[16px]" value={f.reason ?? ''} onChange={(e) => set('reason', e.target.value)} /></Field>
                   <Field label="Do you have PPO insurance?" required><div className="grid grid-cols-3 gap-2">{['Yes', 'No', 'Not sure'].map((o) => <Choice key={o} label={o} selected={f.ppo === o} onClick={() => set('ppo', o)} />)}</div></Field>
                   <Field label="Are you able to come to our Irvine office on a regular basis?" required><div className="grid grid-cols-3 gap-2">{['Yes', 'Sometimes', 'No'].map((o) => <Choice key={o} label={o} selected={f.office === o} onClick={() => set('office', o)} />)}</div></Field>
-                  <Field label="How did you hear about us?"><input className="input text-[16px]" value={f.source ?? ''} onChange={(e) => set('source', e.target.value)} /></Field>
+                  <Field label="How did you hear about us?"><select className="input text-[16px]" value={f.source ?? ''} onChange={(e) => set('source', e.target.value)}><option value="">Select…</option>{['Google search', 'Instagram', 'Facebook', 'YouTube', 'A Helixona patient', 'A physician', 'Friend or family', 'Event or talk', 'Other'].map((o) => <option key={o}>{o}</option>)}</select></Field>
+                  {f.source === 'A Helixona patient' && <Field label="Who referred you?" required><input className="input text-[16px]" placeholder="Their name" value={f.refPatient ?? ''} onChange={(e) => set('refPatient', e.target.value)} /></Field>}
+                  {f.source === 'A physician' && <Field label="Which physician?" required><input className="input text-[16px]" placeholder="Physician name" value={f.refPhysician ?? ''} onChange={(e) => set('refPhysician', e.target.value)} /></Field>}
+                  <Field label="Details (optional)"><input className="input text-[16px]" value={f.heardDetails ?? ''} onChange={(e) => set('heardDetails', e.target.value)} /></Field>
                   <Notice tone="info">A patient advisor will call you for a short screening call before sending your full health questionnaire, so you only complete it if the program is a fit.</Notice>
                 </>
               ) : (
                 <>
                   <Field label="What are you looking for?" required><div className="space-y-2">{['Provider visit to build an optimization plan', 'Diagnostics and lab work', 'Therapies (IV, red light, nano bath, salt room…)', 'Not sure yet'].map((o) => <Choice key={o} label={o} selected={f.goal === o} onClick={() => set('goal', o)} />)}</div></Field>
-                  <Field label="How did you hear about us?"><input className="input text-[16px]" value={f.source ?? ''} onChange={(e) => set('source', e.target.value)} /></Field>
+                  <Field label="How did you hear about us?"><select className="input text-[16px]" value={f.source ?? ''} onChange={(e) => set('source', e.target.value)}><option value="">Select…</option>{['Google search', 'Instagram', 'Facebook', 'YouTube', 'A Helixona patient', 'A physician', 'Friend or family', 'Event or talk', 'Other'].map((o) => <option key={o}>{o}</option>)}</select></Field>
+                  {f.source === 'A Helixona patient' && <Field label="Who referred you?" required><input className="input text-[16px]" placeholder="Their name" value={f.refPatient ?? ''} onChange={(e) => set('refPatient', e.target.value)} /></Field>}
+                  {f.source === 'A physician' && <Field label="Which physician?" required><input className="input text-[16px]" placeholder="Physician name" value={f.refPhysician ?? ''} onChange={(e) => set('refPhysician', e.target.value)} /></Field>}
+                  <Field label="Details (optional)"><input className="input text-[16px]" value={f.heardDetails ?? ''} onChange={(e) => set('heardDetails', e.target.value)} /></Field>
                   <Notice tone="info">No waiting: we email your secure link immediately so you can complete the short Health Optimization questionnaire and book.</Notice>
                 </>
               )}

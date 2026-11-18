@@ -28,7 +28,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const value = useMemo(() => ({ role, setRole }), [role]) // eslint-disable-line react-hooks/exhaustive-deps
   const def = roles.find((r) => r.key === role)!
   const items = nav.filter((n) => n.roles.includes(role))
-  const groups: NavGroup[] = ['Patients', 'Care', 'Membership', 'Reports', 'Admin setup']
+  const groups: NavGroup[] = ['People', 'Care', 'Membership', 'Reports', 'Admin setup']
   const [collapsed, setCollapsed] = useState<string[]>([])
 
   return (

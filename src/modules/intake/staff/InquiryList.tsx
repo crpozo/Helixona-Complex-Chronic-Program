@@ -1,71 +1,76 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Filter, Search } from 'lucide-react'
-import { PageHeader, Pill, QueueTable, Stat, Tabs, toneFor, type Column } from '../../../components/ui'
-import { inquiries } from '../../../mock/inquiries'
+import { Search, UserCheck, X } from 'lucide-react'
+import { PageHeader, Pill, QueueTable, Tabs, toneFor, type Column } from '../../../components/ui'
 import type { Inquiry } from '../../../mock/types'
+import { allInquiries, currentUser, inquiryDate, inquiryStatuses, notify, patchInquiry, useStore } from '../../../mock/store'
 
-/** Most recent logged contact per inquiry (sample). The full log is on the patient record, Communications tab. */
-const lastContact: Record<string, { channel: string; topic: string; when: string; who: string }> = {
-  'INQ-2208': { channel: 'Call', topic: 'Screening call', when: 'Oct 6 · 4:10 PM', who: 'Ana' },
-  'INQ-2205': { channel: 'Call', topic: 'First contact', when: 'Oct 5 · 11:20 AM', who: 'Ana' },
-  'INQ-2199': { channel: 'Text', topic: 'Invitation and intake', when: 'Oct 2 · 10:30 AM', who: 'System' },
-}
+/** Inquiries: people who asked about Helixona and are not patients. One tile per status (counts follow the
+ *  chosen period), ownership, and a page per inquiry with the data the advisor collects. */
+const TODAY = '2026-10-09'
+const shift = (iso: string, d: number) => { const t = new Date(iso + 'T12:00:00Z'); t.setUTCDate(t.getUTCDate() + d); return t.toISOString().slice(0, 10) }
+const periods: Record<string, [string, string] | null> = { 'All time': null, 'This week': [shift(TODAY, -6), TODAY], 'Last 30 days': [shift(TODAY, -29), TODAY], 'This month': ['2026-10-01', '2026-10-31'], 'Last month': ['2026-09-01', '2026-09-30'] }
 
 export default function InquiryList() {
+  useStore()
   const nav = useNavigate()
-  const [tab, setTab] = useState('cc')
+  const me = currentUser()
+  const [tab, setTab] = useState('all')
   const [q, setQ] = useState('')
-  const [showFilters, setShowFilters] = useState(false)
-  const [f, setF] = useState({ status: 'All', owner: 'All', source: 'All' })
-  const statuses = ['All', ...new Set(inquiries.map((i) => i.status))]
-  const owners = ['All', ...new Set(inquiries.map((i) => i.owner))]
-  const sources = ['All', 'Website · Typeform', 'Referral', 'Campaign']
-  const active = Object.values(f).filter((v) => v !== 'All').length
-  const rows = inquiries.filter((i) => (tab === 'all' ? true : tab === 'cc' ? i.pathway === 'Complex Chronic' : i.pathway === 'Health Optimization (L2/L3)'))
-    .filter((i) => !q || `${i.name} ${i.id} ${i.reason} ${i.city}`.toLowerCase().includes(q.toLowerCase()))
-    .filter((i) => f.status === 'All' || i.status === f.status)
-    .filter((i) => f.owner === 'All' || i.owner === f.owner)
-    .filter((i) => f.source === 'All' || (f.source === 'Referral' ? i.source.startsWith('Referral') : f.source === 'Campaign' ? /Google Ads|Instagram/.test(i.source) : i.source === f.source))
+  const [status, setStatus] = useState<string>('All')
+  const [owner, setOwner] = useState('All')
+  const [period, setPeriod] = useState('All time')
+  const [from, setFrom] = useState('2026-09-15')
+  const [to, setTo] = useState(TODAY)
+  const all = allInquiries()
+  const range = period === 'Custom' ? [from, to] as [string, string] : periods[period]
+  const inPeriod = useMemo(() => all.filter((i) => !range || (inquiryDate(i) >= range[0] && inquiryDate(i) <= range[1])), [all, range]) // eslint-disable-line react-hooks/exhaustive-deps
+  const byPath = inPeriod.filter((i) => tab === 'all' || (tab === 'cc' ? i.pathway === 'Complex Chronic' : i.pathway !== 'Complex Chronic'))
+  const rows = byPath
+    .filter((i) => status === 'All' || i.status === status)
+    .filter((i) => owner === 'All' || (owner === 'Mine' ? i.owner === me.name : i.owner === owner))
+    .filter((i) => !q || `${i.name} ${i.reason} ${i.city}`.toLowerCase().includes(q.toLowerCase()))
+  const active = (status !== 'All' ? 1 : 0) + (owner !== 'All' ? 1 : 0) + (q ? 1 : 0)
 
   const columns: Column<Inquiry>[] = [
-    { key: 'id', header: 'Inquiry', render: (r) => <><div className="font-medium text-sand-900">{r.id}</div><div className="text-xs text-sand-500">{r.receivedAt}</div></>, width: '150px' },
-    { key: 'who', header: 'Name · location', render: (r) => <><div className="font-medium text-sand-900">{r.name}</div><div className="text-xs text-sand-500">{r.city}, {r.state}</div></> },
-    { key: 'pathway', header: 'Pathway', render: (r) => <Pill tone={r.pathway === 'Complex Chronic' ? 'teal' : r.pathway.startsWith('Health') ? 'info' : 'neutral'} dot={false}>{r.pathway}</Pill> },
-    { key: 'source', header: 'Source', render: (r) => <span className="text-sand-600">{r.source}</span> },
-    { key: 'reason', header: 'Reason for seeking care', render: (r) => <span className="text-sand-700">{r.reason}</span> },
-    { key: 'status', header: 'Status', render: (r) => <Pill tone={toneFor(r.status)}>{r.status}</Pill> },
-    { key: 'owner', header: 'Owner', render: (r) => <span className={r.owner === 'Unassigned' ? 'font-semibold text-bad-700' : ''}>{r.owner}</span> },
-    { key: 'last', header: 'Last contact', render: (r) => { const c = lastContact[r.id]; return c ? <><div className="text-sand-800">{c.channel} · {c.topic}</div><div className="text-xs text-sand-500">{c.when} · {c.who}</div></> : <span className="text-xs text-sand-400">None yet</span> } },
-    { key: 'next', header: 'Next action', render: (r) => <span className="text-sand-600">{r.nextAction}</span> },
+    { key: 'who', header: 'Name', render: (r) => <><div className="whitespace-nowrap text-[15px] font-semibold text-sand-900">{r.name}</div><div className="whitespace-nowrap text-xs text-sand-500">{r.city}, {r.state} · {r.receivedAt.split(' · ')[0].replace(', 2026', '')}</div></> },
+    { key: 'status', header: 'Status', render: (r) => <Pill tone={toneFor(r.status)} className="whitespace-nowrap">{r.status}</Pill> },
+    { key: 'pathway', header: 'Looking for', render: (r) => <span className="whitespace-nowrap text-sm text-sand-700">{r.pathway === 'Complex Chronic' ? 'Chronic or Complex Chronic' : 'Health Optimization'}</span> },
+    { key: 'reason', header: 'Struggling with', render: (r) => <div className="max-w-[240px] text-sm leading-snug text-sand-800">{r.reason}</div> },
+    { key: 'source', header: 'Heard from', className: 'hidden min-[1400px]:table-cell', render: (r) => <span className="text-sm text-sand-600">{r.source.replace('Website · Typeform · ', '').replace('Website · Typeform', 'Website')}</span> },
+    { key: 'owner', header: 'Owner', render: (r) => r.owner === 'Unassigned'
+      ? <button onClick={(e) => { e.stopPropagation(); patchInquiry(r.id, { owner: me.name }); notify(`${r.name} is now yours`) }} className="btn-secondary whitespace-nowrap px-3 py-1.5 text-[11px]"><UserCheck size={13} /> Take it</button>
+      : <span className={`whitespace-nowrap text-sm ${r.owner === me.name ? 'font-semibold text-sand-900' : 'text-sand-700'}`}>{r.owner}{r.owner === me.name && <span className="ml-1 text-xs font-normal text-sand-500">· you</span>}</span> },
   ]
+  const sel = (label: string, value: string, set: (v: string) => void, opts: string[]) => <label className="flex items-center gap-2 whitespace-nowrap text-xs text-sand-500">{label}<select className="input w-auto max-w-[210px] py-2 text-sm" value={value} onChange={(e) => set(e.target.value)}>{opts.map((o) => <option key={o}>{o}</option>)}</select></label>
 
   return (
     <>
-      <PageHeader eyebrow="Intake · Patient advisor" title="Inquiries" description="Website inquiries arrive from the Typeform with the pathway the patient chose. Complex Chronic and Health Optimization (L2/L3) each get their own questionnaire package."
-        actions={<><button onClick={() => setShowFilters((v) => !v)} className={`btn-secondary ${active ? 'bg-teal-50' : ''}`}><Filter size={16} /> Filters{active ? ` · ${active}` : ''}</button><button className="btn-primary" onClick={() => nav('/staff/patients/new')}>+ Add inquiry manually</button></>} />
-      {showFilters && (
-        <div className="card mb-5 flex flex-wrap items-end gap-4 p-4">
-          <label className="block"><span className="label">Status</span><select className="input py-2" value={f.status} onChange={(e) => setF({ ...f, status: e.target.value })}>{statuses.map((x) => <option key={x}>{x}</option>)}</select></label>
-          <label className="block"><span className="label">Owner</span><select className="input py-2" value={f.owner} onChange={(e) => setF({ ...f, owner: e.target.value })}>{owners.map((x) => <option key={x}>{x}</option>)}</select></label>
-          <label className="block"><span className="label">Source</span><select className="input py-2" value={f.source} onChange={(e) => setF({ ...f, source: e.target.value })}>{sources.map((x) => <option key={x}>{x}</option>)}</select></label>
-          <button onClick={() => setF({ status: 'All', owner: 'All', source: 'All' })} className="btn-ghost">Clear</button>
-          <span className="help ml-auto">{rows.length} of {inquiries.length} inquiries</span>
-        </div>
-      )}
-      <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat label="New this week" value={4} hint="1 unassigned" tone="bad" />
-        <Stat label="In outreach" value={1} hint="next call Oct 8" tone="warn" />
-        <Stat label="Interviews completed" value={1} hint="awaiting Karina" tone="teal" />
-        <Stat label="Accepted for Month 0 (30 d)" value={3} hint="2 intakes open" tone="ok" />
+      <PageHeader eyebrow="Inquiries · not patients yet" title="Inquiries" description="People who asked about Helixona. An inquiry becomes a patient only when it is accepted and added to the patient list."
+        actions={<button className="btn-primary" onClick={() => nav('/staff/inquiries/new')}>+ Add inquiry</button>} />
+
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <div className="flex rounded-full border border-sand-300 bg-white p-0.5" role="group" aria-label="Period">{[...Object.keys(periods), 'Custom'].map((p) => <button key={p} onClick={() => setPeriod(p)} aria-pressed={period === p} className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold ${period === p ? 'bg-sand-900 text-white' : 'text-sand-600 hover:text-sand-900'}`}>{p}</button>)}</div>
+        {period === 'Custom' && <span className="flex items-center gap-1.5 text-xs text-sand-500"><input type="date" className="input w-auto py-1 text-sm" value={from} max={to} onChange={(e) => setFrom(e.target.value)} />to<input type="date" className="input w-auto py-1 text-sm" value={to} min={from} onChange={(e) => setTo(e.target.value)} /></span>}
+        <span className="text-xs text-sand-500">{inPeriod.length} inquiries in this period</span>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Tabs value={tab} onChange={setTab} tabs={[{ key: 'cc', label: 'Complex Chronic', count: inquiries.filter((i) => i.pathway === 'Complex Chronic').length }, { key: 'ho', label: 'Health Optimization (L2/L3)', count: inquiries.filter((i) => i.pathway === 'Health Optimization (L2/L3)').length }, { key: 'all', label: 'All' }]} />
-        <label className="relative mb-4"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-sand-400" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, ID, reason…" className="input w-72 pl-9 py-2" /></label>
+      <div className="mb-5 grid grid-cols-2 gap-2.5 sm:grid-cols-4 xl:grid-cols-8">
+        {inquiryStatuses.map((st) => { const n = byPath.filter((i) => i.status === st).length; const on = status === st; return (
+          <button key={st} onClick={() => setStatus(on ? 'All' : st)} aria-pressed={on} className={`card p-3 text-left transition-colors ${on ? 'border-sand-900 bg-teal-50 shadow-[0_0_0_1px_#141414]' : 'hover:border-sand-400'}`}>
+            <div className="text-2xl font-semibold text-sand-900">{n}</div>
+            <div className="mt-0.5 text-[12px] leading-tight text-sand-600">{st}</div>
+          </button>) })}
       </div>
-      <QueueTable rows={rows} columns={columns} rowKey={(r) => r.id} rowTone={(r) => (r.owner === 'Unassigned' ? 'bad' : toneFor(r.status))}
-        onRowClick={(r) => nav(r.patientId ? `/staff/patients/${r.patientId}` : `/staff/patients/new?inquiry=${r.id}`)} />
-      <p className="help mt-3">Click a row: inquiries with a patient record open the record; new inquiries open “Create patient record”. Source and pathway are preserved on the patient record.</p>
+
+      <Tabs value={tab} onChange={setTab} tabs={[{ key: 'all', label: 'All', count: inPeriod.length }, { key: 'cc', label: 'Chronic or Complex Chronic', count: inPeriod.filter((i) => i.pathway === 'Complex Chronic').length }, { key: 'ho', label: 'Health Optimization', count: inPeriod.filter((i) => i.pathway !== 'Complex Chronic').length }]} />
+      <div className="card mb-3 flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3">
+        <label className="relative min-w-[240px] flex-1"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-sand-400" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name, city or what they are struggling with" className="input w-full py-2 pl-9" /></label>
+        {sel('Status', status, setStatus, ['All', ...inquiryStatuses])}
+        {sel('Owner', owner, setOwner, ['All', 'Mine', 'Unassigned', ...new Set(all.map((i) => i.owner).filter((o) => o !== 'Unassigned'))])}
+        {active > 0 && <button onClick={() => { setQ(''); setStatus('All'); setOwner('All') }} className="btn-ghost whitespace-nowrap px-2 py-1 text-xs"><X size={13} /> Clear {active}</button>}
+      </div>
+      <QueueTable rows={rows} columns={columns} rowKey={(r) => r.id} rowTone={(r) => (r.owner === 'Unassigned' ? 'bad' : toneFor(r.status))} onRowClick={(r) => nav(`/staff/inquiries/${r.id}`)} empty="No inquiries match." />
+      <p className="help mt-3">{rows.length} shown · an inquiry with no owner shows “Take it”; the red stripe marks inquiries nobody owns yet.</p>
     </>
   )
 }

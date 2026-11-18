@@ -5,7 +5,7 @@ import { Breadcrumb, Card, Notice, PageHeader, Pill, Row, VersionTag } from '../
 import { patientById } from '../../../mock/patients'
 import { nameOf } from '../../../mock/names'
 import { alerts, levelTone } from '../../../mock/program'
-import { fmtDay, scoresFor, shiftDays, TODAY, type ScoreEvent, type ScorePoint } from '../../../mock/scores'
+import { definitions, fmtDay, scoresFor, shiftDays, TODAY, type ScoreEvent, type ScorePoint } from '../../../mock/scores'
 
 /** Stand-alone address (opened from the alert queue). The same panel is a tab of the patient record. */
 export default function PatientLongitudinal() {
@@ -14,7 +14,7 @@ export default function PatientLongitudinal() {
   return (
     <>
       <Breadcrumb items={[{ label: 'Alert queue', to: '/staff/alerts' }, { label: nameOf(id) }]} />
-      <PageHeader eyebrow={`eCW ${p?.ecwId ?? '—'}`} title={nameOf(id)} description="How the patient is doing over time, with therapies, prescription changes and crashes marked on the same chart."
+      <PageHeader eyebrow={`eCW ${p?.ecwId ?? '—'}`} title={nameOf(id)} description="How the patient is doing over time, with therapies, prescription changes, flares and crashes marked on the same chart."
         meta={<><VersionTag>Daily check-in v3</VersionTag><span>Physician: Dr. D.</span>{p && <a className="text-teal-700 underline" href={`#/staff/patients/${id}?tab=scores`}>Open in patient record</a>}</>} />
       <ScoresPanel id={id} />
     </>
@@ -26,8 +26,8 @@ const modalityIcon: Record<string, { icon: typeof Sun; color: string }> = {
   'Red light therapy': { icon: Sun, color: '#C0392B' }, 'Hydrogen nano bath': { icon: Droplets, color: '#2D6FA3' }, 'Salt room': { icon: Wind, color: '#8B9279' },
   'IV therapy': { icon: Syringe, color: '#6F4B8A' }, 'Erchonia laser': { icon: Zap, color: '#B06A12' }, 'Oxygen nano bath': { icon: Waves, color: '#3A8F8A' },
 }
-const LINES: { k: 'energy' | 'pain' | 'sleep'; color: string; label: string; better: 'up' | 'down' }[] = [
-  { k: 'energy', color: '#C4A368', label: 'Energy', better: 'up' }, { k: 'pain', color: '#B4382E', label: 'Pain', better: 'down' }, { k: 'sleep', color: '#3A5F8F', label: 'Sleep', better: 'up' },
+const LINES: { k: 'energy' | 'pain' | 'sleep' | 'digestion'; color: string; label: string; better: 'up' | 'down' }[] = [
+  { k: 'energy', color: '#C4A368', label: 'Energy', better: 'up' }, { k: 'pain', color: '#B4382E', label: 'Pain', better: 'down' }, { k: 'sleep', color: '#3A5F8F', label: 'Sleep', better: 'up' }, { k: 'digestion', color: '#5E8C6A', label: 'Digestion', better: 'up' },
 ]
 
 export function ScoresPanel({ id }: { id: string }) {
@@ -38,7 +38,7 @@ export function ScoresPanel({ id }: { id: string }) {
   const [show, setShow] = useState({ crash: true, flare: true, rx: true, therapy: true })
   const modalities = [...new Set(allEvents.filter((e) => e.modality).map((e) => e.modality!))]
   const [mods, setMods] = useState<string[]>(modalities)
-  const [lines, setLines] = useState<string[]>(['energy', 'pain', 'sleep'])
+  const [lines, setLines] = useState<string[]>(['energy', 'pain', 'sleep', 'digestion'])
 
   const [start, end] = range === 'Custom' ? [from, to] : range === 'All' ? [all[0].date, TODAY] : [shiftDays(TODAY, -ranges.find((r) => r[0] === range)![1]), TODAY]
   const points = all.filter((p) => p.date >= start && p.date <= end)
@@ -47,12 +47,12 @@ export function ScoresPanel({ id }: { id: string }) {
 
   // progress summary for the selected period
   const first = points[0], last = points[points.length - 1]
-  const delta = (k: 'energy' | 'pain' | 'sleep') => (first && last ? last[k] - first[k] : 0)
+  const delta = (k: 'energy' | 'pain' | 'sleep' | 'digestion') => (first && last ? last[k] - first[k] : 0)
   const crashes = events.filter((e) => e.kind === 'crash')
   const lastCrash = [...allEvents].filter((e) => e.kind === 'crash' && e.date <= end).pop()
   const daysSinceCrash = lastCrash ? Math.round((Date.parse(end) - Date.parse(lastCrash.date)) / 864e5) : null
-  const wins = (delta('energy') > 0 ? 1 : 0) + (delta('pain') < 0 ? 1 : 0) + (delta('sleep') > 0 ? 1 : 0)
-  const momentum = wins === 3 ? ['On a roll', 'ok'] : wins === 2 ? ['Gaining ground', 'ok'] : wins === 1 ? ['Mixed', 'warn'] : ['Needs attention', 'bad']
+  const wins = (delta('energy') > 0 ? 1 : 0) + (delta('pain') < 0 ? 1 : 0) + (delta('sleep') > 0 ? 1 : 0) + (delta('digestion') > 0 ? 1 : 0)
+  const momentum = wins >= 3 ? ['On a roll', 'ok'] : wins === 2 ? ['Gaining ground', 'ok'] : wins === 1 ? ['Mixed', 'warn'] : ['Needs attention', 'bad']
   const badges = [
     delta('energy') >= 2 && { icon: Sparkles, text: `Energy up ${delta('energy')} points` },
     delta('pain') <= -2 && { icon: TrendingDown, text: `Pain down ${-delta('pain')} points` },
@@ -67,7 +67,7 @@ export function ScoresPanel({ id }: { id: string }) {
   return (
     <div className="grid gap-5 lg:grid-cols-3">
       <div className="space-y-5 lg:col-span-2">
-        <Card title="Scores over time" subtitle="Energy and sleep: higher is better. Pain: lower is better. Icons mark what happened on each date.">
+        <Card title="Data over time" subtitle="Energy, sleep and digestion: higher is better. Pain: lower is better. Icons mark what happened on each date.">
           {/* period */}
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex rounded-full border border-sand-300 bg-white p-0.5" role="group" aria-label="Period">
@@ -90,8 +90,9 @@ export function ScoresPanel({ id }: { id: string }) {
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <span className="text-xs text-sand-500">Show</span>
-            <button onClick={() => setShow({ ...show, crash: !show.crash })} className={chip(show.crash)}><Zap size={12} /> Crashes</button>
-            <button onClick={() => setShow({ ...show, flare: !show.flare })} className={chip(show.flare)}><Flame size={12} /> Pain flares</button>
+            <button title={definitions.crash.text} onClick={() => setShow({ ...show, crash: !show.crash })} className={chip(show.crash)}><Zap size={12} /> Crashes</button>
+            <button title={definitions.flare.text} onClick={() => setShow({ ...show, flare: !show.flare })} className={chip(show.flare)}><Flame size={12} /> Flares</button>
+            <DefinitionHint />
             <button onClick={() => setShow({ ...show, rx: !show.rx })} className={chip(show.rx)}><PillIcon size={12} /> Prescription changes</button>
             <button onClick={() => setShow({ ...show, therapy: !show.therapy })} className={chip(show.therapy)}><Sun size={12} /> Therapies</button>
           </div>
@@ -105,12 +106,12 @@ export function ScoresPanel({ id }: { id: string }) {
         <Card title="Check-in history" subtitle="One row per check-in in the selected period." padded={false}>
           <div className="max-h-[420px] overflow-auto">
             <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-sand-50"><tr className="text-left"><th className="px-5 py-2 eyebrow">Date</th><th className="px-3 py-2 eyebrow">Energy</th><th className="px-3 py-2 eyebrow">Pain</th><th className="px-3 py-2 eyebrow">Sleep</th><th className="px-3 py-2 eyebrow">Crash</th><th className="px-3 py-2 eyebrow">Therapy</th><th className="px-3 py-2 eyebrow">Prescription / Rx</th></tr></thead>
+              <thead className="sticky top-0 bg-sand-50"><tr className="text-left"><th className="px-5 py-2 eyebrow">Date</th><th className="px-3 py-2 eyebrow">Energy</th><th className="px-3 py-2 eyebrow">Pain</th><th className="px-3 py-2 eyebrow">Sleep</th><th className="px-3 py-2 eyebrow">Digestion</th><th className="px-3 py-2 eyebrow">Flare or crash</th><th className="px-3 py-2 eyebrow">Therapy</th><th className="px-3 py-2 eyebrow">Prescription / Rx</th></tr></thead>
               <tbody>{[...points].reverse().map((s) => { const ev = (k: string) => events.filter((e) => e.date === s.date && e.kind === k); return (
                 <tr key={s.date} className="border-t border-sand-100 align-top">
                   <td className="px-5 py-2 font-medium whitespace-nowrap">{fmtDay(s.date, true)}</td><td className="px-3 py-2">{s.energy}</td>
-                  <td className="px-3 py-2">{s.pain}{s.pain >= 7 && <Flame size={13} className="ml-1 inline text-bad-600" aria-label="Pain flare" />}</td><td className="px-3 py-2">{s.sleep}</td>
-                  <td className="px-3 py-2">{ev('crash').map((e) => <span key={e.label} className="inline-flex items-center gap-1 text-bad-700"><Zap size={13} />{e.detail}</span>)}{!ev('crash').length && <span className="text-sand-300">—</span>}</td>
+                  <td className="px-3 py-2">{s.pain}</td><td className="px-3 py-2">{s.sleep}</td><td className="px-3 py-2">{s.digestion}</td>
+                  <td className="px-3 py-2">{ev('crash').map((e) => <div key={e.label} className="flex items-start gap-1 text-bad-700"><Zap size={13} className="mt-0.5 shrink-0" /><span><strong>Crash</strong> · {e.detail}</span></div>)}{ev('flare').map((e) => <div key={e.label} className="flex items-start gap-1 text-warn-700"><Flame size={13} className="mt-0.5 shrink-0" /><span><strong>Flare</strong> · {e.detail}</span></div>)}{!ev('crash').length && !ev('flare').length && <span className="text-sand-300">—</span>}</td>
                   <td className="px-3 py-2">{ev('therapy').map((e) => <div key={e.label}>{e.label}</div>)}{!ev('therapy').length && <span className="text-sand-300">—</span>}</td>
                   <td className="px-3 py-2">{ev('rx').map((e) => <div key={e.label}><span className="font-medium text-plum-600">{e.label}</span><div className="text-xs text-sand-500">{e.detail}</div></div>)}{!ev('rx').length && <span className="text-sand-300">—</span>}</td>
                 </tr>) })}</tbody>
@@ -122,10 +123,14 @@ export function ScoresPanel({ id }: { id: string }) {
       <div className="space-y-5">
         <Card title="In this period">
           <Row label="Crashes">{crashes.length}</Row>
-          <Row label="Pain flares (7 or more)">{points.filter((p) => p.pain >= 7).length}</Row>
+          <Row label="Flares">{events.filter((e) => e.kind === 'flare').length}</Row>
           <Row label="Therapy sessions">{events.filter((e) => e.kind === 'therapy').length}</Row>
           <Row label="Prescription changes">{events.filter((e) => e.kind === 'rx').length}</Row>
           <Row label="Days since last crash">{daysSinceCrash ?? '—'}</Row>
+        </Card>
+        <Card title="Medications and supplements" subtitle="What was ordered, when it started, and whether the patient reports taking it.">
+          <ul className="divide-y divide-sand-100">{([['Low-dose naltrexone · 3 mg', 'Dr. D. · started Jun 15', 6], ['Cholestyramine · 4 g', 'Dr. D. · started Aug 24', 5], ['Levothyroxine · 75 mcg', 'Dr. Patel · before the program', 7], ['Magnesium glycinate · 400 mg', 'Dr. D. · started Jun 22', 5], ['Vitamin D3 · 5,000 IU', 'Dr. D. · started Jun 22', 6], ['Omega-3 · 2 g', 'Dr. D. · started Sep 28', 7]] as [string, string, number][]).map(([n, d, t]) => <li key={n} className="flex items-center justify-between gap-3 py-2 text-sm"><span><span className="block font-medium text-sand-900">{n}</span><span className="block text-xs text-sand-500">{d}</span></span><span className={`whitespace-nowrap text-xs font-semibold ${t >= 6 ? 'text-ok-700' : 'text-warn-700'}`}>{t} of 7 days</span></li>)}</ul>
+          <p className="help mt-2">Taken as reported by the patient in the app, last 7 days.</p>
         </Card>
         <Card title="Alerts for this patient">
           {pAlerts.length === 0 && <p className="help">No alerts.</p>}
@@ -141,13 +146,23 @@ export function ScoresPanel({ id }: { id: string }) {
   )
 }
 
+function DefinitionHint() {
+  const [open, setOpen] = useState(false)
+  return (
+    <span className="relative">
+      <button type="button" onClick={() => setOpen(!open)} onBlur={() => setOpen(false)} aria-expanded={open} className="text-xs text-teal-700 underline">What is a flare? A crash?</button>
+      {open && <span role="tooltip" className="absolute bottom-full left-0 z-20 mb-2 block w-[340px] rounded-xl border border-sand-200 bg-white p-3 text-left shadow-lg">{(['flare', 'crash'] as const).map((k) => <span key={k} className="mb-2 block last:mb-0"><span className="block text-sm font-semibold text-sand-900">{definitions[k].title}</span><span className="block text-xs leading-relaxed text-sand-600">{definitions[k].text}</span></span>)}</span>}
+    </span>
+  )
+}
+
 function LineChart({ points, events, show, mods, lines }: { points: ScorePoint[]; events: ScoreEvent[]; show: { crash: boolean; flare: boolean; rx: boolean; therapy: boolean }; mods: string[]; lines: string[] }) {
   const [tip, setTip] = useState<{ x: number; y: number; text: string } | null>(null)
   const W = 720, H = 300, padL = 28, padR = 22, padT = 34, padB = 58
   const t0 = Date.parse(points[0].date), t1 = Date.parse(points[points.length - 1].date)
   const x = (iso: string) => padL + ((Date.parse(iso) - t0) / Math.max(1, t1 - t0)) * (W - padL - padR)
   const y = (v: number) => padT + (1 - v / 10) * (H - padT - padB)
-  const path = (k: 'energy' | 'pain' | 'sleep') => points.map((s, i) => `${i ? 'L' : 'M'}${x(s.date).toFixed(1)},${y(s[k]).toFixed(1)}`).join(' ')
+  const path = (k: 'energy' | 'pain' | 'sleep' | 'digestion') => points.map((s, i) => `${i ? 'L' : 'M'}${x(s.date).toFixed(1)},${y(s[k]).toFixed(1)}`).join(' ')
   const active = LINES.filter((l) => lines.includes(l.k))
   // label only dates that have room: walk from the newest point back, keeping at least 64px between labels
   const labelled = new Set<string>(); { let lastX = Infinity; for (let i = points.length - 1; i >= 0; i--) { const px = x(points[i].date); if (lastX - px >= 64) { labelled.add(points[i].date); lastX = px } } }
@@ -168,9 +183,9 @@ function LineChart({ points, events, show, mods, lines }: { points: ScorePoint[]
         {active.map((l) => <path key={l.k} d={path(l.k)} fill="none" stroke={l.color} strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" />)}
         {active.map((l) => points.map((s) => <circle key={l.k + s.date} cx={x(s.date)} cy={y(s[l.k])} r="3.2" fill="#fff" stroke={l.color} strokeWidth="2" {...hover(`${fmtDay(s.date)} · ${l.label} ${s[l.k]}`, x(s.date), y(s[l.k]))} />))}
         {/* pain flares */}
-        {show.flare && lines.includes('pain') && points.filter((p) => p.pain >= 7).map((p) => <g key={'f' + p.date} {...hover(`${fmtDay(p.date)} · Pain flare · ${p.pain}/10`, x(p.date), y(p.pain))}><circle cx={x(p.date)} cy={y(p.pain) - 15} r={10} fill="#F9DCD9" /><Flame x={x(p.date) - 7} y={y(p.pain) - 22} width={14} height={14} color="#B4382E" /></g>)}
+        {show.flare && events.filter((e) => e.kind === 'flare').map((e) => { const p = at(e.date); if (!p) return null; const cy = y(Math.max(p.pain, p.energy, p.sleep, p.digestion)) - 16; return <g key={'f' + e.date} {...hover(`${fmtDay(e.date)} · Flare · ${e.detail}`, x(e.date), cy)}><circle cx={x(e.date)} cy={cy} r={11} fill="#F9DCD9" stroke="#B4382E" /><Flame x={x(e.date) - 7} y={cy - 7} width={14} height={14} color="#B4382E" /></g> })}
         {/* crashes: marked where energy drops */}
-        {cr.map((e) => { const p = at(e.date); if (!p) return null; const cy = y(Math.min(p.energy, p.sleep)) + 18; return <g key={'c' + e.date} {...hover(`${fmtDay(e.date)} · Crash · ${e.detail}`, x(e.date), cy)}><circle cx={x(e.date)} cy={cy} r={11} fill="#141414" /><Zap x={x(e.date) - 7} y={cy - 7} width={14} height={14} color="#D4B77A" fill="#D4B77A" /></g> })}
+        {cr.map((e) => { const p = at(e.date); if (!p) return null; const cy = y(Math.min(p.energy, p.sleep, p.digestion, p.pain)) + 18; return <g key={'c' + e.date} {...hover(`${fmtDay(e.date)} · Crash · ${e.detail}`, x(e.date), cy)}><circle cx={x(e.date)} cy={cy} r={11} fill="#141414" /><Zap x={x(e.date) - 7} y={cy - 7} width={14} height={14} color="#D4B77A" fill="#D4B77A" /></g> })}
         {/* therapies along the bottom */}
         <line x1={padL} x2={W - padR} y1={H - padB + 26} y2={H - padB + 26} stroke="#e9e6e1" />
         {th.map((e) => { const m = modalityIcon[e.modality ?? '']; const I = m?.icon ?? Sun; return <g key={e.date + e.label} {...hover(`${fmtDay(e.date)} · ${e.label}`, x(e.date), H - padB + 26)}><line x1={x(e.date)} x2={x(e.date)} y1={padT} y2={H - padB + 16} stroke={m?.color ?? '#a8a197'} strokeOpacity={0.25} /><circle cx={x(e.date)} cy={H - padB + 26} r={10} fill="#fff" stroke={m?.color ?? '#a8a197'} strokeWidth={1.5} /><I x={x(e.date) - 6.5} y={H - padB + 19.5} width={13} height={13} color={m?.color ?? '#7a736a'} /></g> })}

@@ -91,6 +91,24 @@ All data is fictional. The intake questionnaire is the Medical Director's conten
 | `#/staff/calendar/new` | Front desk / nursing | Staff booking: patient, treatment, length with price, date, time, room; checked against eCW. | Prices. |
 | `#/patient/messages`, `#/patient/assistant` | Patient | Chat and email with the clinic; AI assistant for program questions. | Who answers; assistant scope. |
 
+## Changed Nov 18, 2026 (from the clinic's two sheets)
+
+| Route | Role | Purpose | Open questions |
+|---|---|---|---|
+| `#/staff/inquiries` | Advisor / Marie | People who are not patients. One count per inquiry status for the chosen period (presets or custom dates); opens on All; owner column with **Take it**. | — |
+| `#/staff/inquiries/INQ-2210` | Advisor / Marie | The inquiry page, clearly marked “not a patient”: contact, insurance, how they heard, health, commitment, internal assessment and admission review; status in order; when Accepted, the three tasks and **Add to patient list**. | Level and priority definitions. |
+| `#/staff/inquiries/new` | Advisor / Marie | Record a phone or walk-in inquiry. Saves an inquiry, not a patient. | — |
+| `#/staff/patients/new?inquiry=…` | Advisor | Add an accepted inquiry to the patient list and send the invitation; packages are a multi-select, plus extra single documents. | — |
+| `#/staff/patients` | All staff | Only accepted people. Views: all, documentation, chart prep, eCW exceptions. Owner and “take ownership” on the record. | — |
+| `#/staff/patients/P-0041?tab=scores` | Nursing / physician | Tab **Data**: energy, pain, sleep, digestion; flares and crashes from patient reports with the definitions on hand; medications and supplements with reported adherence. | Source of the medication list. |
+| `#/staff/patients/P-0043?tab=story` | All staff | Health story: every questionnaire answer by form and section. | — |
+| `#/staff/admin/packages` | Admin | Define packages of questionnaires, consents and document requests, and when to use each. | Who may edit. |
+| `#/staff/admin/users` | Admin only | People, their role and what they see; permission matrix per role. | Final matrix. |
+| `#/patient/crash` | Patient | Choose Flare or Crash (clinic definitions), then how much it affects daily activities. | — |
+| `#/patient/medications` | Patient | What the doctor ordered, date started, and “I took it / I skipped it” for today. | — |
+
+“Month 0” is shown as **A&P** on every screen.
+
 ## Shared patterns
 
 - **Queues** share one table pattern: severity stripe + status pill (text, never color alone), who/when/why on every row.

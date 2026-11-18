@@ -31,7 +31,7 @@ const uploads = (overrides: Partial<Record<string, Partial<UploadItem>>> = {}): 
 export const patients: Patient[] = [
   {
     id: 'P-0043', ecwId: 'ECW-118204', firstName: 'Marisol', lastName: 'Andrade', dob: '03/14/1971', phone: '(949) 555-0142', email: 'm.andrade@example.com', city: 'Irvine, CA', advisor: 'Ana',
-    status: 'Accepted for Month 0', chartPrep: 'Submitted',
+    status: 'Accepted for A&P', chartPrep: 'Submitted',
     invitation: { state: 'submitted', sentAt: 'Sep 26, 2026 · 2:10 PM', expiresAt: 'Oct 10, 2026', method: 'Magic link', history: [
       { actor: 'System', when: 'Sep 26, 2026 · 2:10 PM', action: 'Invitation sent', reason: 'Email + SMS' },
       { actor: 'System', when: 'Sep 26, 2026 · 2:11 PM', action: 'Delivered' },
@@ -45,14 +45,14 @@ export const patients: Patient[] = [
     history: [
       { actor: 'Ana (advisor)', when: 'Sep 22, 2026 · 10:05 AM', action: 'Status → Advisor interview completed', reason: 'Qualified · Complex Chronic pathway' },
       { actor: 'Karina', when: 'Sep 24, 2026 · 3:30 PM', action: 'Status → Insurance benefits review', reason: 'PPO verified · out-of-network benefits apply to NP visits' },
-      { actor: 'Ana (advisor)', when: 'Sep 26, 2026 · 1:58 PM', action: 'Status → Accepted for Month 0', reason: 'ADM-01 · Meets program criteria' },
+      { actor: 'Ana (advisor)', when: 'Sep 26, 2026 · 1:58 PM', action: 'Status → Accepted for A&P', reason: 'ADM-01 · Meets program criteria' },
       { actor: 'Patient', when: 'Sep 30, 2026 · 7:18 PM', action: 'Intake submitted (Questionnaire v1)' },
       { actor: 'Ana (advisor)', when: 'Oct 1, 2026 · 9:02 AM', action: 'Returned item to patient', reason: 'Lab report incomplete' },
     ],
   },
   {
     id: 'P-0044', ecwId: 'ECW-118391', firstName: 'Devon', lastName: 'Okafor', dob: '11/02/1965', phone: '(714) 555-0199', email: 'devon.okafor@example.com', city: 'Tustin, CA', advisor: 'Ana',
-    status: 'Month 0 scheduled', chartPrep: 'Ready for chart prep',
+    status: 'A&P scheduled', chartPrep: 'Ready for chart prep',
     invitation: { state: 'submitted', sentAt: 'Sep 19, 2026 · 11:20 AM', expiresAt: 'Oct 3, 2026', method: 'Code', history: [
       { actor: 'System', when: 'Sep 19, 2026 · 11:20 AM', action: 'Invitation sent', reason: 'Email + SMS' },
       { actor: 'Patient', when: 'Sep 19, 2026 · 6:02 PM', action: 'Opened' },
@@ -62,16 +62,16 @@ export const patients: Patient[] = [
     uploads: uploads(),
     forms: standardForms(10),
     history: [
-      { actor: 'Ana (advisor)', when: 'Sep 18, 2026 · 2:12 PM', action: 'Status → Accepted for Month 0', reason: 'ADM-01 · Meets program criteria' },
+      { actor: 'Ana (advisor)', when: 'Sep 18, 2026 · 2:12 PM', action: 'Status → Accepted for A&P', reason: 'ADM-01 · Meets program criteria' },
       { actor: 'Patient', when: 'Sep 25, 2026 · 9:40 PM', action: 'Intake submitted (Questionnaire v1)' },
       { actor: 'Ana (advisor)', when: 'Sep 29, 2026 · 8:50 AM', action: 'Status → Reviewed for completeness', reason: 'All required items present' },
       { actor: 'Ana (advisor)', when: 'Sep 29, 2026 · 8:52 AM', action: 'Marked ready for chart prep' },
-      { actor: 'Karina', when: 'Oct 2, 2026 · 4:15 PM', action: 'Status → Month 0 scheduled', reason: 'Assessment Oct 14, 2026 · Month 0 payment received' },
+      { actor: 'Karina', when: 'Oct 2, 2026 · 4:15 PM', action: 'Status → A&P scheduled', reason: 'Assessment Oct 14, 2026 · A&P payment received' },
     ],
   },
   {
     id: 'P-0041', ecwId: 'ECW-117902', firstName: 'Priya', lastName: 'Raman', dob: '07/29/1983', phone: '(949) 555-0117', email: 'priya.raman@example.com', city: 'Newport Beach, CA', advisor: 'Ana',
-    status: 'Month 0 in progress', chartPrep: 'Placed in eCW',
+    status: 'A&P in progress', chartPrep: 'Placed in eCW',
     invitation: { state: 'submitted', sentAt: 'Sep 8, 2026 · 9:00 AM', expiresAt: 'Sep 22, 2026', method: 'Magic link', history: [] },
     intake: { version: 1, progress: 100, submittedAt: 'Sep 12, 2026 · 3:05 PM', sections: {} },
     uploads: uploads(),
@@ -83,7 +83,7 @@ export const patients: Patient[] = [
   },
   {
     id: 'P-0045', ecwId: '—', firstName: 'Thomas', lastName: 'Whitfield', dob: '01/19/1958', phone: '(949) 555-0163', email: 't.whitfield@example.com', city: 'Laguna Hills, CA', advisor: 'Ana',
-    status: 'Accepted for Month 0', chartPrep: 'Awaiting intake',
+    status: 'Accepted for A&P', chartPrep: 'Awaiting intake',
     invitation: { state: 'started', sentAt: 'Oct 1, 2026 · 10:30 AM', expiresAt: 'Oct 15, 2026', method: 'Magic link', history: [
       { actor: 'System', when: 'Oct 1, 2026 · 10:30 AM', action: 'Invitation sent', reason: 'Email only · patient declined SMS' },
       { actor: 'System', when: 'Oct 1, 2026 · 10:31 AM', action: 'Delivered' },
@@ -94,13 +94,13 @@ export const patients: Patient[] = [
     uploads: uploads({ 'ins-front': { status: 'missing', files: [] }, 'ins-back': { status: 'missing', files: [] }, 'photo-id': { status: 'missing', files: [] }, meds: { status: 'missing', files: [] }, labs: { status: 'missing', files: [] }, records: { status: 'optional', files: [] } }),
     forms: standardForms(0),
     history: [
-      { actor: 'Ana (advisor)', when: 'Oct 1, 2026 · 10:28 AM', action: 'Status → Accepted for Month 0', reason: 'ADM-01 · Meets program criteria' },
+      { actor: 'Ana (advisor)', when: 'Oct 1, 2026 · 10:28 AM', action: 'Status → Accepted for A&P', reason: 'ADM-01 · Meets program criteria' },
       { actor: 'Ana (advisor)', when: 'Oct 1, 2026 · 10:30 AM', action: 'Patient record created · invitation sent' },
     ],
   },
   {
     id: 'P-0039', ecwId: 'ECW-117455', firstName: 'Lena', lastName: 'Kowalski', dob: '05/06/1979', phone: '(657) 555-0121', email: 'lena.k@example.com', city: 'Costa Mesa, CA', advisor: 'Ana',
-    status: 'Month 0 in progress', chartPrep: 'Exception',
+    status: 'A&P in progress', chartPrep: 'Exception',
     invitation: { state: 'submitted', sentAt: 'Sep 2, 2026 · 1:00 PM', expiresAt: 'Sep 16, 2026', method: 'Code', history: [] },
     intake: { version: 1, progress: 100, submittedAt: 'Sep 9, 2026 · 11:12 AM', sections: {} },
     uploads: uploads(),

@@ -14,7 +14,7 @@ export default function Messages() {
   ])
   const [text, setText] = useState('')
   const [mail, setMail] = useState({ topic: 'Scheduling', subject: '', body: '' })
-  const [sent, setSent] = useState<{ subject: string; topic: string; when: string }[]>([{ subject: 'Question about my Month 0 visit', topic: 'Scheduling', when: 'Oct 2 · answered Oct 3' }])
+  const [sent, setSent] = useState<{ subject: string; topic: string; when: string }[]>([{ subject: 'Question about my A&P visit', topic: 'Scheduling', when: 'Oct 2 · answered Oct 3' }])
   const now = () => new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).replace(', ', ' · ')
   const send = () => { if (!text.trim()) return; setThread((t) => [...t, { who: 'me', text: text.trim(), when: now() }]); setText('') }
   return (

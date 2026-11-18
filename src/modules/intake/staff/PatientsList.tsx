@@ -4,10 +4,10 @@ import { Search, X } from 'lucide-react'
 import { PageHeader, Pill, QueueTable, Tabs, toneFor, type Column } from '../../../components/ui'
 import { MetricBoard, type Metric } from '../../../components/MetricBoard'
 import { Avatar } from '../../../components/Avatar'
-import { patients } from '../../../mock/patients'
 import { planFor } from '../../../mock/roadmap'
 import { ageOf, demographicsFor } from '../../../mock/demographics'
-import { currentUser, latestNote, statusOf, useStore } from '../../../mock/store'
+import { currentUser, inJourneyOrder, isPatientStatus, latestNote, statusOf, useStore } from '../../../mock/store'
+import { patients as everyone } from '../../../mock/patients'
 import type { Patient } from '../../../mock/types'
 
 /** One screen for everything about patients: invitations, intake review, chart prep and eCW exceptions are
@@ -24,15 +24,16 @@ const nextStep = (p: Patient, status: string) => /waitlist/i.test(status) ? 'On 
 
 const views = [
   { key: 'all', label: 'All patients', test: (_p: Patient, _s: string) => true },
-  { key: 'intake', label: 'Intake review', test: (p: Patient) => !!p.intake && p.chartPrep !== 'Placed in eCW' },
+  { key: 'docs', label: 'Documentation', test: (p: Patient) => !p.intake || p.intake.progress < 100 || p.chartPrep === 'Submitted' || p.uploads.some((u) => u.required && u.status !== 'uploaded') },
   { key: 'chart', label: 'Chart prep', test: (p: Patient) => ['Ready for chart prep', 'Placed in eCW', 'Exception', 'Reviewed for completeness', 'Submitted'].includes(p.chartPrep) },
   { key: 'exceptions', label: 'eCW exceptions', test: (p: Patient) => p.chartPrep === 'Exception' },
-  { key: 'waiting', label: 'Waitlist & pending', test: (_p: Patient, s: string) => /waitlist|pending information/i.test(s) },
 ] as const
 
 export default function PatientsList() {
   useStore()
   const nav = useNavigate()
+  // People still completing their documentation are listed under Inquiries, not here.
+  const patients = everyone.filter((p) => isPatientStatus(statusOf(p)))
   const [sp, setSp] = useSearchParams()
   const view = views.find((v) => v.key === sp.get('view')) ?? views[0]
   const [q, setQ] = useState('')
@@ -50,24 +51,20 @@ export default function PatientsList() {
     .filter((p) => f.advisor === 'All' || p.advisor === f.advisor)
     .filter((p) => !f.open || openItems(p).length > 0)
     .sort((a, b) => (view.key === 'chart' || view.key === 'exceptions' ? chartOrder.indexOf(a.chartPrep) - chartOrder.indexOf(b.chartPrep) : 0)),
-  [view, q, f]) // eslint-disable-line react-hooks/exhaustive-deps
+  [view, q, f, patients.length]) // eslint-disable-line react-hooks/exhaustive-deps
   const activeFilters = (f.status !== 'All' ? 1 : 0) + (f.chart !== 'All' ? 1 : 0) + (f.advisor !== 'All' ? 1 : 0) + (f.open ? 1 : 0) + (q ? 1 : 0)
 
   const metrics: Metric[] = [
-    { key: 'total', label: 'Patients', value: patients.length, hint: 'all records', tone: 'neutral', to: '/staff/patients' },
-    { key: 'awaiting', label: 'Intake awaiting review', value: count((p) => p.chartPrep === 'Submitted'), hint: 'submitted', tone: 'teal', to: '/staff/patients?view=intake' },
-    { key: 'waitingPatient', label: 'Waiting on patient', value: count((p) => !!p.intake && (p.uploads.some((u) => u.status === 'returned') || p.intake.progress < 100)), hint: 'returned / in progress', tone: 'warn', to: '/staff/patients?view=intake' },
+    { key: 'total', label: 'Patients', value: patients.length, hint: 'in care', tone: 'neutral', to: '/staff/patients' },
     { key: 'ready', label: 'Ready for chart prep', value: count((p) => p.chartPrep === 'Ready for chart prep'), hint: 'today', tone: 'teal', to: '/staff/patients?view=chart' },
     { key: 'placed', label: 'Placed · awaiting review', value: count((p) => p.chartPrep === 'Placed in eCW'), tone: 'ok', to: '/staff/patients?view=chart' },
     { key: 'exceptions', label: 'eCW exceptions', value: count((p) => p.chartPrep === 'Exception'), hint: 'needs a person', tone: 'bad', to: '/staff/patients?view=exceptions' },
-    { key: 'waitlist', label: 'Waitlist', value: count((_, s) => s === 'Waitlist'), tone: 'warn', to: '/staff/patients?view=waiting' },
-    { key: 'pending', label: 'Pending information', value: count((_, s) => s === 'Pending information'), tone: 'warn', to: '/staff/patients?view=waiting' },
-    { key: 'accepted', label: 'Accepted for Month 0', value: count((_, s) => s === 'Accepted for Month 0'), hint: '30 days', tone: 'ok' },
-    { key: 'notSent', label: 'Invitation not sent', value: count((p) => !p.invitation), tone: 'neutral' },
+    { key: 'amp', label: 'In A&P', value: count((_, s) => /\bAMP\b/.test(s)), tone: 'teal' },
+    { key: 'docs', label: 'Completing documentation', value: count(views[1].test), hint: 'questionnaire or items', tone: 'warn', to: '/staff/patients?view=docs' },
     { key: 'agentRun', label: 'AI Agent last run', value: '6:02 AM', hint: 'Oct 7 · healthy', tone: 'ok', to: '/staff/ecw-exceptions' },
     { key: 'median', label: 'Median time to review', value: '1.2 d', hint: 'target ≤ 1 d', tone: 'ok' },
   ]
-  const defaults = me.role === 'charlene' ? ['ready', 'placed', 'exceptions', 'agentRun'] : me.role === 'advisor' ? ['awaiting', 'waitingPatient', 'waitlist', 'pending'] : ['total', 'awaiting', 'ready', 'exceptions']
+  const defaults = me.role === 'charlene' ? ['ready', 'placed', 'exceptions', 'agentRun'] : ['total', 'ready', 'exceptions', 'docs']
 
   const columns: Column<Patient>[] = [
     { key: 'who', header: 'Patient', render: (r) => { const n = `${r.firstName} ${r.lastName}`; return <div className="flex items-center gap-3"><span className="hidden min-[1180px]:block"><Avatar name={n} size={38} /></span><div className="min-w-0"><div className="whitespace-nowrap text-[15px] font-semibold text-sand-900">{n}</div><div className="whitespace-nowrap text-xs text-sand-500">{ageOf(r.dob)} yrs · {r.city}</div></div></div> } },
@@ -86,13 +83,13 @@ export default function PatientsList() {
 
   return (
     <>
-      <PageHeader eyebrow="Patients" title="Patients" description="Choose a view, filter, and open a patient for the full record."
+      <PageHeader eyebrow="Patients" title="Patients" description="People accepted into care. Someone who only asked about Helixona is under Inquiries until accepted."
         actions={<button className="btn-primary" onClick={() => nav('/staff/patients/new')}>+ Create patient & send invitation</button>} />
       <MetricBoard id="patients" metrics={metrics} defaults={defaults} />
       <Tabs value={view.key} onChange={(k) => setSp(k === 'all' ? {} : { view: k })} tabs={views.map((v) => ({ key: v.key, label: v.label, count: count(v.test) }))} />
       <div className="card mb-3 flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3">
         <label className="relative min-w-[240px] flex-1"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-sand-400" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name, address, phone or eCW number" className="input w-full py-2 pl-9" /></label>
-        {sel('Status', 'status', [...new Set(patients.map((p) => statusOf(p)))])}
+        {sel('Status', 'status', inJourneyOrder(patients.map((p) => statusOf(p))))}
         {sel('Chart prep', 'chart', chartOrder)}
         {sel('Advisor', 'advisor', [...new Set(patients.map((p) => p.advisor))])}
         <label className="flex items-center gap-2 whitespace-nowrap text-sm text-sand-700"><input type="checkbox" checked={f.open} onChange={(e) => setF({ ...f, open: e.target.checked })} className="h-4 w-4 accent-[#141414]" />Open items only</label>
@@ -104,7 +101,7 @@ export default function PatientsList() {
           <div className="flex rounded-full border border-sand-300 bg-white p-0.5" role="group" aria-label="Which note to show">{(['mine', 'anyone'] as const).map((s) => <button key={s} onClick={() => setScope(s)} aria-pressed={noteScope === s} className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium ${noteScope === s ? 'bg-sand-900 text-white' : 'text-sand-600'}`}>{s === 'mine' ? 'My last note' : 'Latest from anyone'}</button>)}</div>
         </div>
       </div>
-      <QueueTable rows={rows} columns={columns} rowKey={(r) => r.id} rowTone={(r) => toneFor(view.key === 'all' ? statusOf(r) : r.chartPrep)} onRowClick={(r) => nav(`/staff/patients/${r.id}${view.key === 'chart' || view.key === 'exceptions' ? '?tab=chart' : view.key === 'intake' ? '?tab=intake' : ''}`)} empty="No patients match these filters." />
+      <QueueTable rows={rows} columns={columns} rowKey={(r) => r.id} rowTone={(r) => toneFor(view.key === 'all' ? statusOf(r) : r.chartPrep)} onRowClick={(r) => nav(`/staff/patients/${r.id}${view.key === 'chart' || view.key === 'exceptions' ? '?tab=chart' : view.key === 'docs' ? '?tab=intake' : ''}`)} empty="No patients match these filters." />
     </>
   )
 }

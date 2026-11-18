@@ -1,7 +1,7 @@
 /* Patient details beyond the basics: address, sex, contacts, insurance. Sample data only. */
-export interface Demographics { sex: string; pronouns?: string; street: string; cityStateZip: string; language: string; prefers: string; emergency: { name: string; relation: string; phone: string }; insurance: { plan: string; memberId: string; type: string }; pcp: string; pharmacy: string }
+export interface Demographics { sex: string; pronouns?: string; street: string; cityStateZip: string; language: string; prefers: string; emergency: { name: string; relation: string; phone: string }; insurance: { plan: string; memberId: string; type: string }; pcp: string; pharmacy: string; payer: 'Insurance' | 'Cash' }
 const d = (sex: string, street: string, cityStateZip: string, em: [string, string, string], ins: [string, string, string], pcp: string, pharmacy: string, prefers = 'Text message', language = 'English'): Demographics =>
-  ({ sex, street, cityStateZip, language, prefers, emergency: { name: em[0], relation: em[1], phone: em[2] }, insurance: { plan: ins[0], memberId: ins[1], type: ins[2] }, pcp, pharmacy })
+  ({ sex, street, cityStateZip, language, prefers, emergency: { name: em[0], relation: em[1], phone: em[2] }, insurance: { plan: ins[0], memberId: ins[1], type: ins[2] }, pcp, pharmacy, payer: /HMO/.test(ins[2]) ? 'Cash' : 'Insurance' })
 const data: Record<string, Demographics> = {
   'P-0043': d('Female', '1482 Sycamore Ridge Ln, Apt 3B', 'Irvine, CA 92618', ['Rafael Andrade', 'Spouse', '(949) 555-0143'], ['Blue Shield PPO', '•••• 4471', 'PPO'], 'Dr. Helen Park · Irvine Family Medicine', 'CVS · 5425 Alton Pkwy, Irvine', 'Text message', 'English, Spanish'),
   'P-0044': d('Male', '27 Camino Verde', 'Tustin, CA 92780', ['Ngozi Okafor', 'Spouse', '(714) 555-0102'], ['Aetna PPO', '•••• 9920', 'PPO'], 'Dr. Samuel Reyes · Tustin Medical Group', 'Walgreens · 13052 Newport Ave, Tustin', 'Email'),

@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bell, MessageCircle, Sparkles, Calendar, CalendarCheck, ClipboardList, CreditCard, FileCheck2, FileSignature, HeartPulse, Receipt, Siren } from 'lucide-react'
+import { Bell, MessageCircle, Sparkles, Pill as PillIcon, Flame, Zap, Calendar, CalendarCheck, ClipboardList, CreditCard, FileCheck2, FileSignature, HeartPulse, Receipt, Siren } from 'lucide-react'
 import { PhoneFrame, Wordmark } from '../../../components/PhoneFrame'
 import { MonitoringNotice, Pill } from '../../../components/ui'
 import { getPathway, pathwayLabel } from '../../../mock/questionnaire'
@@ -7,12 +8,13 @@ import { Actors, Roadmap } from '../../../components/Roadmap'
 import { myPlan } from '../../../mock/roadmap'
 
 export default function PatientHome() {
+  const [flare, setFlare] = useState<'Flare' | 'Crash' | null>('Flare')
   return (
     <PhoneFrame>
       <div className="px-5 pt-12 pb-8">
         <div className="flex items-center justify-between"><Wordmark size="sm" /><span className="text-xs text-sand-500">Marisol A.</span></div>
         <h1 className="mt-6 font-display text-[26px] font-semibold text-sand-900">Good evening, Marisol</h1>
-        <p className="text-sand-600">{getPathway() === 'chronic' ? <>You're in <strong>Month 0 — Assessment</strong>.</> : <>Your pathway: <strong>{pathwayLabel.optimization}</strong>. First visit not yet scheduled.</>}</p>
+        <p className="text-sand-600">{getPathway() === 'chronic' ? <>You're in <strong>A&P</strong>.</> : <>Your pathway: <strong>{pathwayLabel.optimization}</strong>. First visit not yet scheduled.</>}</p>
 
         <div className="card mt-5 overflow-hidden">
           <div className="bg-teal-800 px-4 py-3 text-white">
@@ -35,11 +37,22 @@ export default function PatientHome() {
           <Tile to="/patient/payments" icon={<CreditCard size={20} />} label="Card on file" status="Add a card to book" tone="neutral" />
         </ul>
 
+        {flare && (
+          <div className="card mt-4 p-4">
+            <div className="flex items-start gap-3"><span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${flare === 'Crash' ? 'bg-sand-900 text-teal-300' : 'bg-bad-100 text-bad-700'}`}>{flare === 'Crash' ? <Zap size={17} /> : <Flame size={17} />}</span>
+              <div className="flex-1"><div className="font-semibold text-sand-900">Active {flare.toLowerCase()} · since Oct 2</div><p className="text-sm text-sand-600">{flare === 'Crash' ? 'Changed from a flare on Oct 8. The start date stays Oct 2.' : 'Reported Oct 2 · affecting daily activities a lot.'}</p></div></div>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              {flare === 'Flare' ? <button onClick={() => setFlare('Crash')} className="btn-secondary px-2 py-2 text-[11px]">It became a crash</button> : <span className="self-center text-xs text-sand-500">Your care team was told.</span>}
+              <button onClick={() => setFlare(null)} className="btn-secondary px-2 py-2 text-[11px]">It is over</button>
+            </div>
+          </div>
+        )}
         <div className="mt-6 eyebrow">During your program</div>
         <ul className="mt-2 space-y-2">
           {([
             ['/patient/survey', 'Daily health check-in', 'About one minute · 3 recent treatments to review', <HeartPulse size={16} />],
-            ['/patient/crash', 'Report a crash or flare', 'Anytime · reviewed during office hours', <Siren size={16} />],
+            ['/patient/crash', 'Report a flare or crash', 'Anytime · reviewed during office hours', <Siren size={16} />],
+            ['/patient/medications', 'Medications & supplements', 'What your doctor ordered · mark what you took today', <PillIcon size={16} />],
             ['/patient/book', 'Book a session', 'Nano bath Thu Oct 9 · 9:00 AM confirmed', <CalendarCheck size={16} />],
             ['/patient/agreement', 'Membership agreement & payment', 'Available once your program is offered', <FileSignature size={16} />],
             ['/patient/payments', 'Payments & receipts', 'Next: $2,000 on Nov 1', <Receipt size={16} />],

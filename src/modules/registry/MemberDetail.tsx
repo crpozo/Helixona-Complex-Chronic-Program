@@ -50,14 +50,14 @@ export default function MemberDetail() {
           {tab === 'timeline' && <Card title="Status history" subtitle="Every change with actor, timestamp, reason code and supporting task or document."><AuditList entries={fullHistory} /></Card>}
           {tab === 'dates' && (
             <Card title="Key dates">
-              <Row label="Month 0">{m.month0Start ?? '—'}{m.month0End ? ` → ${m.month0End}` : ''}</Row>
+              <Row label="A&P">{m.month0Start ?? '—'}{m.month0End ? ` → ${m.month0End}` : ''}</Row>
               <Row label="Membership start">{m.membershipStart ?? '—'}</Row>
               <Row label="Initial nine-month end">{m.nineMonthEnd ?? '—'}</Row>
               <Row label="Pauses">{m.pauses.length ? m.pauses.map((pp) => `${pp.from} → ${pp.to} (${pp.reason})`).join('; ') : 'None'}</Row>
               <Row label="Month 9 review">{m.month9Review ?? 'Not yet scheduled'}</Row>
               <Row label="Total months in active care">{m.activeMonths}</Row>
               <Row label="Monthly amount">{m.monthlyAmount ? `$${m.monthlyAmount.toLocaleString()}` : '—'}</Row>
-              <p className="help mt-3">Month 0 is a separate one-time charge and never counts toward the nine-month membership.</p>
+              <p className="help mt-3">A&P is a separate one-time charge and never counts toward the nine-month membership.</p>
             </Card>
           )}
           {tab === 'transition' && (

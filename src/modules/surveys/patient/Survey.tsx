@@ -12,6 +12,7 @@ const measures = [
   { key: 'pain', label: 'Pain', low: 'No pain', high: 'Worst imaginable', prev: 3 },
   { key: 'fog', label: 'Brain fog', low: 'Clear', high: 'Very foggy', prev: 5 },
   { key: 'sleep', label: 'Sleep last night', low: 'Poor', high: 'Restful', prev: 5 },
+  { key: 'digestion', label: 'Digestion', low: 'Very upset', high: 'Comfortable', prev: 6 },
 ]
 const recentTreatments = [
   { name: 'Red light therapy', when: 'Oct 21 · 2 days ago' },

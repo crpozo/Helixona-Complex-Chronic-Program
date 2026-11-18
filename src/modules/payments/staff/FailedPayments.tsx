@@ -42,7 +42,7 @@ export default function FailedPayments() {
   const cols: Column<Payment>[] = [
     { key: 'p', header: 'Patient', width: '200px', render: (r) => <div className="flex items-center gap-2.5"><Avatar name={nameOf(r.patientId)} size={30} /><span className="font-semibold text-sand-900">{nameOf(r.patientId)}</span></div> },
     { key: 'plan', header: 'Plan', render: (r) => { const pl = planOf(r.patientId); return pl === 'Individual' ? <span className="text-sand-600">Individual</span> : <span className="inline-flex items-center gap-1 text-sand-800"><Users size={13} className="text-teal-700" />{pl}</span> } },
-    { key: 'charge', header: 'Charge', render: (r) => <span className="text-sand-700">{r.type === 'Month 0 assessment' ? 'Month 0 assessment' : 'Membership'}</span> },
+    { key: 'charge', header: 'Charge', render: (r) => <span className="text-sand-700">{r.type === 'A&P assessment' ? 'A&P assessment' : 'Membership'}</span> },
     { key: 'period', header: 'Period', render: (r) => r.period },
     { key: 'amt', header: 'Amount', render: (r) => <span className="font-medium">${r.amount.toLocaleString()}</span> },
     { key: 'date', header: 'Date', render: (r) => <span className="whitespace-nowrap">{r.date}</span> },
@@ -88,7 +88,7 @@ export default function FailedPayments() {
             <label className="relative"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-sand-400" /><input value={f.q} onChange={(e) => set('q', e.target.value)} placeholder="Search patient…" className="input w-56 py-2 pl-9" /></label>
             {sel_('Status', 'status', ['All', 'Paid', 'Failed', 'Retry scheduled', 'Hold proposed', 'Scheduled', 'Refunded'])}
             {sel_('Plan', 'plan', ['All', 'Individual', 'Family'])}
-            {sel_('Charge', 'charge', ['All', 'Membership · month', 'Month 0 assessment'])}
+            {sel_('Charge', 'charge', ['All', 'Membership · month', 'A&P assessment'])}
             {sel_('Dates', 'period', ['All', ...Object.keys(periods), 'Custom'])}
             {f.period === 'Custom' && <span className="flex items-center gap-1.5 text-xs text-sand-500"><input type="date" className="input w-auto py-1 text-sm" value={f.from} max={f.to} onChange={(e) => set('from', e.target.value)} />to<input type="date" className="input w-auto py-1 text-sm" value={f.to} min={f.from} onChange={(e) => set('to', e.target.value)} /></span>}
             {active > 0 && <button onClick={() => setF(blank)} className="btn-ghost px-2 py-1 text-xs"><X size={13} /> Clear {active}</button>}
@@ -100,7 +100,7 @@ export default function FailedPayments() {
           <div className={`grid gap-5 ${sel ? 'xl:grid-cols-3' : ''}`}>
             <div className={sel ? 'xl:col-span-2' : ''}><QueueTable rows={rows} columns={sel ? cols.filter((c) => !['mem', 'last', 'plan'].includes(c.key)) : cols} rowKey={(r) => r.id} rowTone={(r) => tone[statusOf(r)]} onRowClick={setSel} empty="No payments match these filters." /><p className="mt-2 text-xs text-sand-500">{rows.length} payments · ${rows.reduce((n, p) => n + p.amount, 0).toLocaleString()} total · open a row for details</p></div>
             {sel && (
-              <Card title={nameOf(sel.patientId)} subtitle={`${sel.type === 'Month 0 assessment' ? 'Month 0 assessment' : 'Membership'} · ${sel.period} · ${sel.method}`} actions={<button aria-label="Close details" onClick={() => setSel(null)} className="btn-ghost px-2 py-1"><X size={15} /></button>}>
+              <Card title={nameOf(sel.patientId)} subtitle={`${sel.type === 'A&P assessment' ? 'A&P assessment' : 'Membership'} · ${sel.period} · ${sel.method}`} actions={<button aria-label="Close details" onClick={() => setSel(null)} className="btn-ghost px-2 py-1"><X size={15} /></button>}>
                 <Row label="Amount">${sel.amount.toLocaleString()}</Row>
                 <Row label="Date">{sel.date}</Row>
                 <Row label="Payment status"><Pill tone={tone[statusOf(sel)]}>{statusOf(sel)}</Pill></Row>
@@ -135,7 +135,7 @@ export default function FailedPayments() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-label="Receipt" onClick={() => setReceipt(null)}>
           <div className="card w-full max-w-sm p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
             <div className="text-center"><div className="eyebrow">Helixona · Receipt</div><div className="mt-2 font-display text-4xl font-semibold text-sand-900">${receipt.amount.toLocaleString()}.00</div><Pill tone={tone[statusOf(receipt)]}>{statusOf(receipt)}</Pill></div>
-            <div className="mt-4 text-sm"><Row label="Patient">{nameOf(receipt.patientId)}</Row><Row label="For">{receipt.type === 'Month 0 assessment' ? 'Month 0 assessment' : `Membership · ${receipt.period}`}</Row><Row label="Date">{receipt.date}</Row><Row label="Paid with">{receipt.method}</Row></div>
+            <div className="mt-4 text-sm"><Row label="Patient">{nameOf(receipt.patientId)}</Row><Row label="For">{receipt.type === 'A&P assessment' ? 'A&P assessment' : `Membership · ${receipt.period}`}</Row><Row label="Date">{receipt.date}</Row><Row label="Paid with">{receipt.method}</Row></div>
             <div className="mt-5 flex gap-2"><button onClick={() => notify('Receipt downloaded as PDF')} className="btn-secondary flex-1">Download PDF</button><button onClick={() => setReceipt(null)} className="btn-primary flex-1">Close</button></div>
           </div>
         </div>

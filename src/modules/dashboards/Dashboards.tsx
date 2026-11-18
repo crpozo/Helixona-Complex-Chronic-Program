@@ -3,7 +3,7 @@ import { Card, Notice, PageHeader, Pill, Stat, ToConfirm } from '../../component
 import { notify } from '../../mock/store'
 
 const tiles = [
-  { label: 'Intake completion', value: '3 / 5', hint: 'median 4.2 d', tone: 'teal', to: '/staff/patients?view=intake' },
+  { label: 'Intake completion', value: '3 / 5', hint: 'median 4.2 d', tone: 'teal', to: '/staff/patients?view=docs' },
   { label: 'Chart prep', value: '1 ready', hint: '1 exception', tone: 'bad', to: '/staff/patients?view=chart' },
   { label: 'Open alerts', value: 4, hint: '1 escalated', tone: 'bad', to: '/staff/alerts' },
   { label: 'Booking exceptions', value: 2, hint: '1 request', tone: 'warn', to: '/staff/calendar' },
@@ -20,7 +20,7 @@ const defects = [
 ]
 
 export default function Dashboards() {
-  const funnel = [['Inquiries (30 d)', 12], ['Interviews', 6], ['Accepted for Month 0', 4], ['Month 0 scheduled / in progress', 3], ['Program offered', 1], ['Active members', 2]] as const
+  const funnel = [['Inquiries (30 d)', 12], ['Interviews', 6], ['Accepted for A&P', 4], ['A&P scheduled / in progress', 3], ['Program offered', 1], ['Active members', 2]] as const
   const weeks = [['Sep 8', 12, 3], ['Sep 15', 14, 2], ['Sep 22', 16, 4], ['Sep 29', 18, 3], ['Oct 6', 21, 5]] as const
   const max = 22
   return (

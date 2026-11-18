@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react'
-import type { Role } from './types'
+import type { Inquiry, Role } from './types'
+import { inquiries as seedInquiries } from './inquiries'
 
 /* In-memory state shared across screens so the mockup behaves like one product:
    notes, status changes and the confirmation toast. Nothing is persisted except per-user view preferences. */
@@ -27,7 +28,7 @@ const notes: Note[] = [
   { id: 'N-12', patientId: 'P-0043', category: 'Intake', text: 'Texted patient about lab pages; she will re-upload this week.', author: 'Ana', when: 'Oct 1, 2026 · 9:04 AM', ts: 12 },
   { id: 'N-11', patientId: 'P-0043', category: 'Chart prep', text: 'Waiting on pages 3–4 of the Quest report before preparing the note.', author: 'Charlene', when: 'Oct 1, 2026 · 8:40 AM', ts: 11 },
   { id: 'N-10', patientId: 'P-0044', category: 'Chart prep', text: 'Intake complete. Note is ready to paste; PDF checked.', author: 'Charlene', when: 'Oct 2, 2026 · 4:30 PM', ts: 10 },
-  { id: 'N-09', patientId: 'P-0044', category: 'Billing', text: 'Month 0 fee paid by card. Receipt sent.', author: 'Karina', when: 'Oct 2, 2026 · 4:10 PM', ts: 9 },
+  { id: 'N-09', patientId: 'P-0044', category: 'Billing', text: 'A&P fee paid by card. Receipt sent.', author: 'Karina', when: 'Oct 2, 2026 · 4:10 PM', ts: 9 },
   { id: 'N-08', patientId: 'P-0041', category: 'Chart prep', text: 'Reviewed placement in eCW. Note and PDF are in the right place.', author: 'Charlene', when: 'Sep 16, 2026 · 8:30 AM', ts: 8 },
   { id: 'N-07', patientId: 'P-0041', category: 'Scheduling', text: 'Prefers Tuesday or Thursday mornings.', author: 'Ana', when: 'Sep 14, 2026 · 2:00 PM', ts: 7 },
   { id: 'N-06', patientId: 'P-0039', category: 'Chart prep', text: 'PDF did not verify after upload. Uploading by hand today.', author: 'Charlene', when: 'Oct 5, 2026 · 9:15 AM', ts: 6 },
@@ -63,3 +64,36 @@ let toast: string | null = null
 let timer: ReturnType<typeof setTimeout> | undefined
 export const toastMessage = () => toast
 export function notify(message: string) { toast = message; emit(); clearTimeout(timer); timer = setTimeout(() => { toast = null; emit() }, 2600) }
+
+/* ---------------- Status order ---------------- */
+/** Every status in the order a person moves through it. Dropdowns and filters list statuses in this order. */
+export const journeyOrder = ['Inquiry received', 'Advisor outreach', 'Advisor interview completed', 'Insurance benefits review', 'Admissions review', 'Pending information', 'Waitlist',
+  'Accepted for A&P', 'A&P scheduled', 'A&P in progress', 'A&P complete', 'Program offered', 'Contract pending', 'Payment pending',
+  'Active member', 'Active · 9-month program', 'Active · month-to-month program', 'Temporarily paused', 'Paused', 'Month 9 review', 'Continued active care', 'Maintenance', 'Graduated',
+  'Program not offered', 'Patient declined', 'Patient fell off', 'Denied', 'Withdrawn', 'Discharged']
+export const inJourneyOrder = (list: string[]) => [...new Set(list)].sort((a, b) => { const i = journeyOrder.indexOf(a), j = journeyOrder.indexOf(b); return (i < 0 ? 99 : i) - (j < 0 ? 99 : j) })
+/** An inquiry that is accepted is added to the patient list. Patient statuses start at Pending information / Accepted for A&P. */
+export const isPatientStatus = (status: string) => status === 'Pending information' || (journeyOrder.indexOf(status) >= journeyOrder.indexOf('Accepted for A&P') && !['Patient fell off', 'Denied'].includes(status))
+/** Statuses of a website or phone inquiry, in order. Accepted moves the person to the patient list. */
+export const inquiryStatuses = ['Lead received', 'Waiting for response', 'Pending information', 'Interview scheduled', 'Waiting for admission review', 'Accepted', 'Waitlisted', 'Denied'] as const
+
+/* ---------------- Inquiries: status, owner, manual entries ---------------- */
+const inquiryPatch: Record<string, Partial<Inquiry>> = {}
+const addedInquiries: Inquiry[] = []
+export const allInquiries = (): Inquiry[] => [...addedInquiries, ...seedInquiries].map((i) => ({ ...i, ...inquiryPatch[i.id] }))
+export const inquiryById = (id: string) => allInquiries().find((i) => i.id === id)
+export function patchInquiry(id: string, patch: Partial<Inquiry>) { inquiryPatch[id] = { ...inquiryPatch[id], ...patch }; emit() }
+export function addInquiry(i: Omit<Inquiry, 'id' | 'receivedAt'>): string {
+  const id = `INQ-${2211 + addedInquiries.length}`
+  addedInquiries.unshift({ ...i, id, receivedAt: nowStamp() }); emit(); return id
+}
+/** The inquiry's date as YYYY-MM-DD, for period filters. */
+export const inquiryDate = (i: Inquiry) => { const t = Date.parse(i.receivedAt.split(' · ')[0]); return Number.isNaN(t) ? '2026-10-09' : new Date(t).toISOString().slice(0, 10) }
+
+/* ---------------- Patient ownership and program ---------------- */
+const ownerOf: Record<string, string> = {}
+export const patientOwner = (id: string, fallback: string) => ownerOf[id] ?? fallback
+export function takePatient(id: string) { ownerOf[id] = currentUser().name; logEvent(id, `${currentUser().name} took ownership`) }
+const programOf: Record<string, string> = {}
+export const patientProgram = (id: string) => programOf[id]
+export function setProgram(id: string, program: string) { programOf[id] = program; emit() }

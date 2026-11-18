@@ -21,3 +21,6 @@
 | 2026-11-16 | Staff lists show patient full names; internal IDs are not shown | CLAUDE.md §6 (ID-only lists) and requirements privacy note | Client review: staff do not memorize IDs |
 | 2026-11-16 | Intake review and Chart prep are views of one Patients screen, and tabs of the patient record | CLAUDE.md §4 items 10–11 as separate screens | Client review: everything about a patient in one place |
 | 2026-11-16 | Alerts end as Resolved or Pending; no separate acknowledge step | Requirements alert lifecycle (acknowledge) | Client review |
+| 2026-11-18 | “Month 0” is shown as “A&P” in the interface | Requirements and CLAUDE.md wording (Month 0) | Clinic status sheet |
+| 2026-11-18 | Inquiries have their own statuses and page; Accepted adds the person to the patient list | Earlier flow where the advisor created a patient record directly from an inquiry | Clinic inquiry sheet; staff confused inquiries with patients |
+| 2026-11-18 | Patients report a Flare or a Crash plus impact on daily activities, instead of a 0–10 severity | Crash report severity scale | Clinic definitions sheet |

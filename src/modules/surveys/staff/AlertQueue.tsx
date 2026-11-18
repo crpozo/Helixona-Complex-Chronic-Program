@@ -78,7 +78,7 @@ export default function AlertQueue() {
         <div className="xl:col-span-2">
           {sel && (
             <Card title={<span className="flex flex-wrap items-center gap-2">{nameOf(sel.patientId)} <Pill tone={levelTone[sel.level]}>{sel.level}</Pill></span>} subtitle={`${sel.source} · received ${sel.createdAt}`}
-              actions={<button onClick={() => nav(`/staff/alerts/patient/${sel.patientId}`)} className="btn-secondary shrink-0 whitespace-nowrap px-3 py-1.5 text-[11px]"><ArrowUpRight size={14} /> Scores</button>}>
+              actions={<button onClick={() => nav(`/staff/alerts/patient/${sel.patientId}`)} className="btn-secondary shrink-0 whitespace-nowrap px-3 py-1.5 text-[11px]"><ArrowUpRight size={14} /> Data</button>}>
               <Notice tone={levelTone[sel.level]}>{sel.summary}</Notice>
               <div className="mt-3 text-sm">
                 <Row label="Rule applied">{sel.rule}</Row>

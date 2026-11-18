@@ -17,6 +17,9 @@ import Forms from './modules/intake/patient/Forms'
 import Submitted from './modules/intake/patient/Submitted'
 import PatientHome from './modules/intake/patient/PatientHome'
 import InquiryList from './modules/intake/staff/InquiryList'
+import InquiryDetail from './modules/intake/staff/InquiryDetail'
+import Packages from './modules/admin/Packages'
+import UsersPermissions from './modules/admin/UsersPermissions'
 import PatientsList from './modules/intake/staff/PatientsList'
 import CreatePatient from './modules/intake/staff/CreatePatient'
 import PatientDetail from './modules/intake/staff/PatientDetail'
@@ -34,6 +37,7 @@ import AlertRules from './modules/config/AlertRules'
 import MessageTemplates from './modules/notifications/MessageTemplates'
 import NotificationSettings from './modules/notifications/patient/NotificationSettings'
 import Assistant from './modules/messages/patient/Assistant'
+import Medications from './modules/medications/patient/Medications'
 import Messages from './modules/messages/patient/Messages'
 import Registry from './modules/registry/Registry'
 import MemberDetail from './modules/registry/MemberDetail'
@@ -67,10 +71,13 @@ export default function App() {
           {/* Staff · Intake module */}
           <Route path="/staff" element={<Navigate to="/staff/inquiries" replace />} />
           <Route path="/staff/inquiries" element={<InquiryList />} />
+          <Route path="/staff/inquiries/:id" element={<InquiryDetail />} />
+          <Route path="/staff/admin/packages" element={<Packages />} />
+          <Route path="/staff/admin/users" element={<UsersPermissions />} />
           <Route path="/staff/patients" element={<PatientsList />} />
           <Route path="/staff/patients/new" element={<CreatePatient />} />
           <Route path="/staff/patients/:id" element={<PatientDetail />} />
-          <Route path="/staff/intake-review" element={<Navigate to="/staff/patients?view=intake" replace />} />
+          <Route path="/staff/intake-review" element={<Navigate to="/staff/patients?view=docs" replace />} />
           <Route path="/staff/chart-prep" element={<Navigate to="/staff/patients?view=chart" replace />} />
           <Route path="/staff/chart-prep/:id" element={<ChartPrepDetail />} />
           <Route path="/staff/ecw-exceptions" element={<EcwExceptions />} />
@@ -82,6 +89,7 @@ export default function App() {
           <Route path="/patient/payments" element={<PaymentsPatient />} />
           <Route path="/patient/settings" element={<NotificationSettings />} />
           <Route path="/patient/assistant" element={<Assistant />} />
+          <Route path="/patient/medications" element={<Medications />} />
           <Route path="/patient/messages" element={<Messages />} />
           {/* Staff · surveys & alerts, registry, booking, payments, config, dashboards */}
           <Route path="/staff/alerts" element={<AlertQueue />} />

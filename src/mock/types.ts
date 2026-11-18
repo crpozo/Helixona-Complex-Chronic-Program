@@ -11,8 +11,8 @@ export type InvitationState = 'sent' | 'delivered' | 'opened' | 'started' | 'sub
 
 export type RegistryStatus =
   | 'Inquiry received' | 'Advisor outreach' | 'Advisor interview completed' | 'Insurance benefits review'
-  | 'Admissions review' | 'Waitlist' | 'Pending information' | 'Accepted for Month 0' | 'Denied' | 'Patient fell off' | 'Month 0 scheduled'
-  | 'Month 0 in progress' | 'Plan of Care completed' | 'Program offered' | 'Program not offered'
+  | 'Admissions review' | 'Waitlist' | 'Pending information' | 'Accepted for A&P' | 'Denied' | 'Patient fell off' | 'A&P scheduled'
+  | 'A&P in progress' | 'A&P complete' | 'Program offered' | 'Program not offered'
   | 'Patient declined' | 'Contract pending' | 'Payment pending' | 'Active member' | 'Temporarily paused'
   | 'Month 9 review' | 'Continued active care' | 'Maintenance' | 'Graduated' | 'Withdrawn' | 'Discharged'
 
@@ -57,6 +57,8 @@ export interface FormItem {
   method?: 'Typed' | 'Drawn'
 }
 
+export type InquiryStatus = 'Lead received' | 'Waiting for response' | 'Pending information' | 'Interview scheduled' | 'Waiting for admission review' | 'Accepted' | 'Waitlisted' | 'Denied'
+
 export interface Inquiry {
   id: string
   receivedAt: string
@@ -66,7 +68,7 @@ export interface Inquiry {
   city: string
   state: string
   reason: string
-  status: RegistryStatus
+  status: InquiryStatus
   owner: string
   patientId?: string
   nextAction?: string
