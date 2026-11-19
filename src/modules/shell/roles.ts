@@ -17,6 +17,7 @@ export interface NavItem { label: string; to: string; group: NavGroup; roles: Ro
 
 export const nav: NavItem[] = [
   { label: 'Inquiries', to: '/staff/inquiries', group: 'People', roles: ['advisor', 'karina', 'admin'], module: 'Intake', phase: 1 },
+  { label: 'Interview calendar', to: '/staff/interviews', group: 'People', roles: ['advisor', 'admin'], module: 'Intake', phase: 1 },
   { label: 'Patients', to: '/staff/patients', group: 'People', roles: ['advisor', 'karina', 'charlene', 'nursing', 'physician', 'admin'], module: 'Intake', phase: 1 },
   { label: 'Registry', to: '/staff/registry', group: 'Membership', roles: ['karina', 'advisor', 'physician', 'admin'], module: 'Registry', phase: 2 },
   { label: 'Alerts', to: '/staff/alerts', group: 'Care', roles: ['nursing', 'physician', 'admin'], module: 'Surveys & alerts', phase: 2 },

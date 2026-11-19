@@ -119,3 +119,10 @@ All data is fictional. The intake questionnaire is the Medical Director's conten
 ## Brand
 
 Helixona's live site was not reachable from the build environment, so the palette follows CLAUDE.md §6: deep teal accent (`#0F6E6A`), warm neutral grays, Source Sans 3 for UI and Fraunces for headings. All colors are tokens in `src/index.css` (`@theme`) and can be swapped in one place when the official palette is supplied. The wordmark/helix mark is a placeholder.
+
+## Interview scheduling (Nov 19, 2026)
+
+| Route | Purpose | Open questions |
+|---|---|---|
+| `/staff/interviews` | Advisor's interview calendar: Google Calendar connection, weekly windows, interview length, scheduled interviews, what people can choose | One calendar per advisor or shared |
+| `/public/interview/:id` | Person picks or changes the interview time from the link the advisor sent | Booking and change limits; phone or video |

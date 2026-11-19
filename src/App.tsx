@@ -26,6 +26,8 @@ import PatientDetail from './modules/intake/staff/PatientDetail'
 import ChartPrepDetail from './modules/intake/staff/ChartPrepDetail'
 import EcwExceptions from './modules/intake/staff/EcwExceptions'
 import BecomePatient from './modules/public/BecomePatient'
+import ScheduleInterview from './modules/public/ScheduleInterview'
+import InterviewAvailability from './modules/interviews/InterviewAvailability'
 import BookTreatment from './modules/public/BookTreatment'
 import Survey from './modules/surveys/patient/Survey'
 import CrashReport from './modules/surveys/patient/CrashReport'
@@ -61,6 +63,7 @@ export default function App() {
           {/* Public · helixona.com entry points (no sign-in) */}
           <Route path="/public/become-a-patient" element={<BecomePatient />} />
           <Route path="/public/book" element={<BookTreatment />} />
+          <Route path="/public/interview/:id" element={<ScheduleInterview />} />
           <Route path="/patient" element={<Navigate to="/patient/invite" replace />} />
           <Route path="/patient/invite" element={<InvitationLanding />} />
           <Route path="/patient/intake" element={<Questionnaire />} />
@@ -71,6 +74,7 @@ export default function App() {
           {/* Staff · Intake module */}
           <Route path="/staff" element={<Navigate to="/staff/inquiries" replace />} />
           <Route path="/staff/inquiries" element={<InquiryList />} />
+          <Route path="/staff/interviews" element={<InterviewAvailability />} />
           <Route path="/staff/inquiries/:id" element={<InquiryDetail />} />
           <Route path="/staff/admin/packages" element={<Packages />} />
           <Route path="/staff/admin/users" element={<UsersPermissions />} />

@@ -106,3 +106,51 @@ const n = (i: { id: string }) => Number(i.id.replace(/\D/g, ''))
 export const inquiryAge = (i: { id: string }) => 28 + (n(i) * 7) % 41
 const nicknames: Record<string, string> = { Robert: 'Rob', Thomas: 'Tom', Jordan: 'Jordy', Hannah: 'Hanna', Grace: 'Gracie' }
 export const preferredName = (i: { id: string; name: string }) => (n(i) % 3 === 0 ? undefined : nicknames[i.name.split(' ')[0]])
+
+/* ---------------- Interview scheduling ----------------
+ * The advisor sets weekly windows; the person picks a time from a link. Times already taken in the advisor's
+ * Google Calendar or by another interview are not offered. */
+export interface InterviewWindow { id: string; day: number; from: string; to: string }
+export interface Interview { date: string; time: string; bookedBy: 'person' | 'advisor'; when: string }
+export const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+let windows: InterviewWindow[] = [
+  { id: 'w1', day: 1, from: '09:00', to: '12:00' }, { id: 'w2', day: 2, from: '13:00', to: '16:00' },
+  { id: 'w3', day: 3, from: '09:00', to: '12:00' }, { id: 'w4', day: 4, from: '13:00', to: '16:00' }, { id: 'w5', day: 5, from: '09:00', to: '11:00' },
+]
+let slotMinutes = 30
+let googleConnected = true
+/** Events read from the advisor's Google Calendar (sample). Only busy or free is used, never the title. */
+export const googleBusy = [
+  { date: '2026-10-12', from: '10:00', to: '11:00', title: 'Team huddle' }, { date: '2026-10-13', from: '14:00', to: '15:00', title: 'Admission review' },
+  { date: '2026-10-14', from: '09:00', to: '09:30', title: 'Dentist' }, { date: '2026-10-16', from: '09:30', to: '10:30', title: 'Admission review' },
+]
+const interviews: Record<string, Interview> = { 'INQ-2207': { date: '2026-10-13', time: '13:30', bookedBy: 'person', when: 'Oct 6, 2026 · 4:12 PM' } }
+const linksSent: Record<string, string> = { 'INQ-2207': 'Oct 6, 2026 · 2:05 PM' }
+const mins = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3))
+const hhmm = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`
+export const fmtTime = (t: string) => { const m = mins(t); const h = Math.floor(m / 60); return `${h % 12 || 12}:${String(m % 60).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}` }
+export const fmtDate = (iso: string) => new Date(iso + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+export const interviewWindows = () => windows
+export const interviewSlotMinutes = () => slotMinutes
+export const isGoogleConnected = () => googleConnected
+export function setGoogleConnected(v: boolean) { googleConnected = v; emit() }
+export function setSlotMinutes(n: number) { slotMinutes = n; emit() }
+export function addWindow(w: Omit<InterviewWindow, 'id'>) { windows = [...windows, { ...w, id: `w${Date.now()}` }]; emit() }
+export function removeWindow(id: string) { windows = windows.filter((w) => w.id !== id); emit() }
+/** The next two weeks of weekdays, starting the Monday after the sample "today" (Oct 9, 2026). */
+export const interviewDays = () => Array.from({ length: 14 }, (_, k) => { const d = new Date(Date.UTC(2026, 9, 12 + k, 12)); return d.toISOString().slice(0, 10) }).filter((iso) => { const wd = new Date(iso + 'T12:00:00').getDay(); return wd > 0 && wd < 6 })
+export function slotsFor(iso: string, exceptInquiry?: string): string[] {
+  const wd = new Date(iso + 'T12:00:00').getDay()
+  const taken = [...(googleConnected ? googleBusy.filter((b) => b.date === iso).map((b) => [mins(b.from), mins(b.to)]) : []), ...Object.entries(interviews).filter(([k, v]) => v.date === iso && k !== exceptInquiry).map(([, v]) => [mins(v.time), mins(v.time) + slotMinutes])]
+  const out: string[] = []
+  for (const w of windows.filter((x) => x.day === wd)) for (let m = mins(w.from); m + slotMinutes <= mins(w.to); m += slotMinutes) if (!taken.some(([a, b]) => m < b && m + slotMinutes > a)) out.push(hhmm(m))
+  return [...new Set(out)].sort()
+}
+export const interviewOf = (inquiryId: string): Interview | undefined => interviews[inquiryId]
+export const allInterviews = () => Object.entries(interviews).map(([inquiryId, v]) => ({ inquiryId, ...v })).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
+export const interviewLinkSent = (inquiryId: string): string | undefined => linksSent[inquiryId]
+export function sendInterviewLink(inquiryId: string) { linksSent[inquiryId] = nowStamp(); emit() }
+export function bookInterview(inquiryId: string, date: string, time: string, bookedBy: Interview['bookedBy'] = 'person') {
+  interviews[inquiryId] = { date, time, bookedBy, when: nowStamp() }
+  patchInquiry(inquiryId, { status: 'Interview scheduled' })
+}

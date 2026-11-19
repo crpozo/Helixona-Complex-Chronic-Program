@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Check, EyeOff, FileText, Sparkles, Upload, UserCheck, UserPlus } from 'lucide-react'
 import { Breadcrumb, Card, Field, Notice, Pill, Row, toneFor } from '../../../components/ui'
 import { ageOf } from '../../../mock/demographics'
 import type { Inquiry, InquiryStatus } from '../../../mock/types'
-import { addInquiry, currentUser, inquiryById, inquiryStatuses, notify, patchInquiry, useStore, insuranceOf, inquiryAge, preferredName } from '../../../mock/store'
+import { addInquiry, currentUser, inquiryById, inquiryStatuses, notify, patchInquiry, useStore, insuranceOf, inquiryAge, preferredName, fmtDate, fmtTime, interviewLinkSent, interviewOf, sendInterviewLink } from '../../../mock/store'
 
 /** One inquiry: the data the advisor collects before admission (as listed by the clinic), the internal
  *  assessment, and the status. This is NOT a patient record; accepting it is what adds the person to the patient list. */
@@ -161,7 +161,7 @@ export default function InquiryDetail() {
                 {f.decision && <p className="help mt-2">Recorded by {me.name} · {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>}
               </div>
               <Field label="Admission committee review date">{input('decisionDate', '', 'date')}</Field>
-              <Field label="Person notified of the decision">{input('notified', '', 'date')}</Field>
+              <Field label="Person notified of the decision"><div className="grid grid-cols-2 gap-2">{input('notified', '', 'date')}<select aria-label="How they were notified" className="input" value={f.notifiedBy ?? ''} onChange={(e) => set('notifiedBy', e.target.value)}><option value="">Method…</option><option>Email</option><option>Phone</option></select></div></Field>
             </div>
           </Card>}
           <div className="flex items-center justify-between gap-3">
@@ -177,6 +177,16 @@ export default function InquiryDetail() {
               <p className="mt-2 text-sm leading-relaxed text-sand-700">They are added to the patient list only when the inquiry is <strong>Accepted</strong>.</p>
             </Card>
           ) : (<>
+            {inq && <Card title="Interview" subtitle="The person chooses a time from your interview hours.">
+              {interviewOf(inq.id)
+                ? <div className="rounded-xl bg-ok-100 px-3 py-2.5 text-sm text-ok-700"><strong>{fmtDate(interviewOf(inq.id)!.date)} · {fmtTime(interviewOf(inq.id)!.time)}</strong><span className="block text-xs">Chosen by the {interviewOf(inq.id)!.bookedBy} · {interviewOf(inq.id)!.when} · on your Google Calendar</span></div>
+                : <p className="text-sm text-sand-600">{interviewLinkSent(inq.id) ? `Link sent ${interviewLinkSent(inq.id)} · waiting for the person to choose a time.` : 'No interview scheduled yet.'}</p>}
+              <div className="mt-3 flex flex-col gap-2">
+                <button className="btn-primary" onClick={() => { sendInterviewLink(inq.id); if (!interviewOf(inq.id)) patchInquiry(inq.id, { status: 'Waiting for response' }); notify('Scheduling link sent by text and email') }}>{interviewOf(inq.id) ? 'Send link to reschedule' : interviewLinkSent(inq.id) ? 'Send the link again' : 'Send scheduling link'}</button>
+                <Link to={`/public/interview/${inq.id}`} className="btn-secondary">See what the person sees</Link>
+                <Link to="/staff/interviews" className="btn-ghost text-sm">My interview hours</Link>
+              </div>
+            </Card>}
             <Card title="Status" subtitle="In order. Choose where this inquiry is now.">
               <ol className="space-y-1">
                 {inquiryStatuses.map((st, i) => { const cur = inquiryStatuses.indexOf(status); const on = st === status; const done = i < cur && !['Waitlisted', 'Denied'].includes(status); return (
