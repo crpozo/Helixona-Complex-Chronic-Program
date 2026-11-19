@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { Children, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Check, ChevronDown, ChevronRight, Info, ShieldAlert, X } from 'lucide-react'
 
@@ -305,5 +305,34 @@ export function MultiSelect({ options, value, onChange, placeholder = 'Select…
         </ul>
       )}
     </div>
+  )
+}
+
+/* ---------- List + detail: the list keeps the full width; the detail opens in a side panel ---------- */
+export function MasterDetail({ children }: { children: ReactNode }) {
+  const [list, detail] = Children.toArray(children)
+  const [open, setOpen] = useState(false)
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open])
+  return (
+    <>
+      <div onClick={(e) => { if ((e.target as HTMLElement).closest('tbody tr')) setOpen(true) }}>{list}</div>
+      {open && (
+        <div className="fixed inset-0 z-40 flex justify-end" role="dialog" aria-modal="true" aria-label="Details">
+          <button aria-label="Close details" className="absolute inset-0 cursor-default bg-sand-900/30" onClick={() => setOpen(false)} />
+          <div className="relative flex h-full w-[min(720px,94vw)] flex-col bg-sand-50 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-sand-200 bg-white px-5 py-3">
+              <span className="eyebrow">Details</span>
+              <button className="btn-ghost px-2 py-1 text-sm" onClick={() => setOpen(false)}>Close ✕</button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-5">{detail}</div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }

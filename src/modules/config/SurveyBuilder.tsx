@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { GitBranch, GripVertical, Plus, Send } from 'lucide-react'
-import { Card, Field, Notice, PageHeader, Pill, QueueTable, Row, Tabs, Toast, VersionTag, type Column, type Tone } from '../../components/ui'
+import { MasterDetail, Card, Field, Notice, PageHeader, Pill, QueueTable, Row, Tabs, Toast, VersionTag, type Column, type Tone } from '../../components/ui'
 import { questionBank, surveyTemplates, type ContentState, type SurveyTemplate } from '../../mock/program'
 import { notify } from '../../mock/store'
 
@@ -30,9 +30,9 @@ export default function SurveyBuilder() {
     <>
       <Toast message={toast} />
       <PageHeader eyebrow="Configuration · Physician / program admin" title="Survey templates" description="Build surveys from the question bank, add scoring and branching, and publish versions. Publishing clinical content requires an authorized clinical publisher (Dr. D.)." actions={<button className="btn-primary" onClick={() => notify('New template started as a draft')}><Plus size={16} /> New template</button>} />
-      <div className="grid gap-5 xl:grid-cols-5">
-        <div className="xl:col-span-2"><QueueTable rows={surveyTemplates} columns={columns} rowKey={(r) => r.id + r.version} rowTone={(r) => stateTone[r.state]} onRowClick={setSel} /></div>
-        <div className="xl:col-span-3">
+      <MasterDetail>
+        <div><QueueTable rows={surveyTemplates} columns={columns} rowKey={(r) => r.id + r.version} rowTone={(r) => stateTone[r.state]} onRowClick={setSel} /></div>
+        <div>
           <Card title={<span className="flex items-center gap-2">{sel.name} <VersionTag>v{sel.version}</VersionTag> <Pill tone={stateTone[sel.state]}>{sel.state}</Pill></span>} subtitle={`${sel.type} · ${sel.questions} questions · last change ${sel.updatedBy}, ${sel.updatedAt}${sel.publishedBy ? ` · published by ${sel.publishedBy}` : ''}`}
             actions={<div className="flex gap-2">{sel.state === 'Draft' && <button onClick={() => show('Sent for clinical review')} className="btn-secondary px-3 py-1.5 text-xs"><Send size={14} /> Send for review</button>}{sel.state === 'In review' && <button onClick={() => show('Approved by Dr. D.')} className="btn-secondary px-3 py-1.5 text-xs">Approve</button>}{sel.state === 'Approved' && <button onClick={() => show('Published as v' + (sel.version) + ' · previous version retired')} className="btn-primary px-3 py-1.5 text-xs">Publish (Dr. D.)</button>}{sel.state === 'Published' && <button onClick={() => show('Draft v' + (sel.version + 1) + ' created')} className="btn-secondary px-3 py-1.5 text-xs">New draft version</button>}</div>}>
             <div className="mb-4"><StateFlow state={sel.state} /></div>
@@ -82,7 +82,7 @@ export default function SurveyBuilder() {
             )}
           </Card>
         </div>
-      </div>
+      </MasterDetail>
     </>
   )
 }

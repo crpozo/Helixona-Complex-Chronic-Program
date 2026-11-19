@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Card, Field, Notice, PageHeader, Pill, QueueTable, Tabs, VersionTag, type Column } from '../../components/ui'
+import { MasterDetail, Card, Field, Notice, PageHeader, Pill, QueueTable, Tabs, VersionTag, type Column } from '../../components/ui'
 import { alertRules, levelTone, type AlertRule } from '../../mock/program'
 import { stateTone } from './SurveyBuilder'
 import { notify } from '../../mock/store'
@@ -21,9 +21,9 @@ export default function AlertRules() {
       <PageHeader eyebrow="Configuration · Physician" title="Alert rules" description="What creates an alert, how urgent it is, who is notified, and how fast a response is expected. Rules are layered; the most specific layer wins and the applied layer is always shown on the alert." actions={<button className="btn-primary" onClick={() => notify('New alert rule started as a draft')}>+ New rule</button>} />
       <Tabs value={tab} onChange={setTab} tabs={[{ key: 'rules', label: 'Rules', count: alertRules.length }, { key: 'precedence', label: 'Precedence view' }, { key: 'levels', label: 'Levels & labels' }]} />
       {tab === 'rules' && (
-        <div className="grid gap-5 xl:grid-cols-5">
-          <div className="xl:col-span-3"><QueueTable rows={alertRules} columns={columns} rowKey={(r) => r.id} rowTone={(r) => levelTone[r.level]} onRowClick={setSel} /></div>
-          <div className="xl:col-span-2">
+        <MasterDetail>
+          <div><QueueTable rows={alertRules} columns={columns} rowKey={(r) => r.id} rowTone={(r) => levelTone[r.level]} onRowClick={setSel} /></div>
+          <div>
             <Card title={<span className="flex items-center gap-2">{sel.name} <VersionTag>v{sel.version}</VersionTag></span>} subtitle={`${sel.id} · layer: ${sel.layer} · scope: ${sel.scope}`} actions={<Pill tone={stateTone[sel.state]}>{sel.state}</Pill>}>
               <div className="grid gap-3">
                 <Field label="Trigger"><input className="input" defaultValue={sel.trigger} /></Field>
@@ -40,7 +40,7 @@ export default function AlertRules() {
               </div>
             </Card>
           </div>
-        </div>
+        </MasterDetail>
       )}
       {tab === 'precedence' && (
         <div className="grid gap-5 xl:grid-cols-3">

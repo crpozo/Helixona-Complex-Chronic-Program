@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Send } from 'lucide-react'
-import { Card, Field, PageHeader, Pill, QueueTable, Tabs, Toast, VersionTag, type Column } from '../../components/ui'
+import { MasterDetail, Card, Field, PageHeader, Pill, QueueTable, Tabs, Toast, VersionTag, type Column } from '../../components/ui'
 import { deliveryLog, messageTemplates, type DeliveryLog, type MessageTemplate } from '../../mock/program'
 import { stateTone, StateFlow } from '../config/SurveyBuilder'
 import { notify } from '../../mock/store'
@@ -32,9 +32,9 @@ export default function MessageTemplates() {
       <PageHeader eyebrow="Configuration · Program admin" title="Message templates" description="Every email and text is a configuration record: event, audience, channel, timing, template with merge fields, stop rule. Patient messages carry the minimum information needed." actions={<button className="btn-primary" onClick={() => notify('New message template started as a draft')}>+ New template</button>} />
       <Tabs value={tab} onChange={setTab} tabs={[{ key: 'templates', label: 'Templates', count: messageTemplates.length }, { key: 'log', label: 'Delivery log' }]} />
       {tab === 'templates' ? (
-        <div className="grid gap-5 xl:grid-cols-5">
-          <div className="xl:col-span-3"><QueueTable rows={messageTemplates} columns={columns} rowKey={(r) => r.id} rowTone={(r) => stateTone[r.state]} onRowClick={setSel} /></div>
-          <div className="xl:col-span-2">
+        <MasterDetail>
+          <div><QueueTable rows={messageTemplates} columns={columns} rowKey={(r) => r.id} rowTone={(r) => stateTone[r.state]} onRowClick={setSel} /></div>
+          <div>
             <Card title={<span className="flex items-center gap-2">{sel.name} <VersionTag>v{sel.version}</VersionTag></span>} subtitle={`${sel.event} → ${sel.audience} · ${sel.channel}`} actions={<Pill tone={stateTone[sel.state]}>{sel.state}</Pill>}>
               <div className="mb-3"><StateFlow state={sel.state} /></div>
               <div className="grid gap-3">
@@ -48,7 +48,7 @@ export default function MessageTemplates() {
               </div>
             </Card>
           </div>
-        </div>
+        </MasterDetail>
       ) : (
         <>
           <QueueTable rows={deliveryLog} columns={logCols} rowKey={(r) => r.id} rowTone={(r) => (r.result === 'Failed' ? 'bad' : r.result === 'Opted out' ? 'warn' : 'ok')} />

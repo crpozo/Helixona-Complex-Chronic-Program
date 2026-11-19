@@ -24,3 +24,11 @@
 | 2026-11-18 | “Month 0” is shown as “A&P” in the interface | Requirements and CLAUDE.md wording (Month 0) | Clinic status sheet |
 | 2026-11-18 | Inquiries have their own statuses and page; Accepted adds the person to the patient list | Earlier flow where the advisor created a patient record directly from an inquiry | Clinic inquiry sheet; staff confused inquiries with patients |
 | 2026-11-18 | Patients report a Flare or a Crash plus impact on daily activities, instead of a 0–10 severity | Crash report severity scale | Clinic definitions sheet |
+
+## Nov 19, 2026 — Medications and flare reporting briefs
+
+- Source: `docs/source/HCOS_Medication_Module.md` and `docs/source/HCOS_Flare_Reporting.md` (clinic exports dated Nov 17, 2026).
+- The daily "I took it / I skipped it" log requested on Nov 18 is replaced by status per item plus a monthly confirmation, as the newer brief asks.
+- The flare brief proposes a five-level functional scale; the mockup keeps the clinic sheet's four-level impact question (Nov 18). To reconcile with the Medical Director.
+- The safety check lists chest pain and trouble breathing as warning signs that stop the report. They are still not offered as symptoms to document, in line with the Nov 12 rule.
+- List + detail configuration screens (modalities, survey templates, alert rules, message templates, booking exceptions, AI Agent exceptions) now show the list at full width with the detail in a side panel.

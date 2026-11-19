@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Card, Field, MultiSelect, PageHeader, Pill, QueueTable, Row, Tabs, ToConfirm, VersionTag, type Column } from '../../components/ui'
+import { MasterDetail, Card, Field, MultiSelect, PageHeader, Pill, QueueTable, Row, Tabs, ToConfirm, VersionTag, type Column } from '../../components/ui'
 import { modalities, type Modality } from '../../mock/program'
 import { actorCatalog, ecwFor, locations, pathways, stages } from '../../mock/roadmap'
 import { sessionOptions } from '../../mock/billing'
@@ -23,9 +23,9 @@ export default function ModalityConfig() {
   return (
     <>
       <PageHeader eyebrow="Configuration · Program admin / physician" title="Modalities" description="One record per modality is the shared source for scheduling, surveys, patient instructions, consents and monitoring (requirements §9). Rooms and devices are separate resources." actions={<button className="btn-primary" onClick={() => notify('New modality started · fill in its details and save')}>+ Add modality</button>} />
-      <div className="grid gap-5 xl:grid-cols-5">
-        <div className="xl:col-span-2"><QueueTable rows={modalities} columns={columns} rowKey={(r) => r.id} rowTone={(r) => (r.active ? 'ok' : 'neutral')} onRowClick={setSel} /></div>
-        <div className="xl:col-span-3">
+      <MasterDetail>
+        <div><QueueTable rows={modalities} columns={columns} rowKey={(r) => r.id} rowTone={(r) => (r.active ? 'ok' : 'neutral')} onRowClick={setSel} /></div>
+        <div>
           <Card title={<span className="flex items-center gap-2">{sel.name} <VersionTag>config v{sel.version}</VersionTag></span>} subtitle={`${sel.id} · ${sel.category} · owner ${sel.owner}`} actions={<div className="flex gap-2"><button className="btn-secondary px-3 py-1.5 text-xs" onClick={() => notify('Audit history opened · every change with who and when')}>Audit history</button><button className="btn-primary px-3 py-1.5 text-xs" onClick={() => notify('Saved as a new version · goes live when published')}>Save as v{sel.version + 1}</button></div>}>
             <Tabs value={tab} onChange={setTab} tabs={[{ key: 'identity', label: 'Identity' }, { key: 'poc', label: 'Care plan' }, { key: 'sched', label: 'Scheduling' }, { key: 'prep', label: 'Prep' }, { key: 'survey', label: 'Follow-up' }, { key: 'alerts', label: 'Alerts' }, { key: 'docs', label: 'Documents' }]} />
             {tab === 'identity' && <div className="grid gap-4 sm:grid-cols-2"><Field label="Display name"><input className="input" defaultValue={sel.name} /></Field><Field label="Category"><input className="input" defaultValue={sel.category} /></Field>
@@ -46,7 +46,7 @@ export default function ModalityConfig() {
             {tab === 'docs' && <div className="space-y-3"><Row label="Required before first session">{sel.documents.join(', ') || 'None'}</Row><Row label="Re-sign when">Document version changes</Row><div className="mt-2"><ToConfirm>consent list and versions from Shibani</ToConfirm></div></div>}
           </Card>
         </div>
-      </div>
+      </MasterDetail>
     </>
   )
 }

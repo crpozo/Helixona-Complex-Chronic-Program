@@ -1,7 +1,9 @@
+import { notify } from '../../../mock/store'
+import { briefing, lastVisit, nextVisit } from '../../../mock/medications'
 import { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Award, Flame, Pill as PillIcon, Sparkles, Sun, TrendingDown, TrendingUp, Trophy, Waves, Zap, Droplets, Syringe, Wind, Activity } from 'lucide-react'
-import { Breadcrumb, Card, Notice, PageHeader, Pill, Row, VersionTag } from '../../../components/ui'
+import { Breadcrumb, Card, Notice, PageHeader, Pill, Row, ToConfirm, VersionTag } from '../../../components/ui'
 import { patientById } from '../../../mock/patients'
 import { nameOf } from '../../../mock/names'
 import { alerts, levelTone } from '../../../mock/program'
@@ -128,9 +130,18 @@ export function ScoresPanel({ id }: { id: string }) {
           <Row label="Prescription changes">{events.filter((e) => e.kind === 'rx').length}</Row>
           <Row label="Days since last crash">{daysSinceCrash ?? '—'}</Row>
         </Card>
-        <Card title="Medications and supplements" subtitle="What was ordered, when it started, and whether the patient reports taking it.">
-          <ul className="divide-y divide-sand-100">{([['Low-dose naltrexone · 3 mg', 'Dr. D. · started Jun 15', 6], ['Cholestyramine · 4 g', 'Dr. D. · started Aug 24', 5], ['Levothyroxine · 75 mcg', 'Dr. Patel · before the program', 7], ['Magnesium glycinate · 400 mg', 'Dr. D. · started Jun 22', 5], ['Vitamin D3 · 5,000 IU', 'Dr. D. · started Jun 22', 6], ['Omega-3 · 2 g', 'Dr. D. · started Sep 28', 7]] as [string, string, number][]).map(([n, d, t]) => <li key={n} className="flex items-center justify-between gap-3 py-2 text-sm"><span><span className="block font-medium text-sand-900">{n}</span><span className="block text-xs text-sand-500">{d}</span></span><span className={`whitespace-nowrap text-xs font-semibold ${t >= 6 ? 'text-ok-700' : 'text-warn-700'}`}>{t} of 7 days</span></li>)}</ul>
-          <p className="help mt-2">Taken as reported by the patient in the app, last 7 days.</p>
+        <Card title="Since the last visit" subtitle={`Plan vs. actual · ${lastVisit} to the next visit on ${nextVisit}`}>
+          <div className="grid grid-cols-3 gap-2 text-center">{([['Recommended', briefing.recommended.length, 'text-sand-900'], ['Started', briefing.started.length, 'text-ok-700'], ['Not started', briefing.notStarted.length, 'text-bad-700']] as [string, number, string][]).map(([l, n, c]) => <div key={l} className="rounded-xl bg-sand-50 py-2"><div className={`text-2xl font-semibold ${c}`}>{n}</div><div className="text-[11px] text-sand-500">{l}</div></div>)}</div>
+          <div className="eyebrow mt-4">Started</div>
+          <ul className="mt-1 space-y-1 text-sm">{briefing.started.map((m) => <li key={m.id}><span className="font-medium text-sand-900">{m.name}</span> <span className="text-sand-600">· {m.status.toLowerCase()}{m.frequency ? `, ${m.frequency.toLowerCase()}` : ''} · since {m.started}</span></li>)}</ul>
+          <div className="eyebrow mt-3">Not started</div>
+          <ul className="mt-1 space-y-1 text-sm">{briefing.notStarted.map((m) => <li key={m.id}><span className="font-medium text-bad-700">{m.name}</span> <span className="text-sand-600">· {m.status.toLowerCase()} · {m.reason?.toLowerCase()} · {m.obtained}</span></li>)}</ul>
+          <div className="eyebrow mt-3">Other changes</div>
+          <ul className="mt-1 space-y-1 text-sm">{briefing.other.map((m) => <li key={m.id}><span className="font-medium text-sand-900">{m.name}</span> <span className="text-sand-600">· added by the patient {m.ordered} · not yet reviewed</span></li>)}{briefing.unconfirmed.map((m) => <li key={m.id}><span className="font-medium text-sand-900">{m.name}</span> <span className="text-warn-700">· not recently confirmed (last {m.confirmed})</span></li>)}</ul>
+          <div className="eyebrow mt-3">For today's visit</div>
+          <ul className="mt-1 list-disc space-y-1 pl-4 text-sm text-sand-700">{briefing.forToday.map((t) => <li key={t}>{t}</li>)}</ul>
+          <p className="help mt-3">As reported by the patient. A report never changes an order; the list is confirmed at the visit by the MA or physician.</p>
+          <div className="mt-2 flex flex-wrap gap-2"><button className="btn-secondary text-xs" onClick={() => notify('List marked as reviewed at the visit')}>Mark list reviewed</button><ToConfirm>Fullscript and pharmacy fill data, interaction screening source</ToConfirm></div>
         </Card>
         <Card title="Alerts for this patient">
           {pAlerts.length === 0 && <p className="help">No alerts.</p>}

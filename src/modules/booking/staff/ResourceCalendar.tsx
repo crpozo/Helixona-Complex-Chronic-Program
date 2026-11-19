@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react'
-import { Card, Field, Notice, PageHeader, Pill, QueueTable, Row, Stat, Tabs, ToConfirm, type Column, type Tone } from '../../../components/ui'
+import { MasterDetail, Card, Field, Notice, PageHeader, Pill, QueueTable, Row, Stat, Tabs, ToConfirm, type Column, type Tone } from '../../../components/ui'
 import { bookings as sample, type Booking } from '../../../mock/program'
 import { nameOf } from '../../../mock/names'
 import { notify } from '../../../mock/store'
@@ -130,10 +130,10 @@ export default function ResourceCalendar() {
           )}
         </>
       ) : (
-        <div className="grid gap-5 xl:grid-cols-5">
-          <div className="xl:col-span-3"><QueueTable rows={exceptions} columns={cols} rowKey={(r) => r.id} rowTone={(r) => statusTone[r.status]} onRowClick={setSel} /></div>
-          <div className="xl:col-span-2">{sel && <BookingCard b={sel} show={show} />}</div>
-        </div>
+        <MasterDetail>
+          <div><QueueTable rows={exceptions} columns={cols} rowKey={(r) => r.id} rowTone={(r) => statusTone[r.status]} onRowClick={setSel} /></div>
+          <div>{sel && <BookingCard b={sel} show={show} />}</div>
+        </MasterDetail>
       )}
     </>
   )

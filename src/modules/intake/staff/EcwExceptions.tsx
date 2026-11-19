@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Camera, CheckCheck, RotateCw } from 'lucide-react'
-import { Card, Field, Notice, PageHeader, Pill, QueueTable, Row, Stat, Tabs, Toast, type Column } from '../../../components/ui'
+import { MasterDetail, Card, Field, Notice, PageHeader, Pill, QueueTable, Row, Stat, Tabs, Toast, type Column } from '../../../components/ui'
 import { ecwJobs } from '../../../mock/ecwJobs'
 import type { EcwJob } from '../../../mock/types'
 import { nameOf } from '../../../mock/names'
@@ -14,7 +14,7 @@ export default function EcwExceptions() {
   const rows = jobs.filter((j) => (tab === 'open' ? j.status !== 'closed' : j.status === 'closed'))
 
   const columns: Column<EcwJob>[] = [
-    { key: 'id', header: 'Job', render: (r) => <><div className="font-semibold text-sand-900">{r.id}</div><div className="text-xs text-sand-500">{r.queuedAt}</div></>, width: '150px' },
+    { key: 'id', header: 'Job', render: (r) => <><div className="font-semibold text-sand-900">{r.id}</div><div className="whitespace-nowrap text-xs text-sand-500">{r.queuedAt}</div></> },
     { key: 'type', header: 'Job type', render: (r) => <span className="text-sand-800">{r.type}</span> },
     { key: 'p', header: 'Patient', render: (r) => <span className="font-medium">{nameOf(r.patientId)}</span> },
     { key: 'step', header: 'Failed step', render: (r) => r.failedStep },
@@ -36,9 +36,9 @@ export default function EcwExceptions() {
         <Stat label="eCW client" value="Web" hint="to confirm" tone="warn" />
       </div>
       <Tabs value={tab} onChange={setTab} tabs={[{ key: 'open', label: 'Open', count: jobs.filter((j) => j.status !== 'closed').length }, { key: 'closed', label: 'Closed', count: jobs.filter((j) => j.status === 'closed').length }]} />
-      <div className="grid gap-5 lg:grid-cols-5">
-        <div className="lg:col-span-3"><QueueTable rows={rows} columns={columns} rowKey={(r) => r.id} rowTone={(r) => (r.status === 'closed' ? 'ok' : r.severity === 'critical' ? 'bad' : 'warn')} onRowClick={setSel} /></div>
-        <div className="lg:col-span-2">
+      <MasterDetail>
+        <div><QueueTable rows={rows} columns={columns} rowKey={(r) => r.id} rowTone={(r) => (r.status === 'closed' ? 'ok' : r.severity === 'critical' ? 'bad' : 'warn')} onRowClick={setSel} /></div>
+        <div>
           {sel ? (
             <Card title={`${sel.id} · ${sel.type}`} subtitle={`Patient ${sel.patientId} · queued ${sel.queuedAt}`}>
               <Notice tone={sel.severity === 'critical' ? 'bad' : 'warn'} title={sel.failedStep}>{sel.detail}</Notice>
@@ -65,7 +65,7 @@ export default function EcwExceptions() {
             </Card>
           ) : <Card><p className="help">Select an exception to see details.</p></Card>}
         </div>
-      </div>
+      </MasterDetail>
     </>
   )
 }
