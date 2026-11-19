@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Check, EyeOff, FileText, Sparkles, Upload, UserCheck, UserPlus } from 'lucide-react'
-import { Breadcrumb, Card, Field, Notice, Pill, Row, ToConfirm, toneFor } from '../../../components/ui'
+import { Check, ChevronDown, EyeOff, FileText, Sparkles, Upload, UserCheck, UserPlus } from 'lucide-react'
+import { Breadcrumb, Card, Field, Notice, Row, ToConfirm } from '../../../components/ui'
 import { ageOf } from '../../../mock/demographics'
+import { statusLook } from './InquiryList'
 import type { Inquiry, InquiryStatus } from '../../../mock/types'
 import { addInquiry, currentUser, inquiryById, inquiryStatuses, notify, patchInquiry, useStore, insuranceOf, insurancePlans, priorityOf, inquiryAge, preferredName, fmtDate, fmtTime, interviewLinkSent, interviewOf, sendInterviewLink } from '../../../mock/store'
 
@@ -65,7 +66,12 @@ export default function InquiryDetail() {
             <p className="mt-0.5 text-sm text-sand-600">{isNew ? 'Record a call or a walk-in the same way the website form does. Nothing is sent to the person.' : `Received ${inq!.receivedAt} · no chart, no invitation and no charges until accepted.`}</p>
           </div>
           {!isNew && <div className="flex flex-wrap items-center gap-2">
-            <Pill tone={toneFor(status)}>{status}</Pill>
+            <label className="flex items-center gap-2 text-xs font-medium text-sand-600">Status
+              <span className="relative inline-flex items-center">
+                <select aria-label="Change status" value={status} onChange={(e) => setStatus(e.target.value as InquiryStatus)} style={{ color: statusLook[status].color, background: statusLook[status].tint, borderColor: statusLook[status].color + '66' }} className="cursor-pointer appearance-none rounded-full border py-2 pl-4 pr-9 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-teal-400">{inquiryStatuses.map((st) => <option key={st} value={st}>{st}</option>)}</select>
+                <ChevronDown size={15} className="pointer-events-none absolute right-3" style={{ color: statusLook[status].color }} />
+              </span>
+            </label>
             {owner === 'Unassigned'
               ? <button onClick={() => { patchInquiry(inq!.id, { owner: me.name }); notify('This inquiry is now yours') }} className="btn-primary"><UserCheck size={15} /> Take ownership</button>
               : <span className="inline-flex items-center gap-2 rounded-full border border-sand-300 bg-white px-3 py-1.5 text-sm"><UserCheck size={14} className="text-teal-700" />Owner: <strong>{owner}</strong>{owner !== me.name && <button onClick={() => { patchInquiry(inq!.id, { owner: me.name }); notify(`Taken over from ${owner} · recorded`) }} className="text-xs text-teal-700 underline">take over</button>}</span>}
@@ -201,7 +207,7 @@ export default function InquiryDetail() {
                 <Link to="/staff/interviews" className="btn-ghost text-sm">My interview hours</Link>
               </div>
             </Card>}
-            <Card title="Status" subtitle="In order. Choose where this inquiry is now.">
+            <Card title="Status" subtitle="In order. Click a step to move this inquiry there.">
               <ol className="space-y-1">
                 {inquiryStatuses.map((st, i) => { const cur = inquiryStatuses.indexOf(status); const on = st === status; const done = i < cur && !['Waitlisted', 'Denied'].includes(status); return (
                   <li key={st}><button onClick={() => setStatus(st)} aria-current={on} className={`flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-sm ${on ? 'bg-sand-900 font-semibold text-white' : 'text-sand-700 hover:bg-sand-100'}`}>

@@ -5,7 +5,7 @@ import { PageHeader, Pill, QueueTable, Tabs, toneFor, type Column } from '../../
 import type { Inquiry, InquiryStatus } from '../../../mock/types'
 
 /** One color and icon per inquiry status, so the row of counts reads at a glance. The label always stays. */
-const statusLook: Record<InquiryStatus, { color: string; tint: string; Icon: LucideIcon }> = {
+export const statusLook: Record<InquiryStatus, { color: string; tint: string; Icon: LucideIcon }> = {
   'Lead received': { color: '#3b6ea5', tint: '#e3edf7', Icon: Inbox },
   'Waiting for response': { color: '#b06a12', tint: '#fbecd2', Icon: MessageCircle },
   'Pending information': { color: '#c2571a', tint: '#fbe3d3', Icon: FileQuestion },
