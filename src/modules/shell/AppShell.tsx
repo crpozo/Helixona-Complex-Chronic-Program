@@ -56,7 +56,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <div key={g} className="mt-3">
                   <button onClick={() => setCollapsed(closed ? collapsed.filter((x) => x !== g) : [...collapsed, g])} aria-expanded={!closed} className="flex w-full items-center justify-between px-2 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-white/45 hover:text-white/80">{g}<ChevronDown size={12} className={`transition-transform ${closed ? '-rotate-90' : ''}`} /></button>
                   {!closed && its.map((n) => (
-                    <NavLink key={n.to} to={n.to} className={({ isActive }) => `mt-0.5 flex items-center rounded-lg px-3 py-2 text-sm ${isActive ? 'bg-white/10 font-semibold text-white shadow-[inset_3px_0_0_#d4b77a]' : 'text-white/70 hover:bg-white/5 hover:text-white'}`}>{n.label}</NavLink>
+                    <NavLink key={n.to} to={n.to} className={({ isActive }) => `mt-0.5 flex items-center rounded-lg px-3 py-2 text-sm ${isActive ? 'bg-teal-400 font-semibold text-sand-900' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}>{n.label}</NavLink>
                   ))}
                 </div>) })}
             </nav>

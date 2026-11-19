@@ -1,8 +1,20 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, UserCheck, X } from 'lucide-react'
+import { Ban, CalendarCheck, CheckCircle2, ClipboardList, FileQuestion, Hourglass, Inbox, MessageCircle, Search, UserCheck, X, type LucideIcon } from 'lucide-react'
 import { PageHeader, Pill, QueueTable, Tabs, toneFor, type Column } from '../../../components/ui'
-import type { Inquiry } from '../../../mock/types'
+import type { Inquiry, InquiryStatus } from '../../../mock/types'
+
+/** One color and icon per inquiry status, so the row of counts reads at a glance. The label always stays. */
+const statusLook: Record<InquiryStatus, { color: string; tint: string; Icon: LucideIcon }> = {
+  'Lead received': { color: '#3b6ea5', tint: '#e3edf7', Icon: Inbox },
+  'Waiting for response': { color: '#b06a12', tint: '#fbecd2', Icon: MessageCircle },
+  'Pending information': { color: '#c2571a', tint: '#fbe3d3', Icon: FileQuestion },
+  'Interview scheduled': { color: '#6f4b8a', tint: '#ece2f1', Icon: CalendarCheck },
+  'Waiting for admission review': { color: '#8a6d1f', tint: '#f3eadb', Icon: ClipboardList },
+  'Accepted': { color: '#2f7a4f', tint: '#dcefe3', Icon: CheckCircle2 },
+  'Waitlisted': { color: '#1f7a82', tint: '#d8eef0', Icon: Hourglass },
+  'Denied': { color: '#b4382e', tint: '#f9dcd9', Icon: Ban },
+}
 import { allInquiries, currentUser, inquiryDate, inquiryStatuses, notify, patchInquiry, useStore, insuranceOf, priorityOf, inquiryAge, preferredName } from '../../../mock/store'
 
 /** Inquiries: people who asked about Helixona and are not patients. One tile per status (counts follow the
@@ -58,10 +70,14 @@ export default function InquiryList() {
         <span className="text-xs text-sand-500">{inPeriod.length} inquiries in this period</span>
       </div>
       <div className="mb-5 grid grid-cols-2 gap-2.5 sm:grid-cols-4 xl:grid-cols-8">
-        {inquiryStatuses.map((st) => { const n = byPath.filter((i) => i.status === st).length; const on = status === st; return (
-          <button key={st} onClick={() => setStatus(on ? 'All' : st)} aria-pressed={on} className={`card p-3 text-left transition-colors ${on ? 'border-sand-900 bg-teal-50 shadow-[0_0_0_1px_#141414]' : 'hover:border-sand-400'}`}>
-            <div className="text-2xl font-semibold text-sand-900">{n}</div>
-            <div className="mt-0.5 text-[12px] leading-tight text-sand-600">{st}</div>
+        {inquiryStatuses.map((st) => { const n = byPath.filter((i) => i.status === st).length; const on = status === st; const { color, tint, Icon } = statusLook[st]; return (
+          <button key={st} onClick={() => setStatus(on ? 'All' : st)} aria-pressed={on} style={{ borderColor: on ? color : undefined, background: on ? tint : undefined, boxShadow: on ? `0 0 0 1px ${color}` : undefined }} className={`card relative overflow-hidden p-3 pt-3.5 text-left transition-all hover:-translate-y-0.5 hover:shadow-md ${n === 0 ? 'opacity-60' : ''}`}>
+            <span className="absolute inset-x-0 top-0 h-1" style={{ background: color }} />
+            <div className="flex items-start justify-between gap-2">
+              <div className="text-[26px] font-semibold leading-none" style={{ color }}>{n}</div>
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg" style={{ background: tint, color }}><Icon size={15} /></span>
+            </div>
+            <div className="mt-2 text-[12px] font-medium leading-tight text-sand-700">{st}</div>
           </button>) })}
       </div>
 
