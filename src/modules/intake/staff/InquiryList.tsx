@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Ban, CalendarCheck, CheckCircle2, ClipboardList, FileQuestion, Hourglass, Inbox, MessageCircle, Search, UserCheck, X, type LucideIcon } from 'lucide-react'
+import { ChevronDown, Ban, CalendarCheck, CheckCircle2, ClipboardList, FileQuestion, Hourglass, Inbox, MessageCircle, Search, UserCheck, X, type LucideIcon } from 'lucide-react'
 import { PageHeader, Pill, QueueTable, Tabs, toneFor, type Column } from '../../../components/ui'
 import type { Inquiry, InquiryStatus } from '../../../mock/types'
 
@@ -49,7 +49,14 @@ export default function InquiryList() {
     { key: 'age', header: 'Age', className: 'hidden min-[1400px]:table-cell', render: (r) => <span className="text-sm text-sand-700">{inquiryAge(r)}</span> },
     { key: 'received', header: <span className="block w-[74px] whitespace-normal leading-snug">Inquiry received</span>, className: 'hidden min-[1200px]:table-cell', render: (r) => <span className="whitespace-nowrap text-sm text-sand-700">{r.receivedAt.split(' · ')[0].replace(', 2026', '')}</span> },
     { key: 'city', header: 'City / State', className: 'hidden min-[1400px]:table-cell', render: (r) => <span className="whitespace-nowrap text-sm text-sand-700">{r.city}, {r.state}</span> },
-    { key: 'status', header: 'Status', render: (r) => <Pill tone={toneFor(r.status)} className="whitespace-nowrap">{r.status}</Pill> },
+    { key: 'status', header: 'Status', render: (r) => { const look = statusLook[r.status]; return (
+      <span className="relative inline-flex items-center" onClick={(e) => e.stopPropagation()}>
+        <select aria-label={`Change status of ${r.name}`} title="Change status" value={r.status} onChange={(e) => { const st = e.target.value as InquiryStatus; patchInquiry(r.id, { status: st }); if (st === 'Denied') { notify('Denied · give the reason on the inquiry'); nav(`/staff/inquiries/${r.id}`) } else notify(`${r.name} · ${st}${st === 'Accepted' ? ' · open the inquiry to add to the patient list' : ''}`) }}
+          style={{ color: look.color, background: look.tint, borderColor: look.color + '55' }} className="cursor-pointer appearance-none whitespace-nowrap rounded-full border py-1 pl-3 pr-7 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-400">
+          {inquiryStatuses.map((st) => <option key={st} value={st}>{st}</option>)}
+        </select>
+        <ChevronDown size={13} className="pointer-events-none absolute right-2.5" style={{ color: look.color }} />
+      </span>) } },
     { key: 'ins', header: 'Insurance', render: (r) => <span className="whitespace-nowrap text-sm text-sand-700">{insuranceOf(r)}</span> },
     { key: 'prio', header: 'Priority', render: (r) => priorityOf(r) ? <Pill tone={priorityOf(r) === 'High' ? 'bad' : priorityOf(r) === 'Mid' ? 'warn' : 'neutral'} dot={false}>{priorityOf(r)}</Pill> : <span className="text-sand-400">—</span> },
     { key: 'pathway', header: 'Looking for', className: 'hidden min-[1600px]:table-cell', render: (r) => <span className="block max-w-[150px] text-sm leading-snug text-sand-700">{r.pathway === 'Complex Chronic' ? 'Chronic or Complex Chronic' : 'Health Optimization'}</span> },
@@ -84,8 +91,8 @@ export default function InquiryList() {
       <Tabs value={tab} onChange={setTab} tabs={[{ key: 'all', label: 'All', count: inPeriod.length }, { key: 'cc', label: 'Chronic or Complex Chronic', count: inPeriod.filter((i) => i.pathway === 'Complex Chronic').length }, { key: 'ho', label: 'Health Optimization', count: inPeriod.filter((i) => i.pathway !== 'Complex Chronic').length }]} />
       <div className="card mb-3 flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3">
         <label className="relative min-w-[240px] flex-1"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-sand-400" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name, city or what they are struggling with" className="input w-full py-2 pl-9" /></label>
-        {sel('Status', status, setStatus, ['All', ...inquiryStatuses])}
-        {sel('Owner', owner, setOwner, ['All', 'Mine', 'Unassigned', ...new Set(all.map((i) => i.owner).filter((o) => o !== 'Unassigned'))])}
+        {sel('Filter by status', status, setStatus, ['All', ...inquiryStatuses])}
+        {sel('Filter by owner', owner, setOwner, ['All', 'Mine', 'Unassigned', ...new Set(all.map((i) => i.owner).filter((o) => o !== 'Unassigned'))])}
         {active > 0 && <button onClick={() => { setQ(''); setStatus('All'); setOwner('All') }} className="btn-ghost whitespace-nowrap px-2 py-1 text-xs"><X size={13} /> Clear {active}</button>}
       </div>
       <QueueTable rows={rows} columns={columns} rowKey={(r) => r.id} rowTone={(r) => (r.owner === 'Unassigned' ? 'bad' : toneFor(r.status))} onRowClick={(r) => nav(`/staff/inquiries/${r.id}`)} empty="No inquiries match." />
