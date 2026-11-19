@@ -97,3 +97,12 @@ export function takePatient(id: string) { ownerOf[id] = currentUser().name; logE
 const programOf: Record<string, string> = {}
 export const patientProgram = (id: string) => programOf[id]
 export function setProgram(id: string, program: string) { programOf[id] = program; emit() }
+
+/** Type of insurance for an inquiry (sample values until the inquiry form supplies it). */
+const sampleInsurance = ['Blue Shield PPO', 'Cash', 'Aetna PPO', 'Anthem Blue Cross PPO', 'Cash', 'Cigna PPO', 'UnitedHealthcare PPO', 'Medicare']
+export const insuranceOf = (i: { id: string }) => sampleInsurance[Number(i.id.replace(/\D/g, '')) % sampleInsurance.length]
+const n = (i: { id: string }) => Number(i.id.replace(/\D/g, ''))
+/** Age and preferred name for an inquiry (sample values until the inquiry form supplies them). */
+export const inquiryAge = (i: { id: string }) => 28 + (n(i) * 7) % 41
+const nicknames: Record<string, string> = { Robert: 'Rob', Thomas: 'Tom', Jordan: 'Jordy', Hannah: 'Hanna', Grace: 'Gracie' }
+export const preferredName = (i: { id: string; name: string }) => (n(i) % 3 === 0 ? undefined : nicknames[i.name.split(' ')[0]])
