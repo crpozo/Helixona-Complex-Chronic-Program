@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Search, UserCheck, X } from 'lucide-react'
 import { PageHeader, Pill, QueueTable, Tabs, toneFor, type Column } from '../../../components/ui'
 import type { Inquiry } from '../../../mock/types'
-import { allInquiries, currentUser, inquiryDate, inquiryStatuses, notify, patchInquiry, useStore, insuranceOf, inquiryAge, preferredName } from '../../../mock/store'
+import { allInquiries, currentUser, inquiryDate, inquiryStatuses, notify, patchInquiry, useStore, insuranceOf, priorityOf, inquiryAge, preferredName } from '../../../mock/store'
 
 /** Inquiries: people who asked about Helixona and are not patients. One tile per status (counts follow the
  *  chosen period), ownership, and a page per inquiry with the data the advisor collects. */
@@ -34,11 +34,12 @@ export default function InquiryList() {
 
   const columns: Column<Inquiry>[] = [
     { key: 'who', header: 'Name', render: (r) => <><div className="whitespace-nowrap text-[15px] font-semibold text-sand-900">{r.name}</div>{preferredName(r) && <div className="whitespace-nowrap text-xs text-sand-500">Goes by {preferredName(r)}</div>}</> },
-    { key: 'age', header: 'Age', className: 'hidden min-[1300px]:table-cell', render: (r) => <span className="text-sm text-sand-700">{inquiryAge(r)}</span> },
-    { key: 'received', header: <span className="block w-[74px] whitespace-normal leading-snug">Inquiry received</span>, render: (r) => <span className="whitespace-nowrap text-sm text-sand-700">{r.receivedAt.split(' · ')[0].replace(', 2026', '')}</span> },
-    { key: 'city', header: 'City / State', className: 'hidden min-[1200px]:table-cell', render: (r) => <span className="whitespace-nowrap text-sm text-sand-700">{r.city}, {r.state}</span> },
+    { key: 'age', header: 'Age', className: 'hidden min-[1400px]:table-cell', render: (r) => <span className="text-sm text-sand-700">{inquiryAge(r)}</span> },
+    { key: 'received', header: <span className="block w-[74px] whitespace-normal leading-snug">Inquiry received</span>, className: 'hidden min-[1200px]:table-cell', render: (r) => <span className="whitespace-nowrap text-sm text-sand-700">{r.receivedAt.split(' · ')[0].replace(', 2026', '')}</span> },
+    { key: 'city', header: 'City / State', className: 'hidden min-[1400px]:table-cell', render: (r) => <span className="whitespace-nowrap text-sm text-sand-700">{r.city}, {r.state}</span> },
     { key: 'status', header: 'Status', render: (r) => <Pill tone={toneFor(r.status)} className="whitespace-nowrap">{r.status}</Pill> },
     { key: 'ins', header: 'Insurance', render: (r) => <span className="whitespace-nowrap text-sm text-sand-700">{insuranceOf(r)}</span> },
+    { key: 'prio', header: 'Priority', render: (r) => priorityOf(r) ? <Pill tone={priorityOf(r) === 'High' ? 'bad' : priorityOf(r) === 'Mid' ? 'warn' : 'neutral'} dot={false}>{priorityOf(r)}</Pill> : <span className="text-sand-400">—</span> },
     { key: 'pathway', header: 'Looking for', className: 'hidden min-[1600px]:table-cell', render: (r) => <span className="block max-w-[150px] text-sm leading-snug text-sand-700">{r.pathway === 'Complex Chronic' ? 'Chronic or Complex Chronic' : 'Health Optimization'}</span> },
     { key: 'owner', header: 'Owner', render: (r) => r.owner === 'Unassigned'
       ? <button onClick={(e) => { e.stopPropagation(); patchInquiry(r.id, { owner: me.name }); notify(`${r.name} is now yours`) }} className="btn-secondary whitespace-nowrap px-3 py-1.5 text-[11px]"><UserCheck size={13} /> Take it</button>

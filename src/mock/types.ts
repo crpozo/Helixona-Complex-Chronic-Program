@@ -72,6 +72,8 @@ export interface Inquiry {
   owner: string
   patientId?: string
   nextAction?: string
+  insurance?: string
+  priority?: string
 }
 
 export interface EcwJob {

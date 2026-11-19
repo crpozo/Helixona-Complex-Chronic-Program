@@ -99,8 +99,13 @@ export const patientProgram = (id: string) => programOf[id]
 export function setProgram(id: string, program: string) { programOf[id] = program; emit() }
 
 /** Type of insurance for an inquiry (sample values until the inquiry form supplies it). */
-const sampleInsurance = ['Blue Shield PPO', 'Cash', 'Aetna PPO', 'Anthem Blue Cross PPO', 'Cash', 'Cigna PPO', 'UnitedHealthcare PPO', 'Medicare']
-export const insuranceOf = (i: { id: string }) => sampleInsurance[Number(i.id.replace(/\D/g, '')) % sampleInsurance.length]
+/** The PPO plans the clinic accepts (list supplied by the patient advisor, Nov 19, 2026). */
+export const insurancePlans = ['Anthem', 'Medicare', 'Medicare w/ BC PPO', 'Medicare w/ BS PPO', 'Medicare w/ UH PPO', 'BlueCross BlueShield', 'Blue Shield-Platinum', 'Blue Shield-Gold', 'Blue Shield-Silver', 'Blue Shield-Bronze', 'Blue Shield', 'Cov Cal-BS-Silver', 'Cov Cal-BS-Gold', 'Cov Cal-BS-Platinum', 'Cov Cal-BS', 'Cigna PPO', 'United Healthcare PPO']
+const sampleInsurance = ['Blue Shield-Gold', 'Cash', 'Anthem', 'Cigna PPO', 'Cash', 'Medicare w/ BS PPO', 'United Healthcare PPO', 'Cov Cal-BS-Silver']
+const num = (i: { id: string }) => Number(i.id.replace(/\D/g, ''))
+export const insuranceOf = (i: { id: string; insurance?: string }) => i.insurance ?? sampleInsurance[num(i) % sampleInsurance.length]
+const samplePriority = ['High', '', 'Mid', 'Low', 'High', 'Mid']
+export const priorityOf = (i: { id: string; priority?: string }) => i.priority ?? samplePriority[num(i) % samplePriority.length]
 const n = (i: { id: string }) => Number(i.id.replace(/\D/g, ''))
 /** Age and preferred name for an inquiry (sample values until the inquiry form supplies them). */
 export const inquiryAge = (i: { id: string }) => 28 + (n(i) * 7) % 41

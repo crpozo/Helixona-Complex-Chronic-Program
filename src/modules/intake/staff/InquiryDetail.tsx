@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Check, EyeOff, FileText, Sparkles, Upload, UserCheck, UserPlus } from 'lucide-react'
-import { Breadcrumb, Card, Field, Notice, Pill, Row, toneFor } from '../../../components/ui'
+import { Breadcrumb, Card, Field, Notice, Pill, Row, ToConfirm, toneFor } from '../../../components/ui'
 import { ageOf } from '../../../mock/demographics'
 import type { Inquiry, InquiryStatus } from '../../../mock/types'
-import { addInquiry, currentUser, inquiryById, inquiryStatuses, notify, patchInquiry, useStore, insuranceOf, inquiryAge, preferredName, fmtDate, fmtTime, interviewLinkSent, interviewOf, sendInterviewLink } from '../../../mock/store'
+import { addInquiry, currentUser, inquiryById, inquiryStatuses, notify, patchInquiry, useStore, insuranceOf, insurancePlans, priorityOf, inquiryAge, preferredName, fmtDate, fmtTime, interviewLinkSent, interviewOf, sendInterviewLink } from '../../../mock/store'
 
 /** One inquiry: the data the advisor collects before admission (as listed by the clinic), the internal
  *  assessment, and the status. This is NOT a patient record; accepting it is what adds the person to the patient list. */
@@ -12,6 +12,12 @@ const heardWithName = ['Friend', 'Patient', 'Physician', 'Chat board']
 const heardOptions = ['Friend', 'Patient', 'Physician', 'Chat board', 'Google search', 'Instagram', 'Facebook', 'Helixona website', 'Event or talk', 'Other']
 const seg = (on: boolean) => `flex-1 whitespace-nowrap rounded-xl border px-3 py-2.5 text-sm font-medium ${on ? 'border-teal-500 bg-teal-50 text-sand-900' : 'border-sand-300 bg-white text-sand-600 hover:border-sand-400'}`
 const zips: Record<string, [string, string]> = { '92618': ['Irvine', 'CA'], '92660': ['Newport Beach', 'CA'], '92691': ['Mission Viejo', 'CA'], '92651': ['Laguna Beach', 'CA'], '92653': ['Laguna Hills', 'CA'], '92626': ['Costa Mesa', 'CA'], '92705': ['Santa Ana', 'CA'], '92648': ['Huntington Beach', 'CA'], '92782': ['Tustin', 'CA'], '92677': ['Laguna Niguel', 'CA'], '89101': ['Las Vegas', 'NV'], '85001': ['Phoenix', 'AZ'] }
+
+const fmtPhone = (v: string) => { const d = v.replace(/\D/g, '').slice(0, 10); return d.length > 6 ? `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}` : d.length > 3 ? `(${d.slice(0, 3)}) ${d.slice(3)}` : d }
+const money = (k1: string, k2: string, input: (k: string, ph?: string) => React.ReactNode) => <div className="flex items-center gap-2"><span className="text-sand-500">$</span>{input(k1, 'Total')}<span className="whitespace-nowrap text-xs text-sand-500">met $</span>{input(k2, 'Amount met')}</div>
+function UploadSlot({ label, value, onPick }: { label: string; value?: string; onPick: (name: string) => void }) {
+  return <label className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2.5 text-sm ${value ? 'border-ok-600/30 bg-ok-100 text-ok-700' : 'border-dashed border-sand-300 bg-sand-50 text-sand-700 hover:bg-sand-100'}`}>{value ? <Check size={15} /> : <Upload size={15} />}<span className="min-w-0 flex-1 truncate"><strong>{label}</strong>{value ? ` · ${value}` : ''}</span><span className="text-xs">{value ? 'Replace' : 'Upload'}</span><input type="file" className="hidden" onChange={(e) => { const n = e.target.files?.[0]?.name; if (n) onPick(n) }} /></label>
+}
 
 function Choice3({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: string[] }) {
   return <div className="flex gap-2">{options.map((o) => <button key={o} type="button" onClick={() => onChange(o)} aria-pressed={value === o} className={seg(value === o)}>{o}</button>)}</div>
@@ -26,10 +32,10 @@ export default function InquiryDetail() {
   const isNew = id === 'new'
   const inq = isNew ? undefined : inquiryById(id)
   const [f, setF] = useState<Record<string, string>>((): Record<string, string> => inq ? {
-    first: inq.name.split(' ')[0], last: inq.name.split(' ').slice(1).join(' '), preferred: preferredName(inq) ?? '', dob: `${2026 - inquiryAge(inq)}-03-14`, sex: '', street: '', zip: Object.keys(zips).find((z) => zips[z][0] === inq.city) ?? '', city: inq.city, state: inq.state, phone: '(949) 555-0100', email: `${inq.name.split(' ')[0].toLowerCase()}@example.com`,
+    first: inq.name.split(' ')[0], last: inq.name.split(' ').slice(1).join(' '), preferred: preferredName(inq) ?? '', dob: `${2026 - inquiryAge(inq)}-03-14`, sex: '', street: '', zip: Object.keys(zips).find((z) => zips[z][0] === inq.city) ?? '', city: inq.city, state: inq.state, phone: '(949) 555-0100', inDedTotal: '1,500', inDedMet: '900', inOopTotal: '5,000', inOopMet: '1,800', email: `${inq.name.split(' ')[0].toLowerCase()}@example.com`,
     path: inq.pathway === 'Complex Chronic' ? 'chronic' : 'optimization', payer: insuranceOf(inq) === 'Cash' ? 'Cash' : 'Insurance', insurer: insuranceOf(inq) === 'Cash' ? '' : insuranceOf(inq), oonDoc: 'Not yet', dedTotal: '3,000', dedMet: '1,250', oopTotal: '8,000', oopMet: '2,400',
     heard: /Referral · Dr/.test(inq.source) ? 'Physician' : /existing patient/.test(inq.source) ? 'Patient' : /Instagram/.test(inq.source) ? 'Instagram' : /Google/.test(inq.source) ? 'Google search' : 'Helixona website', heardName: /Dr\. Patel/.test(inq.source) ? 'Dr. Patel' : '',
-    struggling: inq.reason, history: '', howLong: 'More than 2 years', specialists: '4', commit: 'Yes', iv: 'Discuss', submitted: '2026-10-06', screened: '', level: '', priority: '', advisorNotes: '', teamReview: '', decisionDate: '', notified: '', denyReason: '', goal: '', goalOther: '', heardDetails: '',
+    struggling: inq.reason, history: '', howLong: 'More than 2 years', specialists: '4', commit: 'Yes', iv: 'Discuss', submitted: '2026-10-06', screened: '', level: '', priority: priorityOf(inq), advisorNotes: '', teamReview: '', decisionDate: '', notified: '', denyReason: '', goal: '', goalOther: '', heardDetails: '',
   } : { path: '', payer: '', commit: '', iv: '', heard: '', submitted: '2026-10-09', oonDoc: 'Not yet' })
   const set = (k: string, v: string) => setF((x) => ({ ...x, [k]: v }))
   const setZip = (v: string) => setF((x) => ({ ...x, zip: v, ...(zips[v] ? { city: zips[v][0], state: zips[v][1] } : {}) }))
@@ -92,7 +98,7 @@ export default function InquiryDetail() {
               <div className="sm:col-span-2"><Field label="ZIP code" hint="Fills in the city and state"><input className="input" inputMode="numeric" maxLength={5} value={f.zip ?? ''} placeholder="92618" onChange={(e) => setZip(e.target.value.replace(/\D/g, ''))} /></Field></div>
               <div className="sm:col-span-3"><Field label="City">{input('city')}</Field></div>
               <div className="sm:col-span-1"><Field label="State">{input('state')}</Field></div>
-              <div className="sm:col-span-3"><Field label="Phone" required>{input('phone')}</Field></div>
+              <div className="sm:col-span-3"><Field label="Phone" required hint="Type the digits only"><input className="input" inputMode="numeric" placeholder="9495550100" value={f.phone ?? ''} onChange={(e) => set('phone', fmtPhone(e.target.value))} /></Field></div>
               <div className="sm:col-span-3"><Field label="Email">{input('email', '', 'email')}</Field></div>
             </div>
           </Card>
@@ -100,12 +106,19 @@ export default function InquiryDetail() {
           <Card title="Insurance">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Cash or insurance patient?" required><Choice3 value={f.payer ?? ''} onChange={(v) => set('payer', v)} options={['Insurance', 'Cash']} /></Field>
-              {f.payer !== 'Cash' && <Field label="Insurance company">{input('insurer')}</Field>}
+              {f.payer !== 'Cash' && <Field label="Insurance plan"><select className="input" value={insurancePlans.includes(f.insurer ?? '') || !f.insurer ? f.insurer ?? '' : 'Other'} onChange={(e) => { set('insurer', e.target.value); if (inq && e.target.value !== 'Other') patchInquiry(inq.id, { insurance: e.target.value }) }}><option value="">Select…</option>{insurancePlans.map((p) => <option key={p}>{p}</option>)}<option>Other</option></select>
+                {f.insurer === 'Other' && <input autoFocus className="input mt-2" placeholder="Type the insurance plan" value={f.insurerOther ?? ''} onChange={(e) => set('insurerOther', e.target.value)} />}</Field>}
             </div>
             {f.payer !== 'Cash' && <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <Field label="In-network deductible · this year">{money('inDedTotal', 'inDedMet', input)}</Field>
+              <Field label="In-network out-of-pocket maximum · this year">{money('inOopTotal', 'inOopMet', input)}</Field>
+              <Field label="Out-of-network deductible · this year">{money('dedTotal', 'dedMet', input)}</Field>
+              <Field label="Out-of-network out-of-pocket maximum · this year">{money('oopTotal', 'oopMet', input)}</Field>
+              <div><div className="label">Primary insurance card</div><div className="grid gap-2 sm:grid-cols-2"><UploadSlot label="Front" value={f.card1f} onPick={(n) => set('card1f', n)} /><UploadSlot label="Back" value={f.card1b} onPick={(n) => set('card1b', n)} /></div></div>
+              <div><div className="label">Secondary / supplemental card</div><div className="grid gap-2 sm:grid-cols-2"><UploadSlot label="Front" value={f.card2f} onPick={(n) => set('card2f', n)} /><UploadSlot label="Back" value={f.card2b} onPick={(n) => set('card2b', n)} /></div></div>
+              <div><div className="label">Insurance plan document</div><UploadSlot label="Plan document" value={f.planDoc} onPick={(n) => { set('planDoc', n); set('oonDoc', 'Yes') }} /></div>
+              <div><div className="label">Insurance plan analysis</div><UploadSlot label="Plan analysis" value={f.planAnalysis} onPick={(n) => set('planAnalysis', n)} /><p className="help mt-1">Needed for the admissions meeting.</p></div>
               <div className="sm:col-span-2"><Field label="Out-of-network plan document submitted (if applicable)"><Choice3 value={f.oonDoc ?? ''} onChange={(v) => set('oonDoc', v)} options={['Yes', 'Not yet', 'Does not apply']} /></Field></div>
-              <Field label="Out-of-network deductible · this year"><div className="flex items-center gap-2"><span className="text-sand-500">$</span>{input('dedTotal', 'Deductible')}<span className="whitespace-nowrap text-xs text-sand-500">met $</span>{input('dedMet', 'Amount met')}</div></Field>
-              <Field label="Out-of-network out-of-pocket maximum · this year"><div className="flex items-center gap-2"><span className="text-sand-500">$</span>{input('oopTotal', 'Maximum')}<span className="whitespace-nowrap text-xs text-sand-500">met $</span>{input('oopMet', 'Amount met')}</div></Field>
             </div>}
           </Card>
 
@@ -122,7 +135,7 @@ export default function InquiryDetail() {
               <div className="sm:col-span-2"><Field label="What they are struggling with right now" required><textarea rows={2} className="input" value={f.struggling ?? ''} onChange={(e) => set('struggling', e.target.value)} /></Field></div>
               <div className="sm:col-span-2"><Field label="Health history"><textarea rows={3} className="input" value={f.history ?? ''} onChange={(e) => set('history', e.target.value)} placeholder="Diagnoses, treatments tried, what helped" /></Field></div>
               <Field label="How long have they been struggling"><select className="input" value={f.howLong ?? ''} onChange={(e) => set('howLong', e.target.value)}><option value="">Select…</option>{['Less than 6 months', '6 to 12 months', '1 to 2 years', 'More than 2 years', 'More than 5 years'].map((o) => <option key={o}>{o}</option>)}</select></Field>
-              <Field label="How many specialists they have seen">{input('specialists', '', 'number')}</Field>
+              <Field label="How many specialists they have seen"><select className="input" value={f.specialists ?? ''} onChange={(e) => set('specialists', e.target.value)}><option value="">Select…</option>{['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10+', '20+'].map((n) => <option key={n}>{n}</option>)}</select></Field>
               <Field label="Willing to commit time to treatment 1–3 times per week"><Choice3 value={f.commit ?? ''} onChange={(v) => set('commit', v)} options={['Yes', 'No', 'Discuss']} /></Field>
               <Field label="Willing to receive IV infusions if recommended"><Choice3 value={f.iv ?? ''} onChange={(v) => set('iv', v)} options={['Yes', 'No', 'Discuss']} /></Field>
             </div>
@@ -150,7 +163,8 @@ export default function InquiryDetail() {
               <Field label="Application / inquiry submitted">{input('submitted', '', 'date')}</Field>
               <Field label="Assessment / screening complete">{input('screened', '', 'date')}</Field>
               <Field label="Patient level"><Choice3 value={f.level ?? ''} onChange={(v) => set('level', v)} options={['1', '2', '3']} /></Field>
-              <Field label="Patient priority"><Choice3 value={f.priority ?? ''} onChange={(v) => set('priority', v)} options={['High', 'Mid', 'Low']} /></Field>
+              <Field label="Patient priority"><Choice3 value={f.priority ?? ''} onChange={(v) => { set('priority', v); if (inq) patchInquiry(inq.id, { priority: v }) }} options={['High', 'Mid', 'Low']} /></Field>
+              <div className="sm:col-span-2"><Field label="Patient interaction & mutual respect assessment" hint="1 is the lowest, 5 the highest. Completed by the advisor after the interview."><div className="grid grid-cols-5 gap-2">{['1', '2', '3', '4', '5'].map((n) => <button key={n} type="button" aria-pressed={f.respect === n} onClick={() => set('respect', n)} className={`rounded-xl border py-2.5 text-sm font-semibold ${f.respect === n ? 'border-teal-500 bg-teal-50 text-sand-900' : 'border-sand-300 bg-white text-sand-700'}`}>{n}</button>)}</div></Field><div className="mt-2"><ToConfirm>the wording of each of the five levels</ToConfirm></div></div>
               <div className="sm:col-span-2"><Field label="New patient advisor’s assessment notes"><textarea rows={3} className="input" value={f.advisorNotes ?? ''} onChange={(e) => set('advisorNotes', e.target.value)} /></Field></div>
               <div className="sm:col-span-2"><Field label="Admission team’s review, notes and decision"><textarea rows={3} className="input" value={f.teamReview ?? ''} onChange={(e) => set('teamReview', e.target.value)} placeholder="Who reviewed, what was discussed, the decision" /></Field></div>
               <div className="sm:col-span-2 rounded-2xl border border-sand-200 bg-sand-50 p-4">
