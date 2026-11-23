@@ -170,14 +170,14 @@ export default function CrashReport() {
             {trig.includes('A recent treatment or therapy') && <div className="mt-3 rounded-xl border border-sand-300 p-3"><div className="text-[15px] font-semibold text-sand-900">Which treatment?</div><div className="mt-2 space-y-2">{recentTreatments.map((t) => <Choice key={t} label={t} selected={treatment === t} onClick={() => setTreatment(t)} />)}</div></div>}
             {trig.includes('Medication or supplement change') && <div className="mt-3 rounded-xl border border-sand-300 p-3"><div className="text-[15px] font-semibold text-sand-900">Which one?</div><div className="mt-2 space-y-2">{seedMeds.filter((m) => m.sinceLastVisit || m.source === 'Added by me').map((m) => <Choice key={m.id} multiple label={`${m.name} · ${m.status.toLowerCase()}`} selected={med.includes(m.id)} onClick={() => toggle(med, setMed, m.id)} />)}</div></div>}
           </Field>
-          <Field label={<Q>What would you like us to do with this report?</Q>} required><div className="space-y-2">{support.map((o) => <Choice key={o.v} size="lg" label={o.l} selected={contact === o.v} onClick={() => setContact(o.v)} />)}</div>{contact === 'Yes' && <p className="mt-2 rounded-xl bg-teal-50 px-3 py-2 text-sm text-sand-700">When you send this report, your care team gets a message in the clinic's medical record system, so the right person sees it and calls you during office hours.</p>}</Field>
+          <Field label={<Q>What would you like us to do with this report?</Q>} required><div className="space-y-2">{support.map((o) => <Choice key={o.v} size="lg" label={o.l} selected={contact === o.v} onClick={() => setContact(o.v)} />)}</div><div className="mt-3 rounded-xl bg-teal-50 px-4 py-3 text-sm leading-relaxed text-sand-800"><div className="font-semibold text-sand-900">What happens next?</div><p className="mt-1">Your care team will receive your report and review it during office hours. If you've requested a call, please allow <strong>1–2 business days</strong> for someone to contact you.</p><p className="mt-2">If your symptoms are getting worse or you need medical attention sooner, please call our office directly at (949) 257-2644. Do not wait for a response to this report.</p></div></Field>
         </div>}
 
         {step > 1 && step < 5 && <button disabled={!canNext} onClick={next} className="btn-primary btn-lg mt-8 w-full">Continue</button>}
         {step === 5 && <button disabled={!contact} onClick={() => setSent(true)} className="btn-primary btn-lg mt-8 w-full">Send report</button>}
         {step > 1 && <>
-          <p className="mt-3 text-center text-xs leading-relaxed text-sand-500">Flare reports are reviewed by your care team during office hours (Mon–Fri 8 AM–5 PM); responses are not immediate. If you need to speak with someone, please call the office at (949) 257-2644.</p>
-          <p className="mt-2 text-center text-sm font-semibold text-bad-700">If you have chest pain or severe shortness of breath, call 911.</p>
+          <p className="mt-3 text-center text-xs leading-relaxed text-sand-500">Reports are reviewed during office hours (Mon–Fri, 8 AM–5 PM). This form is not monitored for urgent medical needs.</p>
+          <p className="mt-2 text-center text-sm font-semibold text-bad-700">For concerns that cannot wait, call (949) 257-2644. For a medical emergency, call 911.</p>
         </>}
       </div>
     </PhoneFrame>

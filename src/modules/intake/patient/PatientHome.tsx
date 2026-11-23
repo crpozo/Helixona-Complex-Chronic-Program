@@ -9,8 +9,20 @@ import { myPlan } from '../../../mock/roadmap'
 
 export default function PatientHome() {
   const [flare, setFlare] = useState<'Flare' | 'Crash' | null>('Flare')
+  /* Once a month the app asks the patient to confirm the medication list. Dismissing it hides it for this visit. */
+  const [medPrompt, setMedPrompt] = useState(() => { try { return sessionStorage.getItem('hlx-med-prompt') !== 'off' } catch { return true } })
+  const closeMedPrompt = () => { setMedPrompt(false); try { sessionStorage.setItem('hlx-med-prompt', 'off') } catch { /* ignore */ } }
   return (
     <PhoneFrame>
+      {medPrompt && <div className="absolute inset-0 z-30 flex items-end bg-sand-900/40" role="dialog" aria-modal="true" aria-label="Monthly medication check-in">
+        <div className="w-full rounded-t-3xl bg-white p-5 pb-7">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-teal-50 text-teal-700"><PillIcon size={20} /></span>
+          <h2 className="mt-3 font-display text-2xl font-semibold text-sand-900">Monthly medication check-in</h2>
+          <p className="mt-1 text-[15px] text-sand-600">It has been a month since you confirmed your medications and supplements. Are you still taking everything as listed, or has something changed?</p>
+          <Link to="/patient/medications" onClick={closeMedPrompt} className="btn-primary btn-lg mt-4 w-full">Review my list</Link>
+          <button onClick={closeMedPrompt} className="btn-ghost mt-2 w-full">Remind me later</button>
+        </div>
+      </div>}
       <div className="px-5 pt-12 pb-8">
         <div className="flex items-center justify-between"><Wordmark size="sm" /><span className="text-xs text-sand-500">Marisol A.</span></div>
         <h1 className="mt-6 font-display text-[26px] font-semibold text-sand-900">Good evening, Marisol</h1>
@@ -52,7 +64,7 @@ export default function PatientHome() {
           {([
             ['/patient/survey', 'Daily health check-in', 'About one minute · 3 recent treatments to review', <HeartPulse size={16} />],
             ['/patient/crash', 'Report a flare or crash', 'Anytime · reviewed during office hours', <Siren size={16} />],
-            ['/patient/medications', 'Medications & supplements', 'What your doctor ordered · mark what you took today', <PillIcon size={16} />],
+            ['/patient/medications', 'Medications & supplements', 'Monthly check-in due · 5 new since your last visit', <PillIcon size={16} />],
             ['/patient/book', 'Book a session', 'Nano bath Thu Oct 9 · 9:00 AM confirmed', <CalendarCheck size={16} />],
             ['/patient/agreement', 'Membership agreement & payment', 'Available once your program is offered', <FileSignature size={16} />],
             ['/patient/payments', 'Payments & receipts', 'Next: $2,000 on Nov 1', <Receipt size={16} />],

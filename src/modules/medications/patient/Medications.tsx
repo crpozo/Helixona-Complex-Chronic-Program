@@ -8,6 +8,15 @@ import { catalog, frequencies, needsReason, reasons, seedMeds, statuses, statusT
 /** My Medications & Supplements. Shows what was ordered, whether it was obtained, and what the patient reports
  *  actually taking. The patient reports changes when they happen and confirms the whole list once a month;
  *  nothing here changes the doctor's order. */
+const whatHappened: { label: string; status?: MedStatus; reason?: string }[] = [
+  { label: 'I have not started it yet', status: 'Not started' },
+  { label: 'I paused it', status: 'Paused' },
+  { label: 'I stopped taking it', status: 'Stopped' },
+  { label: 'I ran out and have not refilled it', status: 'Paused', reason: 'I ran out and have not refilled it' },
+  { label: 'My prescription expired', status: 'Paused', reason: 'My prescription expired' },
+  { label: 'I decided not to start it', status: 'Decided not to start' },
+  { label: 'I am still taking it · I missed the box' },
+]
 type Mode = 'list' | 'confirm' | 'review' | 'add'
 const TODAY = 'Oct 9, 2026'
 
@@ -19,7 +28,11 @@ export default function Medications() {
   const [checkedIn, setCheckedIn] = useState(false)
   const [checked, setChecked] = useState<string[]>([])
   const [q, setQ] = useState('')
-  const [draft, setDraft] = useState<{ name: string; kind: MedKind; from: string }>({ name: '', kind: 'Supplement', from: 'Started on my own' })
+  const [diff, setDiff] = useState<Record<string, string>>({})
+  const [extra, setExtra] = useState<Record<string, string>>({})
+  const [what, setWhat] = useState<Record<string, string>>({})
+  const [touched, setTouched] = useState(false)
+  const [draft, setDraft] = useState<{ name: string; kind: MedKind; from: string }>({ name: '', kind: 'Supplement', from: 'I started it on my own' })
 
   const patch = (id: string, p: Partial<Med>) => setMeds((ms) => ms.map((m) => (m.id === id ? { ...m, ...p, confirmed: TODAY, stale: false } : m)))
   const confirmAll = (ids: string[]) => { setMeds((ms) => ms.map((m) => (ids.includes(m.id) ? { ...m, confirmed: TODAY, stale: false } : m))); setCheckedIn(true); setMode('list') }
@@ -41,18 +54,30 @@ export default function Medications() {
     </PhoneFrame>
   )
 
-  if (mode === 'review') return (
+  if (mode === 'review') {
+    const unchecked = meds.filter((m) => !checked.includes(m.id))
+    const asking = touched ? unchecked : []
+    const ready = touched && unchecked.every((m) => what[m.id])
+    const finish = () => {
+      setMeds((ms) => ms.map((m) => { if (checked.includes(m.id)) return { ...m, confirmed: TODAY, stale: false }; const w = whatHappened.find((x) => x.label === what[m.id]); return w ? { ...m, status: w.status ?? m.status, reason: w.reason ?? m.reason, confirmed: TODAY, stale: false } : m }))
+      setCheckedIn(true); setMode('list')
+    }
+    return (
     <PhoneFrame>
       <PatientTopBar title="Review my full list" back={back} />
       <div className="px-5 pb-8">
         <h1 className="font-display text-2xl font-semibold text-sand-900">Check what you are still taking</h1>
-        <p className="mt-1 text-[15px] text-sand-600">Leaving one unchecked does not mark it as stopped. To stop or change one, open it on your list.</p>
-        <button onClick={() => setChecked(checked.length === meds.length ? [] : meds.map((m) => m.id))} className="btn-secondary mt-4 w-full">{checked.length === meds.length ? 'Clear all' : 'Select all'}</button>
-        <div className="mt-3 space-y-2">{meds.map((m) => <Choice key={m.id} multiple size="lg" label={`${m.name} · ${m.dose}`} selected={checked.includes(m.id)} onClick={() => setChecked(checked.includes(m.id) ? checked.filter((x) => x !== m.id) : [...checked, m.id])} />)}</div>
-        <button disabled={checked.length === 0} onClick={() => confirmAll(checked)} className="btn-primary btn-lg mt-5 w-full">Confirm {checked.length} of {meds.length}</button>
+        <p className="mt-1 text-[15px] text-sand-600">For anything you leave unchecked, we will ask what happened.</p>
+        <button onClick={() => { setTouched(true); setChecked(checked.length === meds.length ? [] : meds.map((m) => m.id)) }} className="btn-secondary mt-4 w-full">{checked.length === meds.length ? 'Clear all' : 'Select all'}</button>
+        <div className="mt-3 space-y-2">{meds.map((m) => <div key={m.id}>
+          <Choice multiple size="lg" label={`${m.name} · ${m.dose}`} selected={checked.includes(m.id)} onClick={() => { setTouched(true); setChecked(checked.includes(m.id) ? checked.filter((x) => x !== m.id) : [...checked, m.id]) }} />
+          {asking.includes(m) && <div className="ml-3 mt-2 rounded-xl border border-warn-600/30 bg-warn-100/60 p-3"><div className="text-sm font-semibold text-sand-900">What happened with {m.name}? <span className="text-bad-600">*</span></div><div className="mt-2 space-y-2">{whatHappened.map((w) => <Choice key={w.label} label={w.label} selected={what[m.id] === w.label} onClick={() => setWhat({ ...what, [m.id]: w.label })} />)}</div></div>}
+        </div>)}</div>
+        <button disabled={!ready} onClick={finish} className="btn-primary btn-lg mt-5 w-full">Confirm my list</button>
+        {touched && !ready && <p className="mt-2 text-center text-xs text-sand-500">Tell us what happened with each unchecked item to finish.</p>}
       </div>
     </PhoneFrame>
-  )
+  ) }
 
   if (mode === 'add') {
     const hits = q.length > 1 ? catalog.filter((c) => c.toLowerCase().includes(q.toLowerCase())) : []
@@ -61,7 +86,7 @@ export default function Medications() {
         <PatientTopBar title="Add to my list" back={back} />
         <div className="px-5 pb-8">
           <h1 className="font-display text-2xl font-semibold text-sand-900">What are you taking?</h1>
-          <p className="mt-1 text-[15px] text-sand-600">Add anything from another doctor or that you started on your own.</p>
+          <p className="mt-1 text-[15px] text-sand-600">Add anything that is missing from your list: from a Helixona provider, another doctor, or started on your own.</p>
           <div className="relative mt-4"><Search size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sand-400" /><input className="input pl-10 text-[16px]" placeholder="Search by name" value={q} onChange={(e) => { setQ(e.target.value); setDraft({ ...draft, name: e.target.value }) }} /></div>
           {hits.length > 0 && <ul className="mt-2 divide-y divide-sand-100 rounded-xl border border-sand-200 bg-white">{hits.map((h) => <li key={h}><button className="w-full px-4 py-3 text-left text-[15px]" onClick={() => { setDraft({ ...draft, name: h }); setQ(h) }}>{h}</button></li>)}</ul>}
           <p className="mt-2 text-sm text-sand-500">Don't see yours? Type the name exactly as it is on the bottle.</p>
@@ -69,8 +94,8 @@ export default function Medications() {
           <div className="mt-5 text-[15px] font-semibold text-sand-900">What is it?</div>
           <div className="mt-2 grid grid-cols-2 gap-2">{(['Medication', 'Supplement'] as const).map((k) => <Choice key={k} label={k} selected={draft.kind === k} onClick={() => setDraft({ ...draft, kind: k })} />)}</div>
           <div className="mt-4 text-[15px] font-semibold text-sand-900">Where is it from?</div>
-          <div className="mt-2 space-y-2">{['Started on my own', 'Another doctor'].map((f) => <Choice key={f} label={f} selected={draft.from === f} onClick={() => setDraft({ ...draft, from: f })} />)}</div>
-          <button disabled={!draft.name.trim()} onClick={() => { const id = `x${meds.length}`; setMeds([...meds, { id, name: draft.name.trim(), dose: 'Dose not entered', when: '', kind: draft.kind, source: 'Added by me', orderedBy: draft.from, ordered: TODAY, obtained: 'Reported by you', status: 'Taking regularly', started: TODAY, confirmed: TODAY, note: 'Your care team will review this with the rest of your list' }]); setQ(''); setDraft({ ...draft, name: '' }); setOpen(id); setMode('list') }} className="btn-primary btn-lg mt-6 w-full">Add to my list</button>
+          <div className="mt-2 space-y-2">{['A Helixona provider prescribed it', 'Another doctor prescribed it', 'I started it on my own'].map((f) => <Choice key={f} label={f} selected={draft.from === f} onClick={() => setDraft({ ...draft, from: f })} />)}</div>
+          <button disabled={!draft.name.trim()} onClick={() => { const id = `x${meds.length}`; setMeds([...meds, { id, name: draft.name.trim(), dose: 'Dose not entered', when: '', kind: draft.kind, source: 'Added by me', orderedBy: draft.from, ordered: TODAY, obtained: 'Reported by you', status: 'Taking as directed', started: TODAY, confirmed: TODAY, note: 'Your care team will review this with the rest of your list' }]); setQ(''); setDraft({ ...draft, name: '' }); setOpen(id); setMode('list') }} className="btn-primary btn-lg mt-6 w-full">Add to my list</button>
           <p className="mt-3 text-xs leading-relaxed text-sand-500">Your care team checks new items against the rest of your list. Do not stop a prescribed medicine because of something you read here; message the clinic.</p>
         </div>
       </PhoneFrame>
@@ -92,20 +117,26 @@ export default function Medications() {
               <div className="mt-3 space-y-2">
                 <button onClick={() => setMode('confirm')} className="btn-primary w-full">No changes · I'm still taking everything as listed</button>
                 <button onClick={() => document.getElementById('med-list')?.scrollIntoView({ behavior: 'smooth' })} className="btn-secondary w-full">Something changed</button>
-                <button onClick={() => { setChecked([]); setMode('review') }} className="btn-secondary w-full">Review my full list</button>
+                <button onClick={() => { setChecked([]); setWhat({}); setTouched(false); setMode('review') }} className="btn-secondary w-full">Review my full list</button>
               </div>
             </div>}
+
+        <div className="mt-5 rounded-2xl border border-teal-300 bg-teal-50 p-4">
+          <div className="eyebrow">New since your last visit · Sep 21</div>
+          {(['Medication', 'Supplement'] as const).map((k) => { const items = meds.filter((m) => m.sinceLastVisit && m.kind === k); return items.length === 0 ? null : <div key={k} className="mt-3"><div className="text-[15px] font-semibold text-sand-900">New {k.toLowerCase()}s · {items.length}</div><ul className="mt-1 divide-y divide-teal-200">{items.map((m) => <li key={m.id} className="flex items-center justify-between gap-2 py-2"><span className="min-w-0"><span className="block truncate text-sm font-medium text-sand-900">{m.name} · {m.dose}</span><span className="block text-xs text-sand-600">{m.status}{m.started ? ` · started ${m.started.replace(', 2026', '')}` : ''}</span></span><button onClick={() => { setFilter('All'); setOpen(m.id); setTimeout(() => document.getElementById('med-' + m.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50) }} className="shrink-0 rounded-full border border-sand-900 bg-white px-3 py-1.5 text-xs font-semibold text-sand-900">Update</button></li>)}</ul></div> })}
+          <p className="mt-2 text-xs text-sand-600">Have you started each one? Tell us so your provider knows before your next visit.</p>
+        </div>
 
         <div className="mt-5 grid grid-cols-3 gap-1 rounded-xl bg-sand-100 p-1" role="tablist">{(['All', 'Medication', 'Supplement'] as const).map((k) => <button key={k} role="tab" aria-selected={filter === k} onClick={() => setFilter(k)} className={`rounded-lg py-2 text-sm font-medium ${filter === k ? 'bg-white text-sand-900 shadow-sm' : 'text-sand-600'}`}>{k === 'All' ? 'All' : `${k}s`} · {meds.filter((m) => k === 'All' || m.kind === k).length}</button>)}</div>
 
         <ul id="med-list" className="mt-3 space-y-3">
           {list.map((m) => { const isOpen = open === m.id; return (
-            <li key={m.id} className="card overflow-hidden">
+            <li key={m.id} id={`med-${m.id}`} className="card scroll-mt-4 overflow-hidden">
               <button onClick={() => setOpen(isOpen ? null : m.id)} aria-expanded={isOpen} className="flex w-full items-start gap-3 p-4 text-left">
                 <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sand-100 text-sand-700">{m.kind === 'Medication' ? <PillIcon size={16} /> : <Leaf size={16} />}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-[16px] font-semibold text-sand-900">{m.name} <span className="font-normal text-sand-600">· {m.dose}</span></span>
-                  <span className="mt-1 flex flex-wrap items-center gap-1.5"><Pill tone={statusTone(m.status)} dot={false}>{m.status}{m.status === 'Taking sometimes' && m.frequency ? ` · ${m.frequency.toLowerCase()}` : ''}</Pill>{m.stale && <span className="inline-flex items-center gap-1 text-xs font-medium text-warn-700"><Clock size={12} /> Not recently confirmed</span>}</span>
+                  <span className="mt-1 flex flex-wrap items-center gap-1.5"><Pill tone={statusTone(m.status)} dot={false}>{m.status}{m.status === 'Taking inconsistently' && m.frequency ? ` · ${m.frequency.toLowerCase()}` : ''}</Pill>{m.stale && <span className="inline-flex items-center gap-1 text-xs font-medium text-warn-700"><Clock size={12} /> Not recently confirmed</span>}</span>
                 </span>
                 <ChevronDown size={18} className={`mt-1 shrink-0 text-sand-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -119,12 +150,23 @@ export default function Medications() {
                 </dl>
                 {m.note && <p className="mt-2 rounded-lg bg-sand-100 px-3 py-2 text-xs text-sand-700">{m.note}</p>}
                 <div className="mt-4 text-[15px] font-semibold text-sand-900">Update what I'm taking</div>
-                <div className="mt-2 grid grid-cols-2 gap-2">{statuses.map((s) => <Choice key={s} label={s} selected={m.status === s} onClick={() => patch(m.id, { status: s as MedStatus, reason: needsReason(s) ? m.reason : undefined, frequency: s === 'Taking sometimes' ? m.frequency ?? 'Some days' : undefined, started: (s === 'Taking regularly' || s === 'Taking sometimes') && (!m.started || m.started === 'Not started') ? TODAY : m.started })} />)}</div>
-                {m.status === 'Taking sometimes' && <><div className="mt-3 text-sm font-medium text-sand-800">How often?</div><div className="mt-2 grid grid-cols-3 gap-2">{frequencies.map((f) => <Choice key={f} label={f} selected={m.frequency === f} onClick={() => patch(m.id, { frequency: f })} />)}</div></>}
-                {(m.status === 'Taking regularly' || m.status === 'Taking sometimes') && <label className="mt-3 block text-sm font-medium text-sand-800">Date you started<input className="input mt-1" defaultValue={m.started} placeholder="A rough date is fine" onBlur={(e) => patch(m.id, { started: e.target.value })} /><span className="mt-1 block text-xs font-normal text-sand-500">Not sure? Leave it as "about" a date, or blank.</span></label>}
-                {needsReason(m.status) && <><div className="mt-3 text-sm font-medium text-sand-800">What is the main reason?</div><div className="mt-2 grid grid-cols-2 gap-2">{reasons.map((r) => <Choice key={r} label={r} selected={m.reason === r} onClick={() => patch(m.id, { reason: r })} />)}</div></>}
-                <label className="mt-3 block text-sm font-medium text-sand-800">Taking a different dose than ordered?<input className="input mt-1" placeholder="Optional · what you actually take" /></label>
-                <p className="mt-3 text-xs leading-relaxed text-sand-500">This records what you tell us. It does not change your doctor's order.</p>
+                <div className="mt-2 grid grid-cols-2 gap-2">{statuses.map((s) => <Choice key={s} label={s} selected={m.status === s} onClick={() => patch(m.id, { status: s as MedStatus, reason: needsReason(s) ? m.reason : undefined, frequency: s === 'Taking inconsistently' ? m.frequency ?? 'Some days' : undefined, started: (s === 'Taking as directed' || s === 'Taking inconsistently') && (!m.started || m.started === 'Not started') ? TODAY : m.started })} />)}</div>
+                {m.status === 'Taking inconsistently' && <><div className="mt-3 text-sm font-medium text-sand-800">How often?</div><div className="mt-2 grid grid-cols-3 gap-2">{frequencies.map((f) => <Choice key={f} label={f} selected={m.frequency === f} onClick={() => patch(m.id, { frequency: f })} />)}</div></>}
+                {(m.status === 'Taking as directed' || m.status === 'Taking inconsistently') && <label className="mt-3 block text-sm font-medium text-sand-800">Date you started<input className="input mt-1" defaultValue={m.started} placeholder="A rough date is fine" onBlur={(e) => patch(m.id, { started: e.target.value })} /><span className="mt-1 block text-xs font-normal text-sand-500">Not sure? Leave it as "about" a date, or blank.</span></label>}
+                {needsReason(m.status) && <><div className="mt-4 text-[15px] font-semibold text-sand-900">What is the main reason?</div><p className="text-sm text-sand-500">Select the reason that best describes your situation.</p><div className="mt-2 space-y-2">{reasons.map((r) => <Choice key={r} label={r} selected={m.reason === r} onClick={() => patch(m.id, { reason: r })} />)}</div>
+                  {m.reason === 'I had a possible side effect or reaction' && <p className="mt-2 rounded-xl bg-warn-100 px-3 py-2 text-sm text-warn-700">Recorded as a possible reaction you reported. Your care team will review it. If your symptoms are serious, call (949) 257-2644, or 911 in an emergency.</p>}
+                  {m.reason === 'I ran out and have not refilled it' && <div className="mt-2 rounded-xl border border-sand-200 p-3"><div className="text-sm font-medium text-sand-800">How long have you been without it?</div><div className="mt-2 grid grid-cols-2 gap-2">{['A few days', 'About a week', '2 to 3 weeks', 'A month or more'].map((o) => <Choice key={o} label={o} selected={extra[m.id + 'out'] === o} onClick={() => setExtra({ ...extra, [m.id + 'out']: o })} />)}</div></div>}
+                  {m.reason === 'My prescription expired' && <div className="mt-2 rounded-xl border border-sand-200 p-3"><div className="text-sm font-medium text-sand-800">Would you like this prescription renewed?</div><div className="mt-2 grid grid-cols-2 gap-2">{['Yes', 'No'].map((o) => <Choice key={o} label={o} selected={extra[m.id + 'renew'] === o} onClick={() => setExtra({ ...extra, [m.id + 'renew']: o })} />)}</div>{extra[m.id + 'renew'] === 'Yes' && <p className="mt-2 text-sm text-sand-600">We will send your renewal request to your care team. It is reviewed during office hours.</p>}</div>}
+                  {m.reason === 'Another reason' && <input className="input mt-2" placeholder="Tell us in your own words" />}</>}
+                <label className="mt-4 block text-sm font-medium text-sand-800">When did you start taking it this way?<input type="date" className="input mt-1" /><span className="mt-1 block text-xs font-normal text-sand-500">An approximate date is fine. We keep this separate from today's date.</span></label>
+                <div className="mt-4 text-sm font-medium text-sand-800">Are you taking a different amount than your provider recommended?</div>
+                <div className="mt-2 grid grid-cols-2 gap-2">{['No', 'Yes'].map((o) => <Choice key={o} label={o} selected={(diff[m.id] ?? 'No') === o} onClick={() => setDiff({ ...diff, [m.id]: o })} />)}</div>
+                {diff[m.id] === 'Yes' && <div className="mt-2 space-y-2 rounded-xl border border-sand-200 p-3">
+                  <label className="block text-sm text-sand-800">What amount are you actually taking?<input className="input mt-1" placeholder="For example 1.5 mg" /></label>
+                  <label className="block text-sm text-sand-800">How often are you taking it?<select className="input mt-1"><option>Once a day</option><option>Twice a day</option><option>Every other day</option><option>A few times a week</option><option>Only when needed</option></select></label>
+                  <label className="block text-sm text-sand-800">When did you make this change?<input type="date" className="input mt-1" /></label>
+                </div>}
+                <p className="mt-3 text-xs leading-relaxed text-sand-500">This records what you tell us. It does not change your provider's order.</p>
               </div>}
             </li>) })}
         </ul>
