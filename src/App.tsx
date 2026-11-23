@@ -25,6 +25,10 @@ import CreatePatient from './modules/intake/staff/CreatePatient'
 import PatientDetail from './modules/intake/staff/PatientDetail'
 import ChartPrepDetail from './modules/intake/staff/ChartPrepDetail'
 import EcwExceptions from './modules/intake/staff/EcwExceptions'
+import { DictationLayer } from './components/Dictation'
+import Tasks from './modules/tasks/Tasks'
+import PlanOfCare from './modules/plan/patient/PlanOfCare'
+import Sharing from './modules/sharing/patient/Sharing'
 import BecomePatient from './modules/public/BecomePatient'
 import ScheduleInterview from './modules/public/ScheduleInterview'
 import InterviewAvailability from './modules/interviews/InterviewAvailability'
@@ -55,6 +59,7 @@ import Dashboards from './modules/dashboards/Dashboards'
 export default function App() {
   return (
     <HashRouter>
+      <DictationLayer />
       <AppShell>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -75,6 +80,7 @@ export default function App() {
           <Route path="/staff" element={<Navigate to="/staff/inquiries" replace />} />
           <Route path="/staff/inquiries" element={<InquiryList />} />
           <Route path="/staff/interviews" element={<InterviewAvailability />} />
+          <Route path="/staff/tasks" element={<Tasks />} />
           <Route path="/staff/inquiries/:id" element={<InquiryDetail />} />
           <Route path="/staff/admin/packages" element={<Packages />} />
           <Route path="/staff/admin/users" element={<UsersPermissions />} />
@@ -92,6 +98,8 @@ export default function App() {
           <Route path="/patient/agreement" element={<Agreement />} />
           <Route path="/patient/payments" element={<PaymentsPatient />} />
           <Route path="/patient/settings" element={<NotificationSettings />} />
+          <Route path="/patient/plan" element={<PlanOfCare />} />
+          <Route path="/patient/sharing" element={<Sharing />} />
           <Route path="/patient/assistant" element={<Assistant />} />
           <Route path="/patient/medications" element={<Medications />} />
           <Route path="/patient/messages" element={<Messages />} />

@@ -8,7 +8,7 @@ export const questionnaireMeta = {
   version: 1,
   publishedBy: 'Medical Director',
   publishedOn: 'Oct 22, 2026',
-  status: 'Draft · as supplied (not yet published by Dr. D.)',
+  status: 'Draft · as supplied (not yet published by the provider)',
   source: 'NP - Questionnaires 2.xlsx',
 }
 

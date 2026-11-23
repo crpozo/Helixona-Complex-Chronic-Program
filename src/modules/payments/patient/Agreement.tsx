@@ -27,7 +27,7 @@ export default function Agreement() {
               <Row label="Charged on">The 1st of each month (your start date)</Row>
               <Row label="Includes">Program modalities in your Plan of Care</Row>
               <Row label="Not included">Insurance visits, labs, IV (billed to insurance)</Row>
-              <Row label="After Month 9">Continue month-to-month only if you and Dr. D. agree</Row>
+              <Row label="After Month 9">Continue month-to-month only if you and your provider agree</Row>
             </div>
             <article className="card mt-4 max-h-72 overflow-y-auto p-4 text-sm leading-relaxed text-sand-700">
               <p className="rounded-lg bg-plum-100/60 px-3 py-2 text-xs text-plum-600"><strong>Placeholder text.</strong> The attorney-approved membership agreement and payment authorization appear here word for word.</p>

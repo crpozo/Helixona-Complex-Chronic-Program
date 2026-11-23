@@ -18,7 +18,7 @@ export const packages: Package[] = [
   { id: 'pk-cc', name: 'Complex Chronic · full intake', when: 'Accepted for A&P · Chronic or Complex Chronic', items: ['q-np', 'q-qol', 'q-met', 'q-mold', 'q-lyme', 'q-brain', 'c-gen', 'c-hipaa', 'c-fin', 'c-comm', 'd-ins', 'd-id', 'd-meds', 'd-labs'], version: 3, updated: 'Oct 22, 2026 · Cassandra' },
   { id: 'pk-ho', name: 'Health Optimization · L2/L3', when: 'Health Optimization inquiry', items: ['q-l23', 'c-gen', 'c-hipaa', 'c-fin', 'c-comm', 'd-id'], version: 2, updated: 'Oct 22, 2026 · Cassandra' },
   { id: 'pk-oon', name: 'Insurance · out of network', when: 'Insurance patient with an out-of-network plan', items: ['d-ins', 'd-oon'], version: 1, updated: 'Nov 3, 2026 · Karina' },
-  { id: 'pk-iv', name: 'IV and EBOO consents', when: 'IV infusions or EBOO are in the plan', items: ['c-iv', 'c-eboo'], version: 1, updated: 'Oct 28, 2026 · Dr. D.' },
+  { id: 'pk-iv', name: 'IV and EBOO consents', when: 'IV infusions or EBOO are in the plan', items: ['c-iv', 'c-eboo'], version: 1, updated: 'Oct 28, 2026 · the provider' },
   { id: 'pk-alc', name: 'À la carte · standard paperwork', when: 'A&P complete · à la carte', items: ['c-gen', 'c-hipaa', 'c-fin', 'd-id'], version: 1, updated: 'Nov 10, 2026 · Cassandra' },
   { id: 'pk-fu', name: 'Follow-up visit', when: 'Returning Health Optimization visits', items: ['q-l23f'], version: 1, updated: 'Oct 22, 2026 · Cassandra' },
 ]

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronDown, Ban, CalendarCheck, CheckCircle2, ClipboardList, FileQuestion, Hourglass, Inbox, MessageCircle, Search, UserCheck, X, type LucideIcon } from 'lucide-react'
-import { PageHeader, Pill, QueueTable, Tabs, toneFor, type Column } from '../../../components/ui'
+import { ChevronDown, Download, Ban, CalendarCheck, CheckCircle2, ClipboardList, FileQuestion, Hourglass, Inbox, MessageCircle, Search, UserCheck, X, type LucideIcon } from 'lucide-react'
+import { MultiSelect, PageHeader, Pill, QueueTable, Tabs, toneFor, type Column } from '../../../components/ui'
 import type { Inquiry, InquiryStatus } from '../../../mock/types'
 
 /** One color and icon per inquiry status, so the row of counts reads at a glance. The label always stays. */
@@ -29,7 +29,8 @@ export default function InquiryList() {
   const me = currentUser()
   const [tab, setTab] = useState('all')
   const [q, setQ] = useState('')
-  const [status, setStatus] = useState<string>('All')
+  const [statuses, setStatuses] = useState<string[]>([])
+  const [picked, setPicked] = useState<string[]>([])
   const [owner, setOwner] = useState('All')
   const [period, setPeriod] = useState('All time')
   const [from, setFrom] = useState('2026-09-15')
@@ -39,12 +40,26 @@ export default function InquiryList() {
   const inPeriod = useMemo(() => all.filter((i) => !range || (inquiryDate(i) >= range[0] && inquiryDate(i) <= range[1])), [all, range]) // eslint-disable-line react-hooks/exhaustive-deps
   const byPath = inPeriod.filter((i) => tab === 'all' || (tab === 'cc' ? i.pathway === 'Complex Chronic' : i.pathway !== 'Complex Chronic'))
   const rows = byPath
-    .filter((i) => status === 'All' || i.status === status)
+    .filter((i) => statuses.length === 0 || statuses.includes(i.status))
     .filter((i) => owner === 'All' || (owner === 'Mine' ? i.owner === me.name : i.owner === owner))
     .filter((i) => !q || `${i.name} ${i.reason} ${i.city}`.toLowerCase().includes(q.toLowerCase()))
-  const active = (status !== 'All' ? 1 : 0) + (owner !== 'All' ? 1 : 0) + (q ? 1 : 0)
+  const active = (statuses.length ? 1 : 0) + (owner !== 'All' ? 1 : 0) + (q ? 1 : 0)
+
+  /* One file with the summary of every selected inquiry, in the format the advisor uses for the admissions meeting. */
+  const downloadSummaries = () => {
+    const text = all.filter((i) => picked.includes(i.id)).map((i) => [
+      `${i.name}${preferredName(i) ? ` (goes by ${preferredName(i)})` : ''}`, i.reason, '',
+      `- Insurance: ${insuranceOf(i)}`, `- Age ${inquiryAge(i)}`, `- Applied ${i.receivedAt.split(' · ')[0]}`, `- ${i.city}, ${i.state}`,
+      `- Looking for: ${i.pathway === 'Complex Chronic' ? 'Chronic or Complex Chronic Recovery' : 'Health Optimization'}`, `- Heard from: ${i.source}`,
+      `- Status: ${i.status} · priority ${priorityOf(i) || 'not set'} · owner ${i.owner}`,
+    ].join('\n')).join('\n\n----------------------------------------\n\n')
+    const url = URL.createObjectURL(new Blob([`Helixona · inquiry summaries · ${picked.length} people\n\n${text}\n`], { type: 'text/plain' }))
+    const link = document.createElement('a'); link.href = url; link.download = 'inquiry-summaries.txt'; link.click(); URL.revokeObjectURL(url)
+    notify(`Summaries for ${picked.length} people downloaded`)
+  }
 
   const columns: Column<Inquiry>[] = [
+    { key: 'pick', header: <input type="checkbox" aria-label="Select all shown" checked={rows.length > 0 && rows.every((r) => picked.includes(r.id))} onChange={(e) => setPicked(e.target.checked ? rows.map((r) => r.id) : [])} />, render: (r) => <input type="checkbox" aria-label={`Select ${r.name}`} checked={picked.includes(r.id)} onClick={(e) => e.stopPropagation()} onChange={(e) => setPicked(e.target.checked ? [...picked, r.id] : picked.filter((x) => x !== r.id))} className="h-4 w-4" /> },
     { key: 'who', header: 'Name', render: (r) => <><div className="whitespace-nowrap text-[15px] font-semibold text-sand-900">{r.name}</div>{preferredName(r) && <div className="whitespace-nowrap text-xs text-sand-500">Goes by {preferredName(r)}</div>}</> },
     { key: 'age', header: 'Age', className: 'hidden min-[1400px]:table-cell', render: (r) => <span className="text-sm text-sand-700">{inquiryAge(r)}</span> },
     { key: 'received', header: <span className="block w-[74px] whitespace-normal leading-snug">Inquiry received</span>, className: 'hidden min-[1200px]:table-cell', render: (r) => <span className="whitespace-nowrap text-sm text-sand-700">{r.receivedAt.split(' · ')[0].replace(', 2026', '')}</span> },
@@ -77,8 +92,8 @@ export default function InquiryList() {
         <span className="text-xs text-sand-500">{inPeriod.length} inquiries in this period</span>
       </div>
       <div className="mb-5 grid grid-cols-2 gap-2.5 sm:grid-cols-4 xl:grid-cols-8">
-        {inquiryStatuses.map((st) => { const n = byPath.filter((i) => i.status === st).length; const on = status === st; const { color, tint, Icon } = statusLook[st]; return (
-          <button key={st} onClick={() => setStatus(on ? 'All' : st)} aria-pressed={on} style={{ borderColor: on ? color : undefined, background: on ? tint : undefined, boxShadow: on ? `0 0 0 1px ${color}` : undefined }} className={`card relative overflow-hidden p-3 pt-3.5 text-left transition-all hover:-translate-y-0.5 hover:shadow-md ${n === 0 ? 'opacity-60' : ''}`}>
+        {inquiryStatuses.map((st) => { const n = byPath.filter((i) => i.status === st).length; const on = statuses.includes(st); const { color, tint, Icon } = statusLook[st]; return (
+          <button key={st} onClick={() => setStatuses(on ? statuses.filter((x) => x !== st) : [...statuses, st])} aria-pressed={on} style={{ borderColor: on ? color : undefined, background: on ? tint : undefined, boxShadow: on ? `0 0 0 1px ${color}` : undefined }} className={`card relative overflow-hidden p-3 pt-3.5 text-left transition-all hover:-translate-y-0.5 hover:shadow-md ${n === 0 ? 'opacity-60' : ''}`}>
             <span className="absolute inset-x-0 top-0 h-1" style={{ background: color }} />
             <div className="flex items-start justify-between gap-2">
               <div className="text-[26px] font-semibold leading-none" style={{ color }}>{n}</div>
@@ -91,10 +106,11 @@ export default function InquiryList() {
       <Tabs value={tab} onChange={setTab} tabs={[{ key: 'all', label: 'All', count: inPeriod.length }, { key: 'cc', label: 'Chronic or Complex Chronic', count: inPeriod.filter((i) => i.pathway === 'Complex Chronic').length }, { key: 'ho', label: 'Health Optimization', count: inPeriod.filter((i) => i.pathway !== 'Complex Chronic').length }]} />
       <div className="card mb-3 flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3">
         <label className="relative min-w-[240px] flex-1"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-sand-400" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name, city or what they are struggling with" className="input w-full py-2 pl-9" /></label>
-        {sel('Filter by status', status, setStatus, ['All', ...inquiryStatuses])}
+        <div className="flex items-center gap-2 whitespace-nowrap text-xs text-sand-500">Filter by status<div className="w-[230px]"><MultiSelect options={inquiryStatuses.map((x) => ({ value: x, label: x }))} value={statuses} onChange={setStatuses} placeholder="All statuses" allLabel="All statuses" /></div></div>
         {sel('Filter by owner', owner, setOwner, ['All', 'Mine', 'Unassigned', ...new Set(all.map((i) => i.owner).filter((o) => o !== 'Unassigned'))])}
-        {active > 0 && <button onClick={() => { setQ(''); setStatus('All'); setOwner('All') }} className="btn-ghost whitespace-nowrap px-2 py-1 text-xs"><X size={13} /> Clear {active}</button>}
+        {active > 0 && <button onClick={() => { setQ(''); setStatuses([]); setOwner('All') }} className="btn-ghost whitespace-nowrap px-2 py-1 text-xs"><X size={13} /> Clear {active}</button>}
       </div>
+      {picked.length > 0 && <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-sand-900 px-4 py-2.5 text-sm text-white"><span><strong>{picked.length}</strong> selected for the admissions meeting</span><span className="flex gap-2"><button className="rounded-lg bg-teal-400 px-3 py-1.5 text-xs font-semibold text-sand-900" onClick={downloadSummaries}><Download size={13} className="mr-1 inline" /> Download summaries</button><button className="rounded-lg px-3 py-1.5 text-xs text-white/80 hover:text-white" onClick={() => setPicked([])}>Clear</button></span></div>}
       <QueueTable rows={rows} columns={columns} rowKey={(r) => r.id} rowTone={(r) => (r.owner === 'Unassigned' ? 'bad' : toneFor(r.status))} onRowClick={(r) => nav(`/staff/inquiries/${r.id}`)} empty="No inquiries match." />
       <p className="help mt-3">{rows.length} shown · an inquiry with no owner shows “Take it”; the red stripe marks inquiries nobody owns yet.</p>
     </>

@@ -18,17 +18,17 @@ export default function InterviewAvailability() {
   const booked = allInterviews()
   return (
     <>
-      <PageHeader eyebrow="People · Patient advisor" title="Interview calendar" description="Set the hours you are available for interviews. People you send the link to choose a time from these hours; anything already on your Google Calendar is left out." />
+      <PageHeader eyebrow="People · Patient advisor" title="Interview calendar" description="Set the hours you are available for interviews. People you send the link to choose a time from these hours; anything already on your Teams calendar is left out." />
       <div className="grid gap-5 xl:grid-cols-3">
         <div className="space-y-5 xl:col-span-1">
-          <Card title="Google Calendar">
+          <Card title="Microsoft Teams calendar">
             <div className="flex items-center justify-between gap-3">
-              <div><div className="text-sm font-semibold text-sand-900">{connected ? `${me.name.toLowerCase()}@helixona.example` : 'Not connected'}</div><div className="text-xs text-sand-500">{connected ? 'Connected · last checked a minute ago' : 'Your busy times are not being checked'}</div></div>
+              <div><div className="text-sm font-semibold text-sand-900">{connected ? `${me.name.toLowerCase()}@helixona.example · Microsoft 365` : 'Not connected'}</div><div className="text-xs text-sand-500">{connected ? 'Connected · last checked a minute ago' : 'Your busy times are not being checked'}</div></div>
               <Pill tone={connected ? 'ok' : 'warn'}>{connected ? 'Connected' : 'Off'}</Pill>
             </div>
-            <ul className="mt-3 space-y-1 text-sm text-sand-700"><li>Busy times on your calendar are never offered.</li><li>Each booked interview is added to your calendar, with an invitation to the person.</li><li>Only busy or free is read. Event names stay private.</li></ul>
+            <ul className="mt-3 space-y-1 text-sm text-sand-700"><li>Busy times on your calendar are never offered.</li><li>Each booked interview is added to your calendar, with a Teams invitation to the person.</li><li>Only busy or free is read. Event names stay private.</li></ul>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button className="btn-secondary" onClick={() => { setGoogleConnected(!connected); notify(connected ? 'Google Calendar disconnected' : 'Google Calendar connected') }}>{connected ? 'Disconnect' : 'Connect Google Calendar'}</button>
+              <button className="btn-secondary" onClick={() => { setGoogleConnected(!connected); notify(connected ? 'Teams calendar disconnected' : 'Teams calendar connected') }}>{connected ? 'Disconnect' : 'Connect Teams calendar'}</button>
               {connected && <button className="btn-ghost" onClick={() => notify('Calendar checked just now')}><RefreshCw size={14} /> Check now</button>}
             </div>
             <div className="mt-3"><ToConfirm>one calendar per advisor or a shared clinic calendar</ToConfirm></div>
@@ -54,7 +54,7 @@ export default function InterviewAvailability() {
                 <div className="text-sm font-semibold text-sand-900">{fmtDate(d)}</div>
                 <div className="mt-2 flex flex-wrap gap-1">{open.map((t) => <span key={t} className="rounded-md bg-ok-100 px-1.5 py-0.5 text-[11px] font-medium text-ok-700">{fmtTime(t).replace(':00', '').replace(' ', '')}</span>)}{open.length === 0 && <span className="text-xs text-sand-400">No open times</span>}</div>
                 {taken.map((b) => <div key={b.inquiryId} className="mt-2 rounded-md bg-sand-900 px-2 py-1 text-[11px] text-white">{fmtTime(b.time)} · interview</div>)}
-                {busy.map((b) => <div key={b.from} className="mt-2 rounded-md bg-sand-100 px-2 py-1 text-[11px] text-sand-600">{fmtTime(b.from)} to {fmtTime(b.to)} · busy in Google</div>)}
+                {busy.map((b) => <div key={b.from} className="mt-2 rounded-md bg-sand-100 px-2 py-1 text-[11px] text-sand-600">{fmtTime(b.from)} to {fmtTime(b.to)} · busy in Teams</div>)}
               </div>) })}</div>
           </Card>
         </div>

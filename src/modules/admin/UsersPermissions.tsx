@@ -26,7 +26,7 @@ const people: { name: string; email: string; role: RoleName; scope: string; acti
   { name: 'Karina', email: 'karina@helixona.example', role: 'Operations & finance', scope: 'All patients', active: true, last: 'Today · 8:30 AM' },
   { name: 'Charlene', email: 'charlene@helixona.example', role: 'Chart prep', scope: 'All patients', active: true, last: 'Today · 6:10 AM' },
   { name: 'Jen', email: 'jen@helixona.example', role: 'Nursing', scope: 'All patients', active: true, last: 'Today · 7:20 AM' },
-  { name: 'Dr. D.', email: 'drd@helixona.example', role: 'Physician', scope: 'Own patients', active: true, last: 'Yesterday · 6:05 PM' },
+  { name: 'Provider', email: 'drd@helixona.example', role: 'Physician', scope: 'Own patients', active: true, last: 'Yesterday · 6:05 PM' },
   { name: 'Mira', email: 'mira@helixona.example', role: 'Front desk', scope: 'All patients', active: false, last: 'Invited · not signed in yet' },
 ]
 

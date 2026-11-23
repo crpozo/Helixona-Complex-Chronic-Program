@@ -7,6 +7,8 @@ import { planFor, stageDates, stageLabel, stages } from '../../../mock/roadmap'
 import { patientById } from '../../../mock/patients'
 import IntakeReviewPanel from './IntakeReviewPanel'
 import CommunicationLog from './CommunicationLog'
+import { PlanBody } from '../../plan/patient/PlanOfCare'
+import { planVersions } from '../../../mock/planOfCare'
 import HealthStory from './HealthStory'
 import { ChartPrepPanel } from './ChartPrepDetail'
 import { NoteRow, NotesPanel } from '../../../components/NotesPanel'
@@ -69,7 +71,7 @@ export default function PatientDetail() {
       {updating && <UpdateStatus current={status} onClose={() => setUpdating(false)} onSave={(st, why, prog) => { changeStatus(p.id, st, prog ? `${prog} · ${why}` : why); if (prog) setProgram(p.id, prog); setUpdating(false); notify(prog ? `A&P complete · ${prog} · ${prog === 'À la carte' ? 'standard paperwork sent' : 'contract and payment sent, flag set in eCW'}` : `Status changed to ${st}`) }} />}
 
       <Tabs value={tab} onChange={setTab} tabs={[
-        { key: 'overview', label: 'Overview' }, { key: 'info', label: 'Information' }, { key: 'story', label: 'Health story' }, { key: 'invitation', label: 'Invitation' }, { key: 'interview', label: 'Interview' },
+        { key: 'overview', label: 'Overview' }, { key: 'info', label: 'Information' }, { key: 'plan', label: 'Plan of care' }, { key: 'story', label: 'Health story' }, { key: 'invitation', label: 'Invitation' }, { key: 'interview', label: 'Interview' },
         { key: 'admissions', label: 'Admission' }, { key: 'intake', label: 'Intake' }, { key: 'chart', label: 'Chart prep' },
         { key: 'notes', label: 'Notes', count: notesFor(p.id).length }, { key: 'scores', label: 'Data' }, { key: 'history', label: 'History' },
       ]} />
@@ -148,6 +150,13 @@ export default function PatientDetail() {
           <p className="lg:col-span-3 text-xs text-sand-500">These details come from the patient’s intake and from eCW. When they differ, eCW is the record of reference and the difference is flagged for chart prep.</p>
         </div>
       )}
+      {tab === 'plan' && <div className="grid gap-5 xl:grid-cols-3">
+        <div className="xl:col-span-2"><Card title={`Plan of Care · version ${planVersions[0].version}`} subtitle={`Authorized by the provider · ${planVersions[0].date} · Step ${planVersions[0].stage} · lead actor ${planVersions[0].lead}`} actions={<button className="btn-secondary px-3 py-1.5 text-[11px]" onClick={() => window.print()}>Print or save as PDF</button>}><PlanBody v={planVersions[0]} /></Card></div>
+        <Card title="What changed over time" subtitle="Newest first. Each version keeps the full plan as it was.">
+          <ol className="space-y-4">{planVersions.map((v) => <li key={v.version} className="border-l-2 border-sand-300 pl-3"><div className="text-sm font-semibold text-sand-900">Version {v.version} · {v.date}</div><div className="text-xs text-sand-500">Provider · Step {v.stage} · lead actor {v.lead}</div><ul className="mt-1 list-disc space-y-0.5 pl-4 text-sm text-sand-700">{v.changes.map((c) => <li key={c}>{c}</li>)}</ul><div className="mt-1 text-xs text-sand-500">Why: {v.why}</div></li>)}</ol>
+          <div className="mt-3"><ToConfirm>where the plan is written today (eCW or here) and who may edit it</ToConfirm></div>
+        </Card>
+      </div>}
       {tab === 'story' && <HealthStory patient={p} />}
       {tab === 'invitation' && <InvitationTab p={p} />}
       {tab === 'interview' && <InterviewTab />}

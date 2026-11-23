@@ -17,7 +17,7 @@ export default function PatientLongitudinal() {
     <>
       <Breadcrumb items={[{ label: 'Alert queue', to: '/staff/alerts' }, { label: nameOf(id) }]} />
       <PageHeader eyebrow={`eCW ${p?.ecwId ?? '—'}`} title={nameOf(id)} description="How the patient is doing over time, with therapies, prescription changes, flares and crashes marked on the same chart."
-        meta={<><VersionTag>Daily check-in v3</VersionTag><span>Physician: Dr. D.</span>{p && <a className="text-teal-700 underline" href={`#/staff/patients/${id}?tab=scores`}>Open in patient record</a>}</>} />
+        meta={<><VersionTag>Daily check-in v3</VersionTag><span>Physician: the provider</span>{p && <a className="text-teal-700 underline" href={`#/staff/patients/${id}?tab=scores`}>Open in patient record</a>}</>} />
       <ScoresPanel id={id} />
     </>
   )
@@ -105,7 +105,12 @@ export function ScoresPanel({ id }: { id: string }) {
           </div>}
         </Card>
 
-        <Card title="Check-in history" subtitle="One row per check-in in the selected period." padded={false}>
+        <Card title="Check-in history" subtitle="One row per check-in in the selected period." padded={false} actions={<div className="flex gap-2"><button className="btn-secondary px-3 py-1.5 text-[11px]" onClick={() => {
+          const cell = (v: string | number) => `"${String(v).replace(/"/g, '""')}"`
+          const ev = (d: string, k: string) => events.filter((e) => e.date === d && e.kind === k).map((e) => (e.detail ? `${e.label}: ${e.detail}` : e.label)).join('; ')
+          const lines = [['Date', 'Energy', 'Pain', 'Sleep', 'Digestion', 'Crash', 'Flare', 'Therapy', 'Prescription change'], ...[...points].reverse().map((s) => [s.date, s.energy, s.pain, s.sleep, s.digestion, ev(s.date, 'crash'), ev(s.date, 'flare'), ev(s.date, 'therapy'), ev(s.date, 'rx')])].map((r) => r.map(cell).join(','))
+          const url = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv' })); const link = document.createElement('a'); link.href = url; link.download = 'check-in-history.csv'; link.click(); URL.revokeObjectURL(url); notify('Check-in history downloaded')
+        }}>Download spreadsheet</button><button className="btn-secondary px-3 py-1.5 text-[11px]" onClick={() => window.print()}>Print or save as PDF</button></div>}>
           <div className="max-h-[420px] overflow-auto">
             <table className="w-full text-sm">
               <thead className="sticky top-0 bg-sand-50"><tr className="text-left"><th className="px-5 py-2 eyebrow">Date</th><th className="px-3 py-2 eyebrow">Energy</th><th className="px-3 py-2 eyebrow">Pain</th><th className="px-3 py-2 eyebrow">Sleep</th><th className="px-3 py-2 eyebrow">Digestion</th><th className="px-3 py-2 eyebrow">Flare or crash</th><th className="px-3 py-2 eyebrow">Therapy</th><th className="px-3 py-2 eyebrow">Prescription / Rx</th></tr></thead>

@@ -13,7 +13,7 @@ export default function Submitted() {
         <div className="mt-8 eyebrow">What happens next</div>
         <ol className="mt-2 space-y-3">
           {[
-            [UserRoundCheck, 'Ana reviews your package', 'Usually within 1 business day. If anything is missing, you\'ll get a text with a link to add it.'],
+            [UserRoundCheck, 'Ana reviews your package', 'Usually within 1–2 business days. If anything is missing, you\'ll get a text with a link to add it.'],
             [Stethoscope, 'Your chart is prepared', 'Your answers and documents are added to your medical record before your first visit.'],
             [CalendarCheck, 'Your A&P assessment', 'Karina will call to schedule your assessment with the Medical Director and confirm the one-time A&P fee.'],
             [Mail, 'Stay in touch', 'Questions? Reply to any message from Helixona or call (949) 257-2644 during clinic hours.'],

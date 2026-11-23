@@ -5,7 +5,7 @@ import { inquiries as seedInquiries } from './inquiries'
 /* In-memory state shared across screens so the mockup behaves like one product:
    notes, status changes and the confirmation toast. Nothing is persisted except per-user view preferences. */
 
-const people: Record<Role, string> = { patient: 'Marisol A.', advisor: 'Ana', karina: 'Karina', charlene: 'Charlene', nursing: 'Nursing', physician: 'Dr. D.', admin: 'Cassandra' }
+const people: Record<Role, string> = { patient: 'Marisol A.', advisor: 'Ana', karina: 'Karina', charlene: 'Charlene', nursing: 'Nursing', physician: 'Provider', admin: 'Cassandra' }
 export function currentUser(): { role: Role; name: string } {
   let role: Role = 'advisor'
   try { role = (localStorage.getItem('hlx-role') as Role) || 'advisor' } catch { /* ignore */ }
@@ -159,3 +159,22 @@ export function bookInterview(inquiryId: string, date: string, time: string, boo
   interviews[inquiryId] = { date, time, bookedBy, when: nowStamp() }
   patchInquiry(inquiryId, { status: 'Interview scheduled' })
 }
+
+/* ---------------- Inquiry communication notes and reminders ---------------- */
+export interface InquiryNote { id: string; inquiryId: string; kind: string; text: string; status: string; author: string; when: string }
+export interface Task { id: string; title: string; due: string; about: string; link: string; owner: string; done: boolean; created: string }
+export const noteKinds = ['Call', 'Email', 'Text message', 'In person', 'Note']
+let inquiryNotes: InquiryNote[] = [
+  { id: 'IN-2', inquiryId: 'INQ-2210', kind: 'Email', text: 'Sent the greeting email and the list of documents we need.', status: 'Lead received', author: 'Ana', when: 'Oct 7, 2026 · 9:15 AM' },
+  { id: 'IN-1', inquiryId: 'INQ-2210', kind: 'Call', text: 'Called, no answer. Left a voicemail with the office number.', status: 'Lead received', author: 'Ana', when: 'Oct 7, 2026 · 8:40 AM' },
+]
+let tasks: Task[] = [
+  { id: 'T-1', title: 'Call back about the insurance plan document', due: '2026-10-12', about: 'Hannah Bergström', link: '/staff/inquiries/INQ-2210', owner: 'Ana', done: false, created: 'Oct 7, 2026 · 9:16 AM' },
+  { id: 'T-2', title: 'Confirm interview time by text', due: '2026-10-10', about: 'Jordan Blake', link: '/staff/inquiries/INQ-2207', owner: 'Ana', done: false, created: 'Oct 6, 2026 · 4:20 PM' },
+]
+export const notesForInquiry = (id: string) => inquiryNotes.filter((x) => x.inquiryId === id)
+export function addInquiryNote(note: Omit<InquiryNote, 'id' | 'author' | 'when'>) { inquiryNotes = [{ ...note, id: `IN-${Date.now()}`, author: currentUser().name, when: nowStamp() }, ...inquiryNotes]; emit() }
+export const allTasks = () => tasks
+export function addTask(t: Omit<Task, 'id' | 'done' | 'created' | 'owner'>) { tasks = [{ ...t, id: `T-${Date.now()}`, done: false, owner: currentUser().name, created: nowStamp() }, ...tasks]; emit() }
+export function patchTask(id: string, p: Partial<Task>) { tasks = tasks.map((t) => (t.id === id ? { ...t, ...p } : t)); emit() }
+export function removeTask(id: string) { tasks = tasks.filter((t) => t.id !== id); emit() }

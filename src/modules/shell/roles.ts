@@ -8,7 +8,7 @@ export const roles: RoleDef[] = [
   { key: 'karina', label: 'Operations & finance', person: 'Karina', home: '/staff/registry', surface: 'staff' },
   { key: 'charlene', label: 'Chart prep', person: 'Charlene', home: '/staff/patients?view=chart', surface: 'staff' },
   { key: 'nursing', label: 'Nursing / care team', person: 'Nursing', home: '/staff/alerts', surface: 'staff' },
-  { key: 'physician', label: 'Physician', person: 'Dr. D.', home: '/staff/config/surveys', surface: 'staff' },
+  { key: 'physician', label: 'Physician', person: 'Provider', home: '/staff/config/surveys', surface: 'staff' },
   { key: 'admin', label: 'Program / technical admin', person: 'Cassandra · Carlos', home: '/staff/dashboards', surface: 'staff' },
 ]
 
@@ -18,6 +18,7 @@ export interface NavItem { label: string; to: string; group: NavGroup; roles: Ro
 export const nav: NavItem[] = [
   { label: 'Inquiries', to: '/staff/inquiries', group: 'People', roles: ['advisor', 'karina', 'admin'], module: 'Intake', phase: 1 },
   { label: 'Interview calendar', to: '/staff/interviews', group: 'People', roles: ['advisor', 'admin'], module: 'Intake', phase: 1 },
+  { label: 'Tasks & reminders', to: '/staff/tasks', group: 'People', roles: ['advisor', 'karina', 'charlene', 'nursing', 'admin'], module: 'Intake', phase: 1 },
   { label: 'Patients', to: '/staff/patients', group: 'People', roles: ['advisor', 'karina', 'charlene', 'nursing', 'physician', 'admin'], module: 'Intake', phase: 1 },
   { label: 'Registry', to: '/staff/registry', group: 'Membership', roles: ['karina', 'advisor', 'physician', 'admin'], module: 'Registry', phase: 2 },
   { label: 'Alerts', to: '/staff/alerts', group: 'Care', roles: ['nursing', 'physician', 'admin'], module: 'Surveys & alerts', phase: 2 },

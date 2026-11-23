@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Check, Mail, MessageCircle, Send } from 'lucide-react'
+import { ArrowLeft, Check, Mail, MessageCircle, Send, Sparkles } from 'lucide-react'
 import { PhoneFrame, PatientTopBar } from '../../../components/PhoneFrame'
 import { Field, MonitoringNotice } from '../../../components/ui'
+import { CallClinic } from '../../../components/CallClinic'
 
 /** Direct line to the clinic: a chat thread and an email form. Both land with the care team and are answered
  *  during office hours; both are logged on the patient record. */
@@ -22,13 +23,15 @@ export default function Messages() {
       <PatientTopBar title="Message the clinic" back={<Link to="/patient/home" className="btn-ghost px-2 py-1 text-sm"><ArrowLeft size={16} /></Link>} />
       <div className="flex flex-1 flex-col px-5 pb-6">
         <div className="grid grid-cols-2 gap-1 rounded-xl bg-sand-100 p-1" role="tablist">{([['chat', 'Chat', MessageCircle], ['email', 'Email', Mail]] as const).map(([k, l, I]) => <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`flex items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium ${tab === k ? 'bg-white text-sand-900 shadow-sm' : 'text-sand-600'}`}><I size={15} />{l}</button>)}</div>
-        <p className="mt-3 text-xs text-sand-500">Answered by your care team Monday to Friday, 8 AM to 5 PM. Usually within one business day.</p>
+        <p className="mt-3 text-xs text-sand-500">A person on your care team answers Monday to Friday, 8 AM to 5 PM. Please allow 1–2 business days.</p>
+        <CallClinic className="mt-3" />
+        <Link to="/patient/assistant" className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-sand-100 py-2.5 text-sm font-medium text-sand-800"><Sparkles size={15} /> Want an answer now? Ask Helixona, our AI assistant</Link>
 
         {tab === 'chat' && <>
           <div className="mt-3 flex-1 space-y-2.5">
             {thread.map((m, i) => <div key={i} className={`flex ${m.who === 'me' ? 'justify-end' : 'justify-start'}`}><div className="max-w-[85%]">{m.name && <div className="mb-0.5 text-[11px] text-sand-500">{m.name}</div>}<div className={`rounded-2xl px-3.5 py-2.5 text-[15px] leading-relaxed ${m.who === 'me' ? 'bg-sand-900 text-white' : 'border border-sand-200 bg-white text-sand-800'}`}>{m.text}</div><div className={`mt-0.5 text-[11px] text-sand-400 ${m.who === 'me' ? 'text-right' : ''}`}>{m.when}{m.who === 'me' && ' · sent'}</div></div></div>)}
           </div>
-          <form onSubmit={(e) => { e.preventDefault(); send() }} className="mt-3 flex gap-2"><input className="input text-[16px]" placeholder="Write a message…" value={text} onChange={(e) => setText(e.target.value)} /><button type="submit" aria-label="Send" disabled={!text.trim()} className="btn-primary px-4"><Send size={16} /></button></form>
+          <form onSubmit={(e) => { e.preventDefault(); send() }} className="mt-3 flex gap-2"><input className="input text-[16px]" placeholder="Write a message…" data-mic="on" value={text} onChange={(e) => setText(e.target.value)} /><button type="submit" aria-label="Send" disabled={!text.trim()} className="btn-primary px-4"><Send size={16} /></button></form>
         </>}
 
         {tab === 'email' && <div className="mt-3 space-y-4">

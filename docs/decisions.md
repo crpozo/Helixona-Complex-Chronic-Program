@@ -32,3 +32,11 @@
 - The flare brief proposes a five-level functional scale; the mockup keeps the clinic sheet's four-level impact question (Nov 18). To reconcile with the Medical Director.
 - The safety check lists chest pain and trouble breathing as warning signs that stop the report. They are still not offered as symptoms to document, in line with the Nov 12 rule.
 - List + detail configuration screens (modalities, survey templates, alert rules, message templates, booking exceptions, AI Agent exceptions) now show the list at full width with the detail in a side panel.
+
+## Nov 23, 2026 — Patient app and inquiries review
+
+- Slider direction: at the live review the request was "good to the left, bad to the right"; the written brief sent afterwards (Daily Health Check-In v4) says 0 = worst, 10 = best, better to the right, and asked to follow it. The mockup follows the brief.
+- The brief keeps Physical Exhaustion provisionally; the review asked to take the fatigue slider out. The mockup shows five sliders and lists the question as open.
+- "Dr. D." was replaced by "your provider" on patient screens and "the provider" / "Provider" on staff screens.
+- The interview calendar is described as Microsoft Teams (was Google).
+- A screenshot shared as an example of the admissions summary contained a real person's details; none of it was copied. The summary uses the same layout with sample data.

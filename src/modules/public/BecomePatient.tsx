@@ -72,7 +72,7 @@ export default function BecomePatient() {
           {step === 'done' && path === 'chronic' && (
             <div className="pt-4 text-center">
               <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-teal-50 text-teal-700"><PhoneCall size={28} /></span>
-              <h2 className="mt-4 text-xl font-semibold text-sand-900">We'll call you within one business day</h2>
+              <h2 className="mt-4 text-xl font-semibold text-sand-900">We'll call you within 1–2 business days</h2>
               <p className="mt-2 text-sand-600">A patient advisor will reach out to {f.phone || 'your phone'} for a short screening call. If the Complex Chronic Program is a fit, you'll receive a secure link to your health questionnaire right after.</p>
               <div className="card mt-5 p-4 text-left text-sm text-sand-600"><div className="eyebrow mb-1">In the app</div>Your inquiry appears in the advisor's queue as <strong>Inquiry received · Complex Chronic</strong>.</div>
               <Link to="/staff/inquiries" className="btn-secondary btn-lg mt-6 w-full">See the staff side (demo)</Link>

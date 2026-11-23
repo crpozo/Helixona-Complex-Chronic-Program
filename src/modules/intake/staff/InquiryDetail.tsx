@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Check, ChevronDown, EyeOff, FileText, Sparkles, Upload, UserCheck, UserPlus } from 'lucide-react'
-import { Breadcrumb, Card, Field, Notice, Row, ToConfirm } from '../../../components/ui'
+import { Check, ChevronDown, Copy, EyeOff, FileText, Sparkles, Upload, UserCheck, UserPlus } from 'lucide-react'
+import { Breadcrumb, Card, Field, Notice } from '../../../components/ui'
 import { ageOf } from '../../../mock/demographics'
 import { statusLook } from './InquiryList'
 import type { Inquiry, InquiryStatus } from '../../../mock/types'
-import { addInquiry, currentUser, inquiryById, inquiryStatuses, notify, patchInquiry, useStore, insuranceOf, insurancePlans, priorityOf, inquiryAge, preferredName, fmtDate, fmtTime, interviewLinkSent, interviewOf, sendInterviewLink } from '../../../mock/store'
+import { addInquiry, currentUser, inquiryById, inquiryStatuses, notify, patchInquiry, useStore, insuranceOf, insurancePlans, priorityOf, inquiryAge, preferredName, fmtDate, fmtTime, addInquiryNote, addTask, noteKinds, notesForInquiry, interviewLinkSent, interviewOf, sendInterviewLink } from '../../../mock/store'
 
 /** One inquiry: the data the advisor collects before admission (as listed by the clinic), the internal
  *  assessment, and the status. This is NOT a patient record; accepting it is what adds the person to the patient list. */
@@ -14,6 +14,17 @@ const heardOptions = ['Friend', 'Patient', 'Physician', 'Chat board', 'Google se
 const seg = (on: boolean) => `flex-1 whitespace-nowrap rounded-xl border px-3 py-2.5 text-sm font-medium ${on ? 'border-teal-500 bg-teal-50 text-sand-900' : 'border-sand-300 bg-white text-sand-600 hover:border-sand-400'}`
 const zips: Record<string, [string, string]> = { '92618': ['Irvine', 'CA'], '92660': ['Newport Beach', 'CA'], '92691': ['Mission Viejo', 'CA'], '92651': ['Laguna Beach', 'CA'], '92653': ['Laguna Hills', 'CA'], '92626': ['Costa Mesa', 'CA'], '92705': ['Santa Ana', 'CA'], '92648': ['Huntington Beach', 'CA'], '92782': ['Tustin', 'CA'], '92677': ['Laguna Niguel', 'CA'], '89101': ['Las Vegas', 'NV'], '85001': ['Phoenix', 'AZ'] }
 
+const respectLevels: [string, string, string][] = [
+  ['', 'Not yet assessed', 'The default until the advisor completes the evaluation.'],
+  ['1', 'Respectful & Collaborative', 'Communicates respectfully, asks questions, expresses concerns appropriately, and participates in a productive conversation.'],
+  ['2', 'Distressed but Respectful', 'May be frustrated, emotional, skeptical, or overwhelmed, but does not engage in personal attacks, harassment, or intimidation.'],
+  ['3', 'Communication Support Needed', 'Interaction includes significant interruptions, raised voice, or difficulty sustaining productive communication. Context and possible accommodations should be explored.'],
+  ['4', 'Significant Boundary Concerns', 'Repeated personal insults, demeaning statements, or hostile behavior continue after respectful clarification of communication expectations.'],
+  ['5', 'Threatening or Abusive Conduct', 'Credible threats, intimidating conduct, discriminatory harassment, or other behavior creating a specific safety concern.'],
+]
+const reviewReasons = ['Patient level', 'Mutual respect assessment', 'Insurance', 'Distance or travel', 'Finances', 'Clinical fit', 'Other']
+const waitlistReasons = ['No opening in the program right now', 'Waiting for insurance information', 'Waiting for documents', 'Person asked to start later', 'Provider capacity', 'Other']
+const extraForms = ['Travel and driver arrangement (lives more than 40 minutes away)', 'Insurance plan document request', 'Records release authorization', 'Financial commitment acknowledgment']
 const fmtPhone = (v: string) => { const d = v.replace(/\D/g, '').slice(0, 10); return d.length > 6 ? `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}` : d.length > 3 ? `(${d.slice(0, 3)}) ${d.slice(3)}` : d }
 const money = (k1: string, k2: string, input: (k: string, ph?: string) => React.ReactNode) => <div className="flex items-center gap-2"><span className="text-sand-500">$</span>{input(k1, 'Total')}<span className="whitespace-nowrap text-xs text-sand-500">met $</span>{input(k2, 'Amount met')}</div>
 function UploadSlot({ label, value, onPick }: { label: string; value?: string; onPick: (name: string) => void }) {
@@ -42,6 +53,18 @@ export default function InquiryDetail() {
   const setZip = (v: string) => setF((x) => ({ ...x, zip: v, ...(zips[v] ? { city: zips[v][0], state: zips[v][1] } : {}) }))
   const fullName = `${f.first ?? ''} ${f.last ?? ''}`.trim()
   const age = /^\d{4}-\d{2}-\d{2}$/.test(f.dob ?? '') ? ageOf(`${f.dob.slice(5, 7)}/${f.dob.slice(8, 10)}/${f.dob.slice(0, 4)}`) : undefined
+  const got = (v?: string) => (v ? `$${v}` : 'requested, not yet received')
+  const us = (iso?: string) => (iso ? `${iso.slice(5, 7)}.${iso.slice(8, 10)}.${iso.slice(2, 4)}` : 'not yet')
+  const notes = inq ? notesForInquiry(inq.id) : []
+  const summaryLines = [f.struggling ?? '', f.howLong ?? '',
+    f.payer === 'Cash' ? 'Cash patient' : (f.insurer === 'Other' ? f.insurerOther : f.insurer) || 'Insurance not recorded',
+    ...(f.payer === 'Cash' ? [] : [`Plan doc: ${f.planDoc ? 'received' : 'requested, not yet received'}`, `In-network deductible: ${got(f.inDedTotal)}${f.inDedMet ? ` · met $${f.inDedMet}` : ''}`, `OON deductible: ${got(f.dedTotal)}${f.dedMet ? ` · met $${f.dedMet}` : ''}`, `OON out-of-pocket max: ${got(f.oopTotal)}${f.oopMet ? ` · met $${f.oopMet}` : ''}`]),
+    `Heard from: ${f.heard || 'not recorded'}${f.heardName ? `, ${f.heardName}` : ''}`,
+    `Age ${age ?? 'not recorded'}${f.sex ? ` · ${f.sex}` : ''}`, `Applied ${us(f.submitted)}`, `Screened ${us(f.screened)}`, [f.city, f.state].filter(Boolean).join(', ') || 'City not recorded',
+    `Specialists: ${f.specialists || 'not recorded'}`, `IVs: ${f.iv || 'not asked'}`, `Time commitment: ${f.commit || 'not asked'}`,
+    `Level ${f.level || 'not set'} · priority ${f.priority || 'not set'} · respect assessment ${f.respect || 'not yet assessed'}`]
+  const [note, setNote] = useState({ kind: 'Call', text: '', remind: false, due: '', task: '' })
+  const [formSent, setFormSent] = useState<string[]>([])
   const [docs, setDocs] = useState<string[]>(inq ? ['Lab results · Sep 2026.pdf', 'Records from previous specialist.pdf'] : [])
   const [analysis, setAnalysis] = useState<'none' | 'reading' | 'done'>('none')
   const status: InquiryStatus = inq?.status ?? 'Lead received'
@@ -140,7 +163,7 @@ export default function InquiryDetail() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2"><Field label="What they are struggling with right now" required><textarea rows={2} className="input" value={f.struggling ?? ''} onChange={(e) => set('struggling', e.target.value)} /></Field></div>
               <div className="sm:col-span-2"><Field label="Health history"><textarea rows={3} className="input" value={f.history ?? ''} onChange={(e) => set('history', e.target.value)} placeholder="Diagnoses, treatments tried, what helped" /></Field></div>
-              <Field label="How long have they been struggling"><select className="input" value={f.howLong ?? ''} onChange={(e) => set('howLong', e.target.value)}><option value="">Select…</option>{['Less than 6 months', '6 to 12 months', '1 to 2 years', 'More than 2 years', 'More than 5 years'].map((o) => <option key={o}>{o}</option>)}</select></Field>
+              <Field label="How long have they been struggling"><select className="input" value={f.howLong ?? ''} onChange={(e) => set('howLong', e.target.value)}><option value="">Select…</option>{['Less than 6 months', '6 to 12 months', '1 to 2 years', 'More than 2 years', 'More than 5 years', 'More than 10 years', 'More than 20 years'].map((o) => <option key={o}>{o}</option>)}</select></Field>
               <Field label="How many specialists they have seen"><select className="input" value={f.specialists ?? ''} onChange={(e) => set('specialists', e.target.value)}><option value="">Select…</option>{['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10+', '20+'].map((n) => <option key={n}>{n}</option>)}</select></Field>
               <Field label="Willing to commit time to treatment 1–3 times per week"><Choice3 value={f.commit ?? ''} onChange={(v) => set('commit', v)} options={['Yes', 'No', 'Discuss']} /></Field>
               <Field label="Willing to receive IV infusions if recommended"><Choice3 value={f.iv ?? ''} onChange={(v) => set('iv', v)} options={['Yes', 'No', 'Discuss']} /></Field>
@@ -170,14 +193,25 @@ export default function InquiryDetail() {
               <Field label="Assessment / screening complete">{input('screened', '', 'date')}</Field>
               <Field label="Patient level"><Choice3 value={f.level ?? ''} onChange={(v) => set('level', v)} options={['1', '2', '3']} /></Field>
               <Field label="Patient priority"><Choice3 value={f.priority ?? ''} onChange={(v) => { set('priority', v); if (inq) patchInquiry(inq.id, { priority: v }) }} options={['High', 'Mid', 'Low']} /></Field>
-              <div className="sm:col-span-2"><Field label="Patient interaction & mutual respect assessment" hint="1 is the lowest, 5 the highest. Completed by the advisor after the interview."><div className="grid grid-cols-5 gap-2">{['1', '2', '3', '4', '5'].map((n) => <button key={n} type="button" aria-pressed={f.respect === n} onClick={() => set('respect', n)} className={`rounded-xl border py-2.5 text-sm font-semibold ${f.respect === n ? 'border-teal-500 bg-teal-50 text-sand-900' : 'border-sand-300 bg-white text-sand-700'}`}>{n}</button>)}</div></Field><div className="mt-2"><ToConfirm>the wording of each of the five levels</ToConfirm></div></div>
+              <div className="sm:col-span-2">
+                <div className="label">Patient interaction & mutual respect assessment <span className="text-bad-600">*</span></div>
+                <p className="help mb-2">Completed by the advisor after the interview. Stays "Not yet assessed" until someone chooses a level; no level is ever assigned automatically.</p>
+                <div className="space-y-2">{respectLevels.map(([n, name, def]) => { const on = (f.respect ?? '') === n; return (
+                  <button key={n || 'none'} type="button" role="radio" aria-checked={on} onClick={() => set('respect', n)} className={`flex w-full items-start gap-3 rounded-xl border px-3.5 py-2.5 text-left ${on ? 'border-sand-900 bg-teal-50' : 'border-sand-300 bg-white hover:bg-sand-50'}`}>
+                    <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${on ? 'bg-sand-900 text-white' : 'bg-sand-100 text-sand-700'}`}>{n || '–'}</span>
+                    <span><span className="block text-sm font-semibold text-sand-900">{name}</span><span className="block text-sm text-sand-600">{def}</span></span>
+                  </button>) })}</div>
+                <p className="help mt-2">These levels are Helixona-developed behavioral classifications, not a validated psychological screening instrument.</p>
+              </div>
               <div className="sm:col-span-2"><Field label="New patient advisor’s assessment notes"><textarea rows={3} className="input" value={f.advisorNotes ?? ''} onChange={(e) => set('advisorNotes', e.target.value)} /></Field></div>
               <div className="sm:col-span-2"><Field label="Admission team’s review, notes and decision"><textarea rows={3} className="input" value={f.teamReview ?? ''} onChange={(e) => set('teamReview', e.target.value)} placeholder="Who reviewed, what was discussed, the decision" /></Field></div>
               <div className="sm:col-span-2 rounded-2xl border border-sand-200 bg-sand-50 p-4">
                 <div className="label">Admission decision</div>
-                <div className="mt-2 grid grid-cols-2 gap-2 lg:grid-cols-4">{([['Accept patient', 'Accepted', 'Adds to the patient list'], ['Discuss / review', 'Waiting for admission review', 'Goes to the admission team'], ['Declined', 'Denied', 'Give a reason · contact stops'], ['Waitlist', 'Waitlisted', 'Adds to the email list']] as [string, InquiryStatus, string][]).map(([label, st, hint]) => { const on = f.decision === st; return (
+                <div className="mt-2 grid grid-cols-2 gap-2 lg:grid-cols-4">{([['Accept patient', 'Accepted', 'Adds to the patient list'], ['Discuss / review', 'Waiting for admission review', 'Goes to the admission team'], ['Declined', 'Denied', 'Give a reason · contact stops'], ['Waitlist', 'Waitlisted', 'Adds to the waitlist and the email list']] as [string, InquiryStatus, string][]).map(([label, st, hint]) => { const on = f.decision === st; return (
                   <button key={st} type="button" aria-pressed={on} onClick={() => { set('decision', st); setStatus(st) }} className={`rounded-xl border px-3 py-3 text-left ${on ? 'border-sand-900 bg-white shadow-[0_0_0_1px_#141414]' : 'border-sand-300 bg-white hover:bg-sand-100'}`}><span className={`block text-sm font-semibold ${st === 'Denied' ? 'text-bad-700' : 'text-sand-900'}`}>{label}</span><span className="mt-0.5 block text-xs text-sand-500">{hint}</span></button>) })}</div>
-                {f.decision === 'Denied' && <div className="mt-3"><div className="text-sm font-medium text-sand-800">Reason for declining <span className="text-bad-600">*</span></div><div className="mt-2 flex flex-wrap gap-2">{['Distance', 'Not sick enough', 'Finances', 'Cannot commit to the schedule', 'Better served by another kind of care', 'Other'].map((r) => <button key={r} type="button" aria-pressed={f.denyReason === r} onClick={() => set('denyReason', r)} className={`rounded-full border px-3 py-1.5 text-sm ${f.denyReason === r ? 'border-sand-900 bg-sand-900 text-white' : 'border-sand-300 bg-white text-sand-700'}`}>{r}</button>)}</div>{f.denyReason === 'Other' && <input className="input mt-2" placeholder="Write the reason" value={f.denyOther ?? ''} onChange={(e) => set('denyOther', e.target.value)} />}</div>}
+                {f.decision === 'Denied' && <div className="mt-3"><div className="text-sm font-medium text-sand-800">Reason for declining <span className="text-bad-600">*</span></div><div className="mt-2 flex flex-wrap gap-2">{['Distance', 'Does not meet clinical criteria', 'Looking for a primary care provider (PCP)', 'Finances', 'Cannot commit to the schedule', 'Better served by another kind of care', 'Other'].map((r) => <button key={r} type="button" aria-pressed={f.denyReason === r} onClick={() => set('denyReason', r)} className={`rounded-full border px-3 py-1.5 text-sm ${f.denyReason === r ? 'border-sand-900 bg-sand-900 text-white' : 'border-sand-300 bg-white text-sand-700'}`}>{r}</button>)}</div>{f.denyReason === 'Other' && <input className="input mt-2" placeholder="Write the reason" value={f.denyOther ?? ''} onChange={(e) => set('denyOther', e.target.value)} />}</div>}
+                {f.decision === 'Waiting for admission review' && <div className="mt-3"><div className="text-sm font-medium text-sand-800">What does the admission team need to discuss? <span className="text-bad-600">*</span></div><div className="mt-2 flex flex-wrap gap-2">{reviewReasons.map((r) => { const cur = (f.reviewWhy ?? '').split('|').filter(Boolean); const on = cur.includes(r); return <button key={r} type="button" aria-pressed={on} onClick={() => set('reviewWhy', (on ? cur.filter((x) => x !== r) : [...cur, r]).join('|'))} className={`rounded-full border px-3 py-1.5 text-sm ${on ? 'border-sand-900 bg-sand-900 text-white' : 'border-sand-300 bg-white text-sand-700'}`}>{r}</button> })}</div>{(f.reviewWhy ?? '').includes('Other') && <input className="input mt-2" placeholder="Write the reason in your own words" />}</div>}
+                {f.decision === 'Waitlisted' && <div className="mt-3"><div className="text-sm font-medium text-sand-800">Reason for the waitlist <span className="text-bad-600">*</span></div><div className="mt-2 flex flex-wrap gap-2">{waitlistReasons.map((r) => { const cur = (f.waitWhy ?? '').split('|').filter(Boolean); const on = cur.includes(r); return <button key={r} type="button" aria-pressed={on} onClick={() => set('waitWhy', (on ? cur.filter((x) => x !== r) : [...cur, r]).join('|'))} className={`rounded-full border px-3 py-1.5 text-sm ${on ? 'border-sand-900 bg-sand-900 text-white' : 'border-sand-300 bg-white text-sand-700'}`}>{r}</button> })}</div>{(f.waitWhy ?? '').includes('Other') && <input className="input mt-2" placeholder="Write the reason in your own words" />}</div>}
                 {f.decision && <p className="help mt-2">Recorded by {me.name} · {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>}
               </div>
               <Field label="Admission committee review date">{input('decisionDate', '', 'date')}</Field>
@@ -199,7 +233,7 @@ export default function InquiryDetail() {
           ) : (<>
             {inq && <Card title="Interview" subtitle="The person chooses a time from your interview hours.">
               {interviewOf(inq.id)
-                ? <div className="rounded-xl bg-ok-100 px-3 py-2.5 text-sm text-ok-700"><strong>{fmtDate(interviewOf(inq.id)!.date)} · {fmtTime(interviewOf(inq.id)!.time)}</strong><span className="block text-xs">Chosen by the {interviewOf(inq.id)!.bookedBy} · {interviewOf(inq.id)!.when} · on your Google Calendar</span></div>
+                ? <div className="rounded-xl bg-ok-100 px-3 py-2.5 text-sm text-ok-700"><strong>{fmtDate(interviewOf(inq.id)!.date)} · {fmtTime(interviewOf(inq.id)!.time)}</strong><span className="block text-xs">Chosen by the {interviewOf(inq.id)!.bookedBy} · {interviewOf(inq.id)!.when} · on your Teams calendar</span></div>
                 : <p className="text-sm text-sand-600">{interviewLinkSent(inq.id) ? `Link sent ${interviewLinkSent(inq.id)} · waiting for the person to choose a time.` : 'No interview scheduled yet.'}</p>}
               <div className="mt-3 flex flex-col gap-2">
                 <button className="btn-primary" onClick={() => { sendInterviewLink(inq.id); if (!interviewOf(inq.id)) patchInquiry(inq.id, { status: 'Waiting for response' }); notify('Scheduling link sent by text and email') }}>{interviewOf(inq.id) ? 'Send link to reschedule' : interviewLinkSent(inq.id) ? 'Send the link again' : 'Send scheduling link'}</button>
@@ -207,17 +241,29 @@ export default function InquiryDetail() {
                 <Link to="/staff/interviews" className="btn-ghost text-sm">My interview hours</Link>
               </div>
             </Card>}
+            {inq && <Card title="Notes and communication" subtitle="Every call, email and text with this person. Saved with the time and the status it had.">
+              <div className="flex flex-wrap gap-1.5">{noteKinds.map((k) => <button key={k} type="button" aria-pressed={note.kind === k} onClick={() => setNote({ ...note, kind: k })} className={`rounded-full border px-2.5 py-1 text-xs font-medium ${note.kind === k ? 'border-sand-900 bg-sand-900 text-white' : 'border-sand-300 bg-white text-sand-700'}`}>{k}</button>)}</div>
+              <textarea rows={3} className="input mt-2" placeholder="What was said or sent, and what comes next" value={note.text} onChange={(e) => setNote({ ...note, text: e.target.value })} />
+              <label className="mt-2 flex items-center gap-2 text-sm text-sand-700"><input type="checkbox" checked={note.remind} onChange={(e) => setNote({ ...note, remind: e.target.checked })} /> Remind me about this</label>
+              {note.remind && <div className="mt-2 grid grid-cols-5 gap-2"><input className="input col-span-3" placeholder="What to do (for example call back)" value={note.task} onChange={(e) => setNote({ ...note, task: e.target.value })} /><input type="date" className="input col-span-2" value={note.due} onChange={(e) => setNote({ ...note, due: e.target.value })} /></div>}
+              <button disabled={!note.text.trim() || (note.remind && !note.due)} className="btn-primary mt-2 w-full" onClick={() => { addInquiryNote({ inquiryId: inq.id, kind: note.kind, text: note.text.trim(), status }); if (note.remind) addTask({ title: note.task.trim() || `Follow up: ${note.text.trim().slice(0, 60)}`, due: note.due, about: inq.name, link: `/staff/inquiries/${inq.id}` }); notify(note.remind ? 'Note saved · reminder added to Tasks' : 'Note saved'); setNote({ kind: note.kind, text: '', remind: false, due: '', task: '' }) }}>Save note</button>
+              <ul className="mt-3 space-y-2">{notes.map((n) => <li key={n.id} className="rounded-xl border border-sand-200 p-2.5 text-sm"><div className="flex flex-wrap items-center justify-between gap-1 text-xs text-sand-500"><span><strong className="text-sand-800">{n.kind}</strong> · {n.author} · {n.when}</span><span className="rounded-full bg-sand-100 px-2 py-0.5">{n.status}</span></div><p className="mt-1 text-sand-800">{n.text}</p></li>)}{notes.length === 0 && <li className="text-sm text-sand-500">No notes yet.</li>}</ul>
+              <Link to="/staff/tasks" className="btn-ghost mt-2 w-full text-sm">Open Tasks & reminders</Link>
+            </Card>}
+            {inq && <Card title="Send a form" subtitle="An extra form for this person, by secure link.">
+              <ul className="space-y-2">{extraForms.map((x) => <li key={x} className="flex items-center justify-between gap-2 text-sm"><span className="text-sand-800">{x}</span>{formSent.includes(x) ? <span className="whitespace-nowrap text-xs font-medium text-ok-700">Sent · waiting</span> : <button className="btn-secondary whitespace-nowrap px-3 py-1.5 text-[11px]" onClick={() => { setFormSent([...formSent, x]); addInquiryNote({ inquiryId: inq.id, kind: 'Email', text: `Form sent: ${x}`, status }); notify('Form sent by text and email') }}>Send</button>}</li>)}</ul>
+            </Card>}
             <Card title="Status" subtitle="In order. Click a step to move this inquiry there.">
               <ol className="space-y-1">
                 {inquiryStatuses.map((st, i) => { const cur = inquiryStatuses.indexOf(status); const on = st === status; const done = i < cur && !['Waitlisted', 'Denied'].includes(status); return (
                   <li key={st}><button onClick={() => setStatus(st)} aria-current={on} className={`flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-sm ${on ? 'bg-sand-900 font-semibold text-white' : 'text-sand-700 hover:bg-sand-100'}`}>
                     <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${on ? 'bg-teal-400 text-sand-900' : done ? 'bg-ok-100 text-ok-700' : 'border border-sand-300 text-sand-500'}`}>{done ? <Check size={11} /> : i + 1}</span>
                     <span className="flex-1">{st}</span>
-                    {st === 'Accepted' && <span className={`text-[11px] font-normal ${on ? 'text-white/70' : 'text-sand-500'}`}>adds to patient list</span>}{st === 'Waitlisted' && <span className={`text-[11px] font-normal ${on ? 'text-white/70' : 'text-sand-500'}`}>adds to email list</span>}{st === 'Denied' && <span className={`text-[11px] font-normal ${on ? 'text-white/70' : 'text-sand-500'}`}>give reason · stop</span>}
+                    {st === 'Accepted' && <span className={`text-[11px] font-normal ${on ? 'text-white/70' : 'text-sand-500'}`}>adds to patient list</span>}{st === 'Waitlisted' && <span className={`text-[11px] font-normal ${on ? 'text-white/70' : 'text-sand-500'}`}>adds to waitlist and email list</span>}{st === 'Denied' && <span className={`text-[11px] font-normal ${on ? 'text-white/70' : 'text-sand-500'}`}>give reason · stop</span>}
                   </button></li>) })}
               </ol>
-              {status === 'Denied' && <div className="mt-3"><Field label="Reason for denial" required><select className="input" value={f.denyReason ?? ''} onChange={(e) => set('denyReason', e.target.value)}><option value="">Select…</option>{['Distance', 'Not sick enough', 'Finances', 'Cannot commit to the schedule', 'Better served by another kind of care', 'Other'].map((o) => <option key={o}>{o}</option>)}</select></Field></div>}
-              {status === 'Waitlisted' && <div className="mt-3"><Notice tone="warn">On the email list. They hear from us when a place opens.</Notice></div>}
+              {status === 'Denied' && <div className="mt-3"><Field label="Reason for denial" required><select className="input" value={f.denyReason ?? ''} onChange={(e) => set('denyReason', e.target.value)}><option value="">Select…</option>{['Distance', 'Does not meet clinical criteria', 'Looking for a primary care provider (PCP)', 'Finances', 'Cannot commit to the schedule', 'Better served by another kind of care', 'Other'].map((o) => <option key={o}>{o}</option>)}</select></Field></div>}
+              {status === 'Waitlisted' && <div className="mt-3"><Notice tone="warn">On the waitlist and the email list. They hear from us when a place opens.</Notice></div>}
             </Card>
             {status === 'Accepted' && <Card title="Now that they are accepted">
               <ul className="space-y-2.5">
@@ -229,12 +275,13 @@ export default function InquiryDetail() {
                 : <button onClick={() => nav(`/staff/patients/new?inquiry=${inq!.id}`)} className="btn-primary mt-4 w-full"><UserPlus size={15} /> Add to patient list</button>}
               <p className="help mt-2">Adding to the patient list creates the patient record and sends the invitation.</p>
             </Card>}
-            <Card title="Summary">
-              <Row label="Received">{inq!.receivedAt.split(' · ')[0]}</Row>
-              <Row label="Owner">{owner}</Row>
-              <Row label="Pays with">{f.payer || '—'}</Row>
-              <Row label="Level · priority">{f.level || '—'} · {f.priority || '—'}</Row>
-              <Row label="Heard from">{f.heard || '—'}{f.heardName ? ` · ${f.heardName}` : ''}</Row>
+            <Card title="Summary" subtitle="Written from this page, for the admissions meeting." actions={<button className="btn-ghost px-2 py-1 text-xs" onClick={() => { navigator.clipboard?.writeText(summaryLines.join('\n')); notify('Summary copied') }}><Copy size={13} /> Copy</button>}>
+              <p className="text-sm font-medium text-sand-900">{f.struggling || 'No health summary yet'}</p>
+              <p className="mt-1 text-sm text-sand-600">{f.howLong ? `${f.howLong} with conditions / symptoms` : 'Duration not recorded'}</p>
+              <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-sand-800">{summaryLines.slice(2).map((l) => <li key={l}>{l}</li>)}</ul>
+              {notes[0] && <p className="mt-3 border-t border-sand-100 pt-3 text-sm text-sand-700"><strong>Latest note · {notes[0].when.split(' · ')[0]}:</strong> {notes[0].text} <span className="text-sand-500">· {notes[0].author}</span></p>}
+              <div className="mt-3 grid grid-cols-2 gap-2">{[['Card front', f.card1f], ['Card back', f.card1b]].map(([l, v]) => <div key={l} className={`flex h-20 items-center justify-center rounded-lg border text-center text-xs ${v ? 'border-ok-600/30 bg-ok-100 text-ok-700' : 'border-dashed border-sand-300 text-sand-400'}`}>{v ? <span className="px-2"><strong className="block">{l}</strong>{v}</span> : `${l} · not uploaded`}</div>)}</div>
+              <p className="help mt-2">Owner {owner} · received {inq!.receivedAt.split(' · ')[0]}</p>
             </Card>
           </>)}
         </div>

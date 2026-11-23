@@ -29,12 +29,12 @@ export default function SurveyBuilder() {
   return (
     <>
       <Toast message={toast} />
-      <PageHeader eyebrow="Configuration · Physician / program admin" title="Survey templates" description="Build surveys from the question bank, add scoring and branching, and publish versions. Publishing clinical content requires an authorized clinical publisher (Dr. D.)." actions={<button className="btn-primary" onClick={() => notify('New template started as a draft')}><Plus size={16} /> New template</button>} />
+      <PageHeader eyebrow="Configuration · Physician / program admin" title="Survey templates" description="Build surveys from the question bank, add scoring and branching, and publish versions. Publishing clinical content requires an authorized clinical publisher (Provider)." actions={<button className="btn-primary" onClick={() => notify('New template started as a draft')}><Plus size={16} /> New template</button>} />
       <MasterDetail>
         <div><QueueTable rows={surveyTemplates} columns={columns} rowKey={(r) => r.id + r.version} rowTone={(r) => stateTone[r.state]} onRowClick={setSel} /></div>
         <div>
           <Card title={<span className="flex items-center gap-2">{sel.name} <VersionTag>v{sel.version}</VersionTag> <Pill tone={stateTone[sel.state]}>{sel.state}</Pill></span>} subtitle={`${sel.type} · ${sel.questions} questions · last change ${sel.updatedBy}, ${sel.updatedAt}${sel.publishedBy ? ` · published by ${sel.publishedBy}` : ''}`}
-            actions={<div className="flex gap-2">{sel.state === 'Draft' && <button onClick={() => show('Sent for clinical review')} className="btn-secondary px-3 py-1.5 text-xs"><Send size={14} /> Send for review</button>}{sel.state === 'In review' && <button onClick={() => show('Approved by Dr. D.')} className="btn-secondary px-3 py-1.5 text-xs">Approve</button>}{sel.state === 'Approved' && <button onClick={() => show('Published as v' + (sel.version) + ' · previous version retired')} className="btn-primary px-3 py-1.5 text-xs">Publish (Dr. D.)</button>}{sel.state === 'Published' && <button onClick={() => show('Draft v' + (sel.version + 1) + ' created')} className="btn-secondary px-3 py-1.5 text-xs">New draft version</button>}</div>}>
+            actions={<div className="flex gap-2">{sel.state === 'Draft' && <button onClick={() => show('Sent for clinical review')} className="btn-secondary px-3 py-1.5 text-xs"><Send size={14} /> Send for review</button>}{sel.state === 'In review' && <button onClick={() => show('Approved by the provider')} className="btn-secondary px-3 py-1.5 text-xs">Approve</button>}{sel.state === 'Approved' && <button onClick={() => show('Published as v' + (sel.version) + ' · previous version retired')} className="btn-primary px-3 py-1.5 text-xs">Publish (Provider)</button>}{sel.state === 'Published' && <button onClick={() => show('Draft v' + (sel.version + 1) + ' created')} className="btn-secondary px-3 py-1.5 text-xs">New draft version</button>}</div>}>
             <div className="mb-4"><StateFlow state={sel.state} /></div>
             <Tabs value={tab} onChange={setTab} tabs={[{ key: 'sections', label: 'Questions' }, { key: 'bank', label: 'Question bank' }, { key: 'scoring', label: 'Scoring' }, { key: 'assign', label: 'Schedule' }, { key: 'versions', label: 'Versions' }]} />
             {tab === 'sections' && (
@@ -71,13 +71,13 @@ export default function SurveyBuilder() {
                 <Row label="Reminders">1 reminder after 24 h · max 1</Row>
                 <Row label="Stop rule">Sequence complete · patient paused · patient opted out</Row>
                 <Row label="Patient override">Allowed (physician)</Row>
-                <div className="grid gap-3 sm:grid-cols-2 pt-2"><Field label="Also assign to"><select className="input"><option>Program · Complex Chronic</option><option>Stage · Active care</option><option>Modality…</option><option>Physician · Dr. D.</option><option>Patient…</option></select></Field><Field label="Effective from"><input type="date" className="input" /></Field></div>
+                <div className="grid gap-3 sm:grid-cols-2 pt-2"><Field label="Also assign to"><select className="input"><option>Program · Complex Chronic</option><option>Stage · Active care</option><option>Modality…</option><option>Physician · the provider</option><option>Patient…</option></select></Field><Field label="Effective from"><input type="date" className="input" /></Field></div>
               </div>
             )}
             {tab === 'versions' && (
               <table className="w-full text-sm"><thead><tr className="bg-sand-50 text-left"><th className="px-3 py-2 eyebrow">Version</th><th className="px-3 py-2 eyebrow">State</th><th className="px-3 py-2 eyebrow">Who · when · why</th></tr></thead><tbody>
-                <tr className="border-t border-sand-100"><td className="px-3 py-2">v2</td><td className="px-3 py-2"><Pill tone="ok">Published</Pill></td><td className="px-3 py-2 text-sand-600">Dr. D. · Sep 20, 2026 · Added sleep question after nursing feedback</td></tr>
-                <tr className="border-t border-sand-100"><td className="px-3 py-2">v1</td><td className="px-3 py-2"><Pill>Retired</Pill></td><td className="px-3 py-2 text-sand-600">Dr. D. · Sep 15, 2026 · Initial publication · retired Sep 20</td></tr>
+                <tr className="border-t border-sand-100"><td className="px-3 py-2">v2</td><td className="px-3 py-2"><Pill tone="ok">Published</Pill></td><td className="px-3 py-2 text-sand-600">Provider · Sep 20, 2026 · Added sleep question after nursing feedback</td></tr>
+                <tr className="border-t border-sand-100"><td className="px-3 py-2">v1</td><td className="px-3 py-2"><Pill>Retired</Pill></td><td className="px-3 py-2 text-sand-600">Provider · Sep 15, 2026 · Initial publication · retired Sep 20</td></tr>
               </tbody></table>
             )}
           </Card>

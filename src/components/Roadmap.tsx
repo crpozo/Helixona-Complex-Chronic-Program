@@ -22,8 +22,8 @@ function RoadPiece({ side, top, bottom }: { side: 'left' | 'right'; top: string;
  *  `compact`: one-line stepper for staff headers and tight spaces. */
 export function Roadmap({ current, compact = false }: { current: number; compact?: boolean }) {
   const [open, setOpen] = useState<number | null>(current)
-  /* The patient's choice is remembered: once collapsed it stays collapsed on every visit, until they open it again. */
-  const [folded, setFoldedState] = useState(() => { try { return localStorage.getItem('hlx-roadmap-folded') === '1' } catch { return false } })
+  /* The patient's choice is remembered: it starts collapsed and stays the way they left it on every visit. */
+  const [folded, setFoldedState] = useState(() => { try { return localStorage.getItem('hlx-roadmap-folded') !== '0' } catch { return true } })
   const setFolded = (v: boolean) => { setFoldedState(v); try { localStorage.setItem('hlx-roadmap-folded', v ? '1' : '0') } catch { /* ignore */ } }
   const cur = stages.find((s) => s.n === current) ?? stages[0]
 

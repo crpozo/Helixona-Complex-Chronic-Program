@@ -126,3 +126,12 @@ Helixona's live site was not reachable from the build environment, so the palett
 |---|---|---|
 | `/staff/interviews` | Advisor's interview calendar: Google Calendar connection, weekly windows, interview length, scheduled interviews, what people can choose | One calendar per advisor or shared |
 | `/public/interview/:id` | Person picks or changes the interview time from the link the advisor sent | Booking and change limits; phone or video |
+
+## Added Nov 23, 2026
+
+| Route | Purpose | Open questions |
+|---|---|---|
+| `/patient/plan` | Plan of Care: current plan in full and what changed in each version | Where the plan is written today |
+| `/patient/sharing` | Share with someone who helps me: person, what they may see, signed authorization | Authorization wording (attorney) |
+| `/patient/settings` | Settings: membership, payments, sharing, and notification channels incl. app notifications | |
+| `/staff/tasks` | Tasks & reminders, grouped by person; created from inquiry notes or added here | Whether tasks also come from patient notes |

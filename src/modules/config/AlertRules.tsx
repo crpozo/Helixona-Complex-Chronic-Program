@@ -35,7 +35,7 @@ export default function AlertRules() {
                 <Field label="Escalation timer"><input className="input" defaultValue={sel.escalation} /></Field>
                 <Field label="After-hours behavior"><input className="input" defaultValue={sel.afterHours} /></Field>
                 <Field label="Patient-facing emergency language"><select className="input"><option>Show standard notice (not continuously monitored · call 911)</option><option>Show notice + call-us-now banner</option></select></Field>
-                <div className="flex gap-2 pt-1"><button className="btn-secondary" onClick={() => notify('Draft saved · not active until it is published')}>Save draft</button><button className="btn-primary" onClick={() => notify('Sent to Dr. D. for clinical review and publish')}>Send for clinical publish</button></div>
+                <div className="flex gap-2 pt-1"><button className="btn-secondary" onClick={() => notify('Draft saved · not active until it is published')}>Save draft</button><button className="btn-primary" onClick={() => notify('Sent to the provider for clinical review and publish')}>Send for clinical publish</button></div>
                 <p className="help">Changes to clinical alert rules require an authorized clinical publisher. Every version and every alert action is audited.</p>
               </div>
             </Card>
@@ -45,7 +45,7 @@ export default function AlertRules() {
       {tab === 'precedence' && (
         <div className="grid gap-5 xl:grid-cols-3">
           <div className="xl:col-span-2">
-            <Card title="Which rule applies, and why" subtitle="Example: crash report from Priya Raman (Dr. D.'s patient, Active care, after nano bath) with severity 7.">
+            <Card title="Which rule applies, and why" subtitle="Example: crash report from Priya Raman (Provider's patient, Active care, after nano bath) with severity 7.">
               <ol className="space-y-2">
                 {layers.map((l, i) => {
                   const rule = alertRules.find((r) => r.layer === l && (l !== 'Modality' || r.scope.includes('laser')) )
@@ -62,7 +62,7 @@ export default function AlertRules() {
                   )
                 })}
               </ol>
-              <Notice tone="teal" title="Result">Urgent clinical review · threshold from the patient override (AR-06, severity ≥ 6) · routed to Dr. D. by SMS with NP as backup (AR-05) · respond within 30 minutes · after 30 minutes escalate to the Medical Director. The alert shows “Applied layer: Patient override”.</Notice>
+              <Notice tone="teal" title="Result">Urgent clinical review · threshold from the patient override (AR-06, severity ≥ 6) · routed to the provider by SMS with NP as backup (AR-05) · respond within 30 minutes · after 30 minutes escalate to the Medical Director. The alert shows “Applied layer: Patient override”.</Notice>
             </Card>
           </div>
           <Card title="Order of precedence" subtitle="Most specific wins. Lower layers fill in whatever the winning layer does not set, so there are no hidden contradictions.">

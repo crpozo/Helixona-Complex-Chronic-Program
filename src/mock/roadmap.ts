@@ -40,12 +40,12 @@ export const ecwFor = (location: string) => locations.find((l) => l.name === loc
 /* Where each sample patient is on the roadmap and which actors they are working on. */
 export interface PatientPlan { stage: number; actors: string[]; leadActor?: string; pathway: PathwayName; updatedBy: string; updatedAt: string }
 const plans: Record<string, PatientPlan> = {
-  'P-0031': { stage: 3, actors: ['Mold', 'Lyme'], leadActor: 'Mold', pathway: 'Complex Chronic', updatedBy: 'Dr. D.', updatedAt: 'Oct 8, 2026' },
-  'P-0041': { stage: 4, actors: ['Mold', 'Mast cell activation'], leadActor: 'Mold', pathway: 'Complex Chronic', updatedBy: 'Dr. D.', updatedAt: 'Oct 1, 2026' },
-  'P-0043': { stage: 2, actors: ['Long COVID'], leadActor: 'Long COVID', pathway: 'Complex Chronic', updatedBy: 'Dr. D.', updatedAt: 'Oct 14, 2026' },
+  'P-0031': { stage: 3, actors: ['Mold', 'Lyme'], leadActor: 'Mold', pathway: 'Complex Chronic', updatedBy: 'Your provider', updatedAt: 'Oct 8, 2026' },
+  'P-0041': { stage: 4, actors: ['Mold', 'Mast cell activation'], leadActor: 'Mold', pathway: 'Complex Chronic', updatedBy: 'Your provider', updatedAt: 'Oct 1, 2026' },
+  'P-0043': { stage: 2, actors: ['Long COVID'], leadActor: 'Long COVID', pathway: 'Complex Chronic', updatedBy: 'Your provider', updatedAt: 'Oct 14, 2026' },
   'P-0044': { stage: 1, actors: [], pathway: 'Complex Chronic', updatedBy: 'Ana', updatedAt: 'Oct 15, 2026' },
   'P-0045': { stage: 1, actors: [], pathway: 'Health Optimization', updatedBy: 'Ana', updatedAt: 'Oct 16, 2026' },
-  'P-0019': { stage: 7, actors: ['Lyme'], leadActor: 'Lyme', pathway: 'Complex Chronic', updatedBy: 'Dr. D.', updatedAt: 'Sep 30, 2026' },
+  'P-0019': { stage: 7, actors: ['Lyme'], leadActor: 'Lyme', pathway: 'Complex Chronic', updatedBy: 'Your provider', updatedAt: 'Sep 30, 2026' },
 }
 export const planFor = (patientId: string): PatientPlan => plans[patientId] ?? { stage: 1, actors: [], pathway: 'Complex Chronic', updatedBy: 'Ana', updatedAt: 'Oct 1, 2026' }
 /** The signed-in sample patient (Marisol A., P-0031). */
