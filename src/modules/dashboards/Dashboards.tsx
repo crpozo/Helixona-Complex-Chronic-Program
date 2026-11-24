@@ -1,20 +1,41 @@
 import { Link } from 'react-router-dom'
-import { ChevronRight } from 'lucide-react'
+import { AlertTriangle, ChevronRight } from 'lucide-react'
 import { Card, Pill, ToConfirm } from '../../components/ui'
 import { allTasks, currentUser, notify, useStore } from '../../mock/store'
 
 /** Program dashboard. Same plain building blocks as the rest of the staff screens: one strip of numbers,
  *  a list of what needs attention today, and the supporting detail. Every number opens the screen behind it. */
-const metrics: { label: string; value: string; hint: string; to: string; flag?: boolean }[] = [
-  { label: 'Open alerts', value: '4', hint: '1 escalated', to: '/staff/alerts', flag: true },
-  { label: 'Intake complete', value: '3 of 5', hint: 'median 4.2 days', to: '/staff/patients?view=docs' },
-  { label: 'Chart prep', value: '1 ready', hint: '1 exception', to: '/staff/patients?view=chart', flag: true },
-  { label: 'Booking exceptions', value: '2', hint: '1 request', to: '/staff/calendar' },
-  { label: 'Contracts signed', value: '1 of 2', hint: '1 pending', to: '/staff/registry' },
-  { label: 'Payment failures', value: '2', hint: '1 hold proposed', to: '/staff/payments', flag: true },
-  { label: 'Active members', value: '2', hint: 'target 3–5', to: '/staff/registry' },
-  { label: 'Month 9 reviews', value: '1', hint: 'due Oct 9', to: '/staff/registry' },
+const alertTrend = [2, 3, 2, 5, 3, 4, 4]
+const waiting = [
+  { n: 2, label: 'Payment failures', note: '1 hold needs approval', to: '/staff/payments', bad: true },
+  { n: 2, label: 'Booking exceptions', note: '1 request to review', to: '/staff/calendar', bad: false },
+  { n: 2, label: 'AI Agent exceptions', note: '1 written but not verified', to: '/staff/ecw-exceptions', bad: true },
 ]
+
+/** Seven-day trend line: one 2px line, a dot on today, the value on hover. */
+function Spark({ values, label }: { values: number[]; label: string }) {
+  const w = 120, h = 44, pad = 5, max = Math.max(...values), min = Math.min(...values)
+  const x = (i: number) => pad + (i * (w - pad * 2)) / (values.length - 1)
+  const y = (v: number) => h - pad - ((v - min) / (max - min || 1)) * (h - pad * 2)
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width={w} height={h} role="img" aria-label={`${label}: ${values.join(', ')}`}>
+      <polyline points={values.map((v, i) => `${x(i)},${y(v)}`).join(' ')} fill="none" stroke="var(--color-sand-400)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      {values.map((v, i) => <circle key={i} cx={x(i)} cy={y(v)} r={i === values.length - 1 ? 4 : 7} fill={i === values.length - 1 ? 'var(--color-sand-900)' : 'transparent'} stroke={i === values.length - 1 ? '#fff' : 'none'} strokeWidth="2"><title>{`${values.length - 1 - i === 0 ? 'Today' : `${values.length - 1 - i} days ago`}: ${v}`}</title></circle>)}
+    </svg>
+  )
+}
+
+/** "3 of 5" as five segments: one segment per person, filled when done. */
+function Meter({ to, label, done, total, note, bad = false }: { to: string; label: string; done: number; total: number; note: string; bad?: boolean }) {
+  return (
+    <Link to={to} className="mt-3 block hover:opacity-80">
+      <div className="flex items-baseline justify-between gap-2"><span className="text-sm font-medium text-sand-900">{label}</span><span className="whitespace-nowrap text-sm text-sand-700"><strong className="text-sand-900">{done}</strong> of {total}</span></div>
+      <div className="mt-1.5 flex gap-1" role="img" aria-label={`${done} of ${total}`}>{Array.from({ length: total }, (_, i) => <span key={i} title={i < done ? 'Done' : 'Not yet'} className={`h-2.5 flex-1 rounded-full ${i < done ? 'bg-sand-900' : 'bg-sand-200'}`} />)}</div>
+      <div className={`mt-1 flex items-center gap-1 text-xs ${bad ? 'font-medium text-bad-700' : 'text-sand-500'}`}>{bad && <AlertTriangle size={12} />}{note}</div>
+    </Link>
+  )
+}
+
 const attention: { what: string; who: string; due: string; tone: 'bad' | 'warn' | 'neutral'; to: string }[] = [
   { what: 'Escalated alert · crash report, severity 7', who: 'Priya Raman', due: 'Past due · 8:12 AM', tone: 'bad', to: '/staff/alerts' },
   { what: 'Intake note was written but could not be verified in eCW', who: 'Lena Kowalski', due: 'Needs a person', tone: 'bad', to: '/staff/ecw-exceptions' },
@@ -42,13 +63,41 @@ export default function Dashboards() {
         <button onClick={() => notify('Weekly report exported · logged with your name and time')} className="btn-secondary">Export weekly report</button>
       </div>
 
-      <div className="card mb-5 grid grid-cols-2 overflow-hidden sm:grid-cols-4 xl:grid-cols-8">
-        {metrics.map((m) => (
-          <Link key={m.label} to={m.to} className="border-b border-r border-sand-200 px-4 py-4 transition-colors last:border-r-0 hover:bg-sand-50 xl:border-b-0">
-            <div className="flex items-center gap-1.5 text-[12.5px] text-sand-600">{m.flag && <span className="h-1.5 w-1.5 rounded-full bg-bad-600" />}{m.label}</div>
-            <div className="mt-1.5 whitespace-nowrap text-[26px] font-semibold leading-none text-sand-900">{m.value}</div>
-            <div className="mt-1.5 text-xs text-sand-500">{m.hint}</div>
-          </Link>))}
+      <div className="mb-5 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <Link to="/staff/alerts" className="card flex flex-col p-5 transition-shadow hover:shadow-md">
+          <div className="flex items-center justify-between text-sm text-sand-600"><span>Open alerts</span><ChevronRight size={15} className="text-sand-400" /></div>
+          <div className="mt-2 flex items-end justify-between gap-3">
+            <div className="text-[44px] font-semibold leading-none text-sand-900">4</div>
+            <Spark values={alertTrend} label="Open alerts, last 7 days" />
+          </div>
+          <div className="mt-3 flex items-center gap-1.5 text-sm font-medium text-bad-700"><AlertTriangle size={14} /> 1 escalated · past due</div>
+          <div className="mt-1 text-xs text-sand-500">Last 7 days: {alertTrend[0]} → {alertTrend[alertTrend.length - 1]}</div>
+        </Link>
+
+        <div className="card p-5">
+          <div className="text-sm text-sand-600">Getting started</div>
+          <Meter to="/staff/patients?view=docs" label="Intake complete" done={3} total={5} note="median 4.2 days" />
+          <Meter to="/staff/registry" label="Contracts signed" done={1} total={2} note="1 waiting for signature" />
+          <Meter to="/staff/patients?view=chart" label="Chart prep placed in eCW" done={1} total={2} note="1 needs a person" bad />
+        </div>
+
+        <Link to="/staff/registry" className="card flex flex-col p-5 transition-shadow hover:shadow-md">
+          <div className="flex items-center justify-between text-sm text-sand-600"><span>Active members</span><ChevronRight size={15} className="text-sand-400" /></div>
+          <div className="mt-2 text-[44px] font-semibold leading-none text-sand-900">2 <span className="text-base font-normal text-sand-500">of 5 places</span></div>
+          <div className="mt-4 flex gap-1.5" role="img" aria-label="2 active members; the pilot target is 3 to 5">{[1, 2, 3, 4, 5].map((n) => <span key={n} title={n <= 2 ? `Member ${n}` : n === 3 ? 'Pilot minimum' : 'Open place'} className={`h-3 flex-1 rounded-full ${n <= 2 ? 'bg-sand-900' : 'bg-sand-200'}`} />)}</div>
+          <div className="mt-1.5 flex text-[11px] text-sand-500"><span className="w-[40%]" /><span className="flex-1 border-l border-sand-400 pl-1.5">pilot target: 3 to 5</span></div>
+          <div className="mt-auto pt-3 text-sm text-sand-700"><span className="font-medium text-sand-900">1 Month 9 review</span> due today</div>
+        </Link>
+
+        <div className="card p-5">
+          <div className="text-sm text-sand-600">Waiting on someone</div>
+          <ul className="mt-2 divide-y divide-sand-100">{waiting.map((w) => (
+            <li key={w.label}><Link to={w.to} className="flex items-center gap-3 py-2.5 hover:opacity-80">
+              <span className="w-8 text-[26px] font-semibold leading-none text-sand-900">{w.n}</span>
+              <span className="min-w-0 flex-1"><span className="block text-sm font-medium text-sand-900">{w.label}</span><span className={`flex items-center gap-1 text-xs ${w.bad ? 'font-medium text-bad-700' : 'text-sand-500'}`}>{w.bad && <AlertTriangle size={12} />}{w.note}</span></span>
+              <ChevronRight size={15} className="shrink-0 text-sand-400" />
+            </Link></li>))}</ul>
+        </div>
       </div>
 
       <div className="grid gap-5 xl:grid-cols-3">
