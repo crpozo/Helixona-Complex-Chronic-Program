@@ -58,7 +58,7 @@ export default function ResourceCalendar() {
 
   return (
     <>
-      <PageHeader eyebrow="Care · Calendar" title="Calendar · data pulled from eCW" description="Treatments across the top, time down the side. Insurance visits come from eCW and are read-only; program sessions are booked here and copied to eCW."
+      <PageHeader eyebrow="Care · Calendar" title="Calendar" description="Program sessions are booked here and copied to eCW. Insurance visits come from eCW and are read-only."
         meta={<><span className="inline-flex items-center gap-1.5">Last read from eCW: <strong className="text-sand-800">{readAt} today</strong></span><button onClick={() => { setReadAt(new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })); notify('eCW calendar read again · 2 insurance visits, no new conflicts') }} className="inline-flex items-center gap-1 text-teal-700 underline"><RefreshCw size={13} /> Read eCW again</button><ToConfirm>whether rooms/devices exist as eCW resources</ToConfirm></>}
         actions={<button onClick={() => nav('/staff/calendar/new')} className="btn-primary">+ Staff booking</button>} />
       <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4">

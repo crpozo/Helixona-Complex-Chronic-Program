@@ -83,7 +83,7 @@ export default function PatientsList() {
 
   return (
     <>
-      <PageHeader eyebrow="Patients" title="Patients" description="People accepted into care. Someone who only asked about Helixona is under Inquiries until accepted."
+      <PageHeader eyebrow="Patients" title="Patients" description="People accepted into care."
         actions={<button className="btn-primary" onClick={() => nav('/staff/patients/new')}>+ Create patient & send invitation</button>} />
       <MetricBoard id="patients" metrics={metrics} defaults={defaults} />
       <Tabs value={view.key} onChange={(k) => setSp(k === 'all' ? {} : { view: k })} tabs={views.map((v) => ({ key: v.key, label: v.label, count: count(v.test) }))} />

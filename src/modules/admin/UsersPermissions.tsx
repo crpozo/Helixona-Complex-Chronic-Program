@@ -39,7 +39,7 @@ export default function UsersPermissions() {
   const cycle = (r: RoleName, i: number) => { if (r === 'Administrator') return; const order: Level[] = ['none', 'view', 'edit']; setPerm({ ...perm, [r]: perm[r].map((l, k) => (k === i ? order[(order.indexOf(l) + 1) % 3] : l)) }) }
   return (
     <>
-      <PageHeader eyebrow="Admin setup · administrators only" title="Users and permissions" description="Who works here, the role each person has, and what each role can see or change. By default everyone sees all patients; narrow it per person only when needed."
+      <PageHeader eyebrow="Admin setup · administrators only" title="Users and permissions" description="Who works here, their role, and what each role can see or change."
         actions={<button onClick={() => notify('Invitation sent · the person chooses a password and a second step to sign in')} className="btn-primary">+ Invite a person</button>} />
       <Tabs value={tab} onChange={setTab} tabs={[{ key: 'people', label: 'People', count: users.length }, { key: 'roles', label: 'Roles and permissions' }]} />
       {tab === 'people' && (

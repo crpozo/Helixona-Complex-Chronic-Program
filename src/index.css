@@ -123,3 +123,10 @@ select.input:disabled { cursor: not-allowed; opacity: 0.6; }
 .theme-staff .input { border-radius: 14px; }
 .theme-staff .btn-primary, .theme-staff .btn-secondary, .theme-staff .btn-danger { border-radius: 999px; }
 .theme-staff [role="tab"][aria-selected="true"] { border-color: #c4a368; }
+
+/* Staff typography: labels and table headings in plain sentence case; buttons read as words, not as banners. */
+.theme-staff .eyebrow { text-transform: none; letter-spacing: 0; font-size: 12.5px; font-weight: 500; color: var(--color-sand-500); }
+.theme-staff .btn-primary, .theme-staff .btn-secondary, .theme-staff .btn-danger, .theme-staff .btn-ghost { text-transform: none; letter-spacing: 0; font-size: 14px; font-weight: 600; }
+.theme-staff .btn-lg { font-size: 15px; letter-spacing: 0; padding-top: 0.8rem; padding-bottom: 0.8rem; }
+.theme-staff thead th { border-bottom: 1px solid var(--color-sand-200); }
+.theme-staff tbody tr { transition: background-color 120ms; }

@@ -28,7 +28,7 @@ export default function EcwExceptions() {
   return (
     <>
       <Toast message={toast} />
-      <PageHeader eyebrow="System · Chart prep & technical admin" title="AI Agent exceptions" description="Anything the AI Agent could not complete and verify. A failure after a write is critical and is never retried automatically — a person decides." />
+      <PageHeader eyebrow="System · Chart prep & technical admin" title="AI Agent exceptions" description="Anything the AI Agent could not complete and verify. A person decides what happens next." />
       <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat label="Open exceptions" value={jobs.filter((j) => j.status !== 'closed').length} hint="1 critical" tone="bad" />
         <Stat label="Jobs last 24 h" value={14} hint="12 verified" tone="ok" />

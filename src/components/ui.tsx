@@ -47,7 +47,7 @@ export function PageHeader({ title, description, actions, meta }: { eyebrow?: st
     <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
       <div className="min-w-0">
         <h1 className="font-display text-[28px] leading-tight font-semibold text-sand-900">{title}</h1>
-        {description && <p className="mt-1.5 max-w-3xl text-[15px] leading-relaxed text-sand-600">{description}</p>}
+        {description && <p className="mt-1 max-w-2xl text-[14.5px] leading-relaxed text-sand-500">{description}</p>}
         {meta && <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-sand-500">{meta}</div>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
@@ -74,16 +74,15 @@ export function Card({ title, subtitle, children, actions, className = '', padde
 }
 
 export function Stat({ label, value, hint, tone = 'neutral', to }: { label: string; value: ReactNode; hint?: string; tone?: Tone; to?: string }) {
+  const flagged = tone === 'bad' || tone === 'warn'
   const body = (
-    <div className="card p-4 h-full">
-      <div className="eyebrow">{label}</div>
-      <div className="mt-1 flex items-baseline gap-2">
-        <div className="text-2xl font-semibold text-sand-900">{value}</div>
-        {hint && <Pill tone={tone} dot={false}>{hint}</Pill>}
-      </div>
+    <div className="card flex h-full flex-col p-5">
+      <div className="text-sm text-sand-600">{label}</div>
+      <div className="mt-1.5 text-[32px] font-semibold leading-none text-sand-900">{value}</div>
+      {hint && <div className={`mt-2 flex items-center gap-1.5 text-[13px] ${tone === 'bad' ? 'font-medium text-bad-700' : tone === 'warn' ? 'font-medium text-warn-700' : tone === 'ok' ? 'text-ok-700' : 'text-sand-500'}`}>{flagged && <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${tone === 'bad' ? 'bg-bad-600' : 'bg-warn-600'}`} />}{hint}</div>}
     </div>
   )
-  return to ? <Link to={to} className="block hover:-translate-y-px transition-transform">{body}</Link> : body
+  return to ? <Link to={to} className="block transition-shadow hover:shadow-md rounded-[22px]">{body}</Link> : body
 }
 
 /* ---------- Queue table (shared pattern across all staff queues) ---------- */
@@ -99,7 +98,7 @@ export function QueueTable<T>({ rows, columns, rowTone, onRowClick, rowKey, empt
           <thead>
             <tr className="bg-sand-50 text-left">
               {columns.map((c) => (
-                <th key={c.key} style={{ width: c.width }} className={`whitespace-nowrap px-4 py-3 eyebrow font-semibold ${c.className ?? ''}`}>{c.header}</th>
+                <th key={c.key} style={{ width: c.width }} className={`whitespace-nowrap px-4 py-3 eyebrow ${c.className ?? ''}`}>{c.header}</th>
               ))}
             </tr>
           </thead>

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PageHeader, Pill, QueueTable, Stat, Tabs, toneFor, WhoWhenWhy, type Column } from '../../components/ui'
+import { PageHeader, Pill, QueueTable, Stat, Tabs, toneFor, type Column } from '../../components/ui'
 import { members, statusCatalog, type Member } from '../../mock/program'
 import { nameOf } from '../../mock/names'
 import { planOf } from '../../mock/billing'
@@ -16,18 +16,18 @@ export default function Registry() {
   const phase = (s: string) => statusCatalog.find((c) => c.status === s)?.phase ?? '—'
   const rows = members.filter((m) => tab === 'all' ? true : tab === 'members' ? ['Active member', 'Temporarily paused', 'Month 9 review', 'Continued active care', 'Maintenance'].includes(m.status) : tab === 'month0' ? phase(m.status) === 'A&P' || phase(m.status) === 'Decision' || phase(m.status) === 'Enrollment' : phase(m.status) === 'Closed' || phase(m.status) === 'After Month 9')
   const columns: Column<Member>[] = [
-    { key: 'id', header: 'Patient', render: (r) => <div className="flex items-center gap-2.5"><Avatar name={nameOf(r.id)} size={30} /><div><div className="font-semibold text-sand-900">{nameOf(r.id)}</div><div className="text-xs text-sand-500">{planOf(r.id)}</div></div></div>, width: '220px' },
+    { key: 'id', header: 'Patient', render: (r) => <div className="flex items-center gap-2.5"><Avatar name={nameOf(r.id)} size={30} /><div><div className="whitespace-nowrap font-semibold text-sand-900">{nameOf(r.id)}</div><div className="whitespace-nowrap text-xs text-sand-500">{planOf(r.id)}</div></div></div> },
     { key: 'status', header: 'Status', render: (r) => <><Pill tone={toneFor(statusOf(r))}>{statusOf(r)}</Pill><div className="mt-1 text-xs text-sand-500">{phase(r.status)}</div></> },
-    { key: 'm0', header: 'A&P', render: (r) => <span className="text-xs">{r.month0Start ? `${r.month0Start}${r.month0End ? ` → ${r.month0End}` : ''}` : '—'}</span> },
-    { key: 'start', header: 'Membership', render: (r) => <span className="text-xs">{r.membershipStart ? `${r.membershipStart} → ${r.nineMonthEnd}` : '—'}</span> },
-    { key: 'pause', header: 'Pauses', render: (r) => r.pauses.length ? <Pill tone="warn" dot={false}>{r.pauses.length} · {r.pauses[0].reason.split(' · ')[1]}</Pill> : <span className="text-sand-400">—</span> },
-    { key: 'months', header: 'Active months', render: (r) => <span className="font-medium">{r.activeMonths}</span> },
-    { key: 'amt', header: 'Monthly', render: (r) => (r.monthlyAmount ? `$${r.monthlyAmount.toLocaleString()}` : '—') },
-    { key: 'last', header: 'Last change · who · when · why', render: (r) => <WhoWhenWhy actor={r.lastChange.actor} when={r.lastChange.when} reason={`${r.lastChange.action}${r.lastChange.reason ? ' · ' + r.lastChange.reason : ''}`} /> },
+    { key: 'm0', header: 'A&P', render: (r) => r.month0Start ? <span className="block whitespace-nowrap text-[13px] leading-snug text-sand-800">{r.month0Start}{r.month0End && <span className="block text-sand-500">to {r.month0End}</span>}</span> : <span className="text-sand-400">—</span> },
+    { key: 'start', header: 'Membership', render: (r) => r.membershipStart ? <span className="block whitespace-nowrap text-[13px] leading-snug text-sand-800">{r.membershipStart}<span className="block text-sand-500">to {r.nineMonthEnd}</span></span> : <span className="text-sand-400">—</span> },
+    { key: 'pause', header: 'Pauses', className: 'hidden min-[1500px]:table-cell', render: (r) => r.pauses.length ? <Pill tone="warn" dot={false}>{r.pauses.length} · {r.pauses[0].reason.split(' · ')[1]}</Pill> : <span className="text-sand-400">—</span> },
+    { key: 'months', header: 'Months', render: (r) => <span className="font-medium">{r.activeMonths}</span> },
+    { key: 'amt', header: 'Monthly', className: 'hidden min-[1340px]:table-cell', render: (r) => (r.monthlyAmount ? `$${r.monthlyAmount.toLocaleString()}` : '—') },
+    { key: 'last', header: 'Last change', render: (r) => <span className="block min-w-[170px] text-[13px] leading-snug"><span className="block text-sand-800"><strong className="font-semibold">{r.lastChange.actor}</strong> · {r.lastChange.when}</span><span className="block text-sand-500">{r.lastChange.action}{r.lastChange.reason ? ` · ${r.lastChange.reason}` : ''}</span></span> },
   ]
   return (
     <>
-      <PageHeader eyebrow="Registry · Operations (Karina)" title="Membership registry" description="Operational control center for every patient in the program: current status, dates, pauses, Month 9 review and total active months. Transition rules live in configuration, not code; irreversible transitions always need a person." actions={<><button className="btn-secondary" onClick={() => notify('Registry exported · logged with your name and time')}>Export (logged)</button><button className="btn-primary" onClick={() => setPicking(true)}>Update status</button></>} />
+      <PageHeader eyebrow="Registry · Operations (Karina)" title="Membership registry" description="Status, dates, pauses and active months for every person in the program." actions={<><button className="btn-secondary" onClick={() => notify('Registry exported · logged with your name and time')}>Export</button><button className="btn-primary" onClick={() => setPicking(true)}>Update status</button></>} />
       <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-5">
         <Stat label="Active members" value={members.filter((m) => m.status === 'Active member').length} hint="pilot target 3–5" tone="ok" />
         <Stat label="In A&P" value={members.filter((m) => /A&P/i.test(m.status)).length} tone="teal" />

@@ -36,7 +36,7 @@ export default function AlertQueue() {
   return (
     <>
       <Toast message={toast} />
-      <PageHeader eyebrow="Surveys & alerts · Nursing / care team" title="Alert queue" description="Survey answers and crash reports that matched an alert rule. Follow up, then resolve it or leave it pending with the action still needed. Escalation happens automatically when a response target lapses." />
+      <PageHeader eyebrow="Surveys & alerts · Nursing / care team" title="Alert queue" description="Check-in answers and flare or crash reports that need a follow-up." />
       <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-5">
         <Stat label="Unassigned" value={list.filter((a) => a.status === 'Unassigned').length} tone="bad" />
         <Stat label="Overdue / escalated" value={list.filter((a) => a.status === 'Overdue' || a.status === 'Escalated').length} tone="bad" />

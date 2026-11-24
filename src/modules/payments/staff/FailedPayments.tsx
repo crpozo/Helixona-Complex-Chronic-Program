@@ -41,22 +41,22 @@ export default function FailedPayments() {
 
   const cols: Column<Payment>[] = [
     { key: 'p', header: 'Patient', width: '200px', render: (r) => <div className="flex items-center gap-2.5"><Avatar name={nameOf(r.patientId)} size={30} /><span className="font-semibold text-sand-900">{nameOf(r.patientId)}</span></div> },
-    { key: 'plan', header: 'Plan', render: (r) => { const pl = planOf(r.patientId); return pl === 'Individual' ? <span className="text-sand-600">Individual</span> : <span className="inline-flex items-center gap-1 text-sand-800"><Users size={13} className="text-teal-700" />{pl}</span> } },
-    { key: 'charge', header: 'Charge', render: (r) => <span className="text-sand-700">{r.type === 'A&P assessment' ? 'A&P assessment' : 'Membership'}</span> },
-    { key: 'period', header: 'Period', render: (r) => r.period },
+    { key: 'plan', header: 'Plan', render: (r) => { const pl = planOf(r.patientId); return pl === 'Individual' ? <span className="text-sand-600">Individual</span> : <span className="inline-flex items-center gap-1 text-sand-800"><Users size={13} className="shrink-0 text-teal-700" />{pl}</span> } },
+    { key: 'charge', header: 'Charge', className: 'hidden min-[1400px]:table-cell', render: (r) => <span className="text-sand-700">{r.type === 'A&P assessment' ? 'A&P assessment' : 'Membership'}</span> },
+    { key: 'period', header: 'Period', render: (r) => <span className="whitespace-nowrap">{r.period}</span> },
     { key: 'amt', header: 'Amount', render: (r) => <span className="font-medium">${r.amount.toLocaleString()}</span> },
     { key: 'date', header: 'Date', render: (r) => <span className="whitespace-nowrap">{r.date}</span> },
     { key: 'st', header: 'Payment status', render: (r) => <Pill tone={tone[statusOf(r)]}>{statusOf(r)}</Pill> },
     { key: 'mem', header: 'Membership', render: (r) => { const m = membershipOf(r.patientId); return m === '—' ? <span className="text-sand-400">—</span> : <Pill tone={toneFor(m)} dot={false}>{m}</Pill> } },
-    { key: 'last', header: 'Last processed', render: (r) => { const l = lastPaidOf(r.patientId); return l ? <span className="text-xs text-sand-600">${l.amount.toLocaleString()} · {l.date.replace(', 2026', '')}</span> : <span className="text-xs text-sand-400">None yet</span> } },
-    { key: 'next', header: 'Next action', render: (r) => <span className="text-xs">{r.nextAction ?? '—'}</span> },
+    { key: 'last', header: 'Last processed', className: 'hidden min-[1400px]:table-cell', render: (r) => { const l = lastPaidOf(r.patientId); return l ? <span className="text-xs text-sand-600">${l.amount.toLocaleString()} · {l.date.replace(', 2026', '')}</span> : <span className="text-xs text-sand-400">None yet</span> } },
+    { key: 'next', header: 'Next action', render: (r) => <span className="block text-[13px] leading-snug text-sand-700">{r.nextAction ?? '—'}</span> },
   ]
   const sum = (fn: (p: Payment) => boolean) => payments.filter(fn).reduce((n, p) => n + p.amount, 0)
   const sel_ = (label: string, k: keyof Filters, opts: string[]) => <label className="flex items-center gap-1.5 text-xs text-sand-500">{label}<select className="input w-auto py-1.5 pr-8 text-sm" value={f[k]} onChange={(e) => set(k, e.target.value)}>{opts.map((o) => <option key={o}>{o}</option>)}</select></label>
 
   return (
     <>
-      <PageHeader eyebrow="Membership · Payments" title="Payments" description="Every charge with its payment status, the membership behind it and the last payment that went through. Open a row to retry, see the receipt or log a call. Card and bank details stay in Stripe." meta={<ToConfirm>retry cadence, grace period, hold policy, refunds (Karina + attorney)</ToConfirm>} actions={<button onClick={() => nav('/staff/payments/reconciliation')} className="btn-secondary">Reconciliation report</button>} />
+      <PageHeader eyebrow="Membership · Payments" title="Payments" description="Every charge and its status. Open a row to retry, see the receipt or log a call." meta={<ToConfirm>retry cadence, grace period, hold policy, refunds (Karina + attorney)</ToConfirm>} actions={<button onClick={() => nav('/staff/payments/reconciliation')} className="btn-secondary">Reconciliation report</button>} />
       <MetricBoard id="payments" defaults={['failed', 'holds', 'due', 'collected']} metrics={[
         { key: 'failed', label: 'Failed · open', value: payments.filter((p) => statusOf(p) === 'Failed').length, tone: 'bad' },
         { key: 'holds', label: 'Holds needing approval', value: payments.filter((p) => statusOf(p) === 'Hold proposed').length, hint: 'human decision', tone: 'bad' },

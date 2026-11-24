@@ -16,13 +16,13 @@ export default function ModalityConfig() {
   const columns: Column<Modality>[] = [
     { key: 'name', header: 'Modality', render: (r) => <><div className="font-semibold text-sand-900">{r.name}</div><div className="text-xs text-sand-500">{r.id} · {r.category}</div></> },
     { key: 'mode', header: 'Booking', render: (r) => <Pill tone={r.bookingMode === 'Book now' ? 'ok' : r.bookingMode === 'Request' ? 'warn' : 'neutral'} dot={false}>{r.bookingMode}</Pill> },
-    { key: 'rules', header: 'Rules', render: (r) => <span className="text-xs text-sand-600">{r.duration} min · ≥{r.minSpacingDays} d apart · ≤{r.maxPerWeek}/wk</span> },
-    { key: 'survey', header: 'Follow-up', render: (r) => r.surveyOffsets.length ? <span className="text-xs">{r.surveyTemplate} · +{r.surveyOffsets.join('/')} d</span> : <span className="text-xs text-sand-400">None</span> },
+    { key: 'rules', header: 'Rules', render: (r) => <span className="text-xs text-sand-600">{r.duration} min · {r.minSpacingDays}+ days apart · up to {r.maxPerWeek} a week</span> },
+    { key: 'survey', header: 'Follow-up', render: (r) => r.surveyOffsets.length ? <span className="text-xs">{r.surveyTemplate} · after {r.surveyOffsets.join(', ')} days</span> : <span className="text-xs text-sand-400">None</span> },
     { key: 'active', header: 'Status', render: (r) => <Pill tone={r.active ? 'ok' : 'neutral'}>{r.active ? 'Active' : 'Inactive'}</Pill> },
   ]
   return (
     <>
-      <PageHeader eyebrow="Configuration · Program admin / physician" title="Modalities" description="One record per modality is the shared source for scheduling, surveys, patient instructions, consents and monitoring (requirements §9). Rooms and devices are separate resources." actions={<button className="btn-primary" onClick={() => notify('New modality started · fill in its details and save')}>+ Add modality</button>} />
+      <PageHeader eyebrow="Configuration · Program admin / physician" title="Modalities" description="Each treatment and its rules for booking, follow-up and alerts." actions={<button className="btn-primary" onClick={() => notify('New modality started · fill in its details and save')}>+ Add modality</button>} />
       <MasterDetail>
         <div><QueueTable rows={modalities} columns={columns} rowKey={(r) => r.id} rowTone={(r) => (r.active ? 'ok' : 'neutral')} onRowClick={setSel} /></div>
         <div>
