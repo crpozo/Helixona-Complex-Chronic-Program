@@ -26,7 +26,7 @@ export function PatientTopBar({ title, back, right }: { title?: string; back?: R
 
 /** Helixona wordmark: the official logo (white letters + gold X on dark; dark letters on light). */
 export function Wordmark({ size = 'md', light = false }: { size?: 'sm' | 'md' | 'lg'; light?: boolean }) {
-  const h = size === 'lg' ? 36 : size === 'sm' ? 22 : 28
+  const h = size === 'lg' ? 44 : size === 'sm' ? 28 : 34
   const base = import.meta.env.BASE_URL
   return <img src={`${base}${light ? 'logo-on-dark.png' : 'logo-on-light.png'}`} alt="Helixona" style={{ height: h, width: 'auto' }} className="block select-none" draggable={false} />
 }
