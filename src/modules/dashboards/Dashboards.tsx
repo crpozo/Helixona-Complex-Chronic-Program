@@ -41,7 +41,7 @@ export default function Dashboards() {
   const completed = done.filter(Boolean).length
   const maxH = Math.max(...hours.map((h) => h[1]))
   return (
-    <div className="-mx-5 -my-6 min-h-[calc(100vh-56px)] bg-[#0a0a0b] px-5 py-7 text-white sm:px-8" style={{ backgroundImage: 'radial-gradient(900px 420px at 78% -10%, rgba(212,183,122,0.10), transparent 60%), radial-gradient(700px 380px at 0% 0%, rgba(120,140,170,0.10), transparent 60%)' }}>
+    <div className="night-raw text-white">
       <div className="mx-auto max-w-[1340px]">
         <div className="flex flex-wrap items-center justify-between gap-5">
           <div className="flex flex-wrap items-center gap-6">

@@ -62,8 +62,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             </nav>
             <div className="border-t border-white/10 px-5 py-3 text-xs text-white/50">Signed in as<div className="text-sm font-medium text-white">{def.person}</div><div>{def.label}</div></div>
           </aside>
-          <div className="flex min-w-0 flex-1 flex-col">
-            <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-sand-200 bg-white px-5 py-2.5">
+          <div className="theme-night flex min-w-0 flex-1 flex-col">
+            <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-sand-200 bg-sand-50/80 px-5 py-2.5 backdrop-blur">
               <nav className="flex gap-1 overflow-x-auto md:hidden">{items.map((n) => <NavLink key={n.to} to={n.to} className={({ isActive }) => `whitespace-nowrap rounded-lg px-2.5 py-1.5 text-sm ${isActive ? 'bg-sand-900 text-white' : 'text-sand-600'}`}>{n.label}</NavLink>)}</nav>
               <span className="hidden text-sm text-sand-500 md:block">{items.find((n) => location.pathname.startsWith(n.to))?.group ?? 'Helixona'}</span>
               <div className="ml-auto flex items-center gap-2">

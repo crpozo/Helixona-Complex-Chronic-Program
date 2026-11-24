@@ -6,14 +6,14 @@ import type { Inquiry, InquiryStatus } from '../../../mock/types'
 
 /** One color and icon per inquiry status, so the row of counts reads at a glance. The label always stays. */
 export const statusLook: Record<InquiryStatus, { color: string; tint: string; Icon: LucideIcon }> = {
-  'Lead received': { color: '#3b6ea5', tint: '#e3edf7', Icon: Inbox },
-  'Waiting for response': { color: '#b06a12', tint: '#fbecd2', Icon: MessageCircle },
-  'Pending information': { color: '#c2571a', tint: '#fbe3d3', Icon: FileQuestion },
-  'Interview scheduled': { color: '#6f4b8a', tint: '#ece2f1', Icon: CalendarCheck },
-  'Waiting for admission review': { color: '#8a6d1f', tint: '#f3eadb', Icon: ClipboardList },
-  'Accepted': { color: '#2f7a4f', tint: '#dcefe3', Icon: CheckCircle2 },
-  'Waitlisted': { color: '#1f7a82', tint: '#d8eef0', Icon: Hourglass },
-  'Denied': { color: '#b4382e', tint: '#f9dcd9', Icon: Ban },
+  'Lead received': { color: '#7fb0f5', tint: '#7fb0f526', Icon: Inbox },
+  'Waiting for response': { color: '#f3c770', tint: '#f3c77026', Icon: MessageCircle },
+  'Pending information': { color: '#ff9d6b', tint: '#ff9d6b26', Icon: FileQuestion },
+  'Interview scheduled': { color: '#c8a8ea', tint: '#c8a8ea26', Icon: CalendarCheck },
+  'Waiting for admission review': { color: '#e4cb94', tint: '#e4cb9426', Icon: ClipboardList },
+  'Accepted': { color: '#74e2b6', tint: '#74e2b626', Icon: CheckCircle2 },
+  'Waitlisted': { color: '#6fd3dc', tint: '#6fd3dc26', Icon: Hourglass },
+  'Denied': { color: '#ff9bb1', tint: '#ff9bb126', Icon: Ban },
 }
 import { allInquiries, currentUser, inquiryDate, inquiryStatuses, notify, patchInquiry, useStore, insuranceOf, priorityOf, inquiryAge, preferredName } from '../../../mock/store'
 
