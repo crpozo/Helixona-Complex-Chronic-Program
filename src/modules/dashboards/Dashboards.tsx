@@ -1,77 +1,141 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, Notice, PageHeader, Pill, Stat, ToConfirm } from '../../components/ui'
-import { notify } from '../../mock/store'
+import { ArrowLeft, ArrowRight, Bot, CalendarCheck, CheckSquare, ClipboardList, CreditCard, FileSignature, Phone, Plus, Siren, Stethoscope, Users } from 'lucide-react'
+import { ToConfirm } from '../../components/ui'
+import { currentUser, notify } from '../../mock/store'
+
+/** Program dashboard. A dark "daily plan" board: today's goals, three headline widgets, the day's timeline,
+ *  and the operational numbers behind the pilot. Every widget opens the queue behind it. */
+const gold = '#d4b77a'
+const glass = 'rounded-[28px] border border-white/10 bg-white/[0.04]'
 
 const tiles = [
-  { label: 'Intake completion', value: '3 / 5', hint: 'median 4.2 d', tone: 'teal', to: '/staff/patients?view=docs' },
-  { label: 'Chart prep', value: '1 ready', hint: '1 exception', tone: 'bad', to: '/staff/patients?view=chart' },
-  { label: 'Open alerts', value: 4, hint: '1 escalated', tone: 'bad', to: '/staff/alerts' },
-  { label: 'Booking exceptions', value: 2, hint: '1 request', tone: 'warn', to: '/staff/calendar' },
-  { label: 'Contract completion', value: '1 / 2', hint: '1 pending', tone: 'warn', to: '/staff/registry' },
-  { label: 'Payment failures', value: 2, hint: '1 hold proposed', tone: 'bad', to: '/staff/payments' },
-  { label: 'Active members', value: 2, hint: 'target 3–5', tone: 'ok', to: '/staff/registry' },
-  { label: 'Month 9 reviews', value: 1, hint: 'due Oct 9', tone: 'warn', to: '/staff/registry' },
-] as const
-
-const defects = [
-  { id: 'DEF-014', sev: 'High', title: 'PDF read-back fails when Patient Docs category is renamed', owner: 'Carlos', status: 'In progress', workaround: 'Charlene uploads PDF manually · close as done manually' },
-  { id: 'DEF-012', sev: 'Medium', title: 'Survey reminder sent outside business-hour window (DST)', owner: 'Carlos', status: 'Fixed · verify', workaround: 'None needed' },
-  { id: 'DEF-011', sev: 'Low', title: 'Invitation email preview wraps merge field on iOS Mail', owner: 'Ana', status: 'Open', workaround: 'Cosmetic' },
+  { label: 'Chart prep', value: '1 ready', hint: '1 exception', to: '/staff/patients?view=chart', Icon: ClipboardList },
+  { label: 'Booking exceptions', value: '2', hint: '1 request', to: '/staff/calendar', Icon: CalendarCheck },
+  { label: 'Contract completion', value: '1 / 2', hint: '1 pending', to: '/staff/registry', Icon: FileSignature },
+  { label: 'Payment failures', value: '2', hint: '1 hold proposed', to: '/staff/payments', Icon: CreditCard },
+  { label: 'Active members', value: '2', hint: 'target 3–5', to: '/staff/registry', Icon: Users },
+  { label: 'Month 9 reviews', value: '1', hint: 'due Oct 9', to: '/staff/registry', Icon: Stethoscope },
 ]
+const goals = ['Clear the escalated alert', 'Review 2 failed payments', 'Approve the Month 9 review', 'Close the AI Agent exception', 'Send the weekly report']
+const done = [true, true, false, false, false]
+/** Hour-of-day bars: check-ins answered (tall, slate) and alerts created (short, gold). */
+const hours: [string, number, number][] = [['8', 9, 1], ['9', 7, 0], ['10', 5, 2], ['11', 6, 1], ['12', 3, 0], ['1', 8, 2], ['2', 6, 3], ['3', 5, 1], ['4', 8, 2], ['5', 6, 0]]
+const timeline: { from: number; to: number; row: number; title: string; tag: string; dot: string; to_: string; Icon: typeof Phone }[] = [
+  { from: 8, to: 11, row: 0, title: 'Review alerts', tag: 'High priority', dot: '#e06a8c', to_: '/staff/alerts', Icon: Siren },
+  { from: 10.5, to: 13.7, row: 1, title: 'Admissions meeting', tag: 'Important', dot: '#4fd1a1', to_: '/staff/inquiries', Icon: Users },
+  { from: 11.6, to: 14.8, row: 0, title: 'Interview · Jordan B.', tag: 'Scheduled', dot: gold, to_: '/staff/interviews', Icon: Phone },
+  { from: 14.6, to: 18, row: 1, title: 'Payments follow-up', tag: 'Low priority', dot: '#5b8def', to_: '/staff/payments', Icon: CreditCard },
+]
+const defects = [
+  { id: 'DEF-014', sev: 'High', title: 'PDF read-back fails when Patient Docs category is renamed', owner: 'Carlos', status: 'In progress' },
+  { id: 'DEF-012', sev: 'Medium', title: 'Survey reminder sent outside business-hour window (DST)', owner: 'Carlos', status: 'Fixed · verify' },
+  { id: 'DEF-011', sev: 'Low', title: 'Invitation email preview wraps merge field on iOS Mail', owner: 'Ana', status: 'Open' },
+]
+const funnel: [string, number][] = [['Inquiries (30 d)', 12], ['Interviews', 6], ['Accepted for A&P', 4], ['A&P scheduled / in progress', 3], ['Program offered', 1], ['Active members', 2]]
+const START = 8, END = 18
 
 export default function Dashboards() {
-  const funnel = [['Inquiries (30 d)', 12], ['Interviews', 6], ['Accepted for A&P', 4], ['A&P scheduled / in progress', 3], ['Program offered', 1], ['Active members', 2]] as const
-  const weeks = [['Sep 8', 12, 3], ['Sep 15', 14, 2], ['Sep 22', 16, 4], ['Sep 29', 18, 3], ['Oct 6', 21, 5]] as const
-  const max = 22
+  const me = currentUser()
+  const [day, setDay] = useState(9)
+  const completed = done.filter(Boolean).length
+  const maxH = Math.max(...hours.map((h) => h[1]))
   return (
-    <>
-      <PageHeader eyebrow="System · Program admin (Cassandra)" title="Dashboards" description="Operational view of the pilot. Every tile opens the queue behind it. Exports are available to program admins and are logged." meta={<ToConfirm>which numbers Cassandra wants on the weekly report</ToConfirm>} actions={<button className="btn-secondary" onClick={() => notify('Weekly report exported · logged with your name and time')}>Export weekly report (logged)</button>} />
-      <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4">{tiles.map((t) => <Stat key={t.label} label={t.label} value={t.value} hint={t.hint} tone={t.tone} to={t.to} />)}</div>
-      <div className="grid gap-5 xl:grid-cols-3">
-        <Card title="Enrollment funnel · last 30 days" subtitle="From website inquiry to active membership.">
-          <ul className="space-y-2">{funnel.map(([l, v]) => <li key={l} className="text-sm"><div className="flex justify-between"><span className="text-sand-700">{l}</span><span className="font-semibold">{v}</span></div><div className="mt-1 h-2 rounded-full bg-sand-100"><div className="h-2 rounded-full bg-teal-500" style={{ width: `${(v / 12) * 100}%` }} /></div></li>)}</ul>
-        </Card>
-        <Card title="Surveys & alerts by week" subtitle="Surveys answered (gold) and alerts created (dark).">
-          <svg viewBox="0 0 320 160" className="w-full" role="img" aria-label="Surveys and alerts by week">
-            {weeks.map(([w, s, a], i) => { const x = 20 + i * 60; return (<g key={w}>
-              <rect x={x} y={130 - (s / max) * 110} width="20" height={(s / max) * 110} fill="var(--color-teal-400)" />
-              <rect x={x + 24} y={130 - (a / max) * 110} width="20" height={(a / max) * 110} fill="var(--color-teal-700)" />
-              <text x={x + 22} y="146" textAnchor="middle" fontSize="10" fill="var(--color-sand-600)">{w}</text>
-              <text x={x + 10} y={126 - (s / max) * 110} textAnchor="middle" fontSize="10" fill="var(--color-sand-700)">{s}</text>
-              <text x={x + 34} y={126 - (a / max) * 110} textAnchor="middle" fontSize="10" fill="var(--color-sand-700)">{a}</text>
-            </g>) })}
-            <line x1="14" x2="310" y1="130" y2="130" stroke="var(--color-sand-300)" />
-          </svg>
-          <div className="mt-1 text-xs text-sand-500">Response rate 89% · median time to acknowledge 2.1 h</div>
-        </Card>
-        <Card title="AI Agent · 7 days" subtitle="Every write is read back and verified.">
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="rounded-xl bg-ok-100 p-3"><div className="text-2xl font-semibold text-ok-700">41</div><div className="text-xs text-ok-700">verified</div></div>
-            <div className="rounded-xl bg-bad-100 p-3"><div className="text-2xl font-semibold text-bad-700">2</div><div className="text-xs text-bad-700">exceptions</div></div>
-            <div className="rounded-xl bg-sand-100 p-3"><div className="text-2xl font-semibold text-sand-700">6:02</div><div className="text-xs text-sand-600">last run (AM)</div></div>
+    <div className="-mx-5 -my-6 min-h-[calc(100vh-56px)] bg-[#0a0a0b] px-5 py-7 text-white sm:px-8" style={{ backgroundImage: 'radial-gradient(900px 420px at 78% -10%, rgba(212,183,122,0.10), transparent 60%), radial-gradient(700px 380px at 0% 0%, rgba(120,140,170,0.10), transparent 60%)' }}>
+      <div className="mx-auto max-w-[1340px]">
+        <div className="flex flex-wrap items-center justify-between gap-5">
+          <div className="flex flex-wrap items-center gap-6">
+            <div><div className="text-sm text-white/50">Your daily plan · {me.name.split(' · ')[0]}</div><h1 className="font-display text-[40px] font-medium leading-tight tracking-tight">Stay on track today</h1></div>
+            <div className="hidden h-14 w-px bg-white/10 md:block" />
+            <div className="flex items-center gap-3"><span className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/15 bg-gradient-to-b from-white/20 to-white/5"><CheckSquare size={22} /></span><div><div className="text-lg font-medium">Keep it going!</div><div className="text-sm text-white/50">Yesterday's queue was cleared by 4:40 PM.</div></div></div>
           </div>
-          <div className="mt-3 text-xs text-sand-600">J2 intake notes 9 · J3 booking mirrors 27 · J4 schedule reads 7 · <Link to="/staff/ecw-exceptions" className="text-teal-700 underline">open exceptions</Link></div>
-        </Card>
-      </div>
-      <div className="mt-5 grid gap-5 xl:grid-cols-3">
-        <div className="xl:col-span-2">
-          <Card title="Pilot defects" subtitle="Issue log with owner, severity, workaround and resolution status (acceptance criteria §16)." padded={false}>
-            <table className="w-full text-sm"><thead><tr className="bg-sand-50 text-left"><th className="px-5 py-2 eyebrow">ID</th><th className="px-3 py-2 eyebrow">Severity</th><th className="px-3 py-2 eyebrow">Issue</th><th className="px-3 py-2 eyebrow">Owner</th><th className="px-3 py-2 eyebrow">Status</th><th className="px-3 py-2 eyebrow">Workaround</th></tr></thead><tbody>
-              {defects.map((d) => <tr key={d.id} className="border-t border-sand-100"><td className="px-5 py-2 font-medium">{d.id}</td><td className="px-3 py-2"><Pill tone={d.sev === 'High' ? 'bad' : d.sev === 'Medium' ? 'warn' : 'neutral'}>{d.sev}</Pill></td><td className="px-3 py-2">{d.title}</td><td className="px-3 py-2">{d.owner}</td><td className="px-3 py-2"><Pill tone={/fixed/i.test(d.status) ? 'ok' : /progress/i.test(d.status) ? 'teal' : 'warn'}>{d.status}</Pill></td><td className="px-3 py-2 text-xs text-sand-600">{d.workaround}</td></tr>)}
-            </tbody></table>
-          </Card>
+          <div className="flex items-center gap-4">
+            <button onClick={() => notify('Choose a widget to add to your board')} className="flex items-center gap-2 text-sm font-medium"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-black"><Plus size={17} /></span>Add widget</button>
+            <button onClick={() => notify('Drag widgets to rearrange · saved for you only')} className="rounded-full bg-gradient-to-b from-[#b9c4d6] to-[#7f8ea6] px-6 py-2.5 text-sm font-semibold text-[#0d1420] shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]">Customize</button>
+          </div>
         </div>
-        <Card title="Audit & security" subtitle="Technical admin (Carlos)">
-          <ul className="space-y-2 text-sm text-sand-700">
-            <li className="flex justify-between"><span>Staff sign-ins with second factor</span><Pill tone="ok">100%</Pill></li>
-            <li className="flex justify-between"><span>Patient-record access events · 7 d</span><span className="font-medium">312</span></li>
-            <li className="flex justify-between"><span>Configuration changes · 7 d</span><span className="font-medium">6</span></li>
-            <li className="flex justify-between"><span>Exports containing patient data · 30 d</span><span className="font-medium">2 (logged)</span></li>
-            <li className="flex justify-between"><span>Last backup restore test</span><span className="font-medium">Sep 28</span></li>
-          </ul>
-          <div className="mt-3"><Notice tone="info">Full audit export and user/role management live in Technical admin (not mocked separately).</Notice></div>
-        </Card>
+
+        <div className="mt-7 border-y border-white/10 py-3">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-5">
+              <span className="flex h-[62px] w-[62px] shrink-0 flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] leading-tight"><span className="text-lg font-medium">{day}</span><span className="text-xs text-white/50">Oct</span></span>
+              <div className="text-xl text-white/50">Your daily goals <span className="ml-2 text-white">{completed}/{goals.length}</span> <span className="text-base text-white/80">completed</span></div>
+            </div>
+            <div className="flex gap-2">{([[-1, ArrowLeft, 'Previous day'], [1, ArrowRight, 'Next day']] as const).map(([d, I, l]) => <button key={l} aria-label={l} onClick={() => setDay(Math.min(31, Math.max(1, day + d)))} className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/15 hover:bg-white/10"><I size={18} /></button>)}</div>
+          </div>
+          <ul className="mt-3 flex flex-wrap gap-2">{goals.map((g, i) => <li key={g} className={`rounded-full border px-3 py-1 text-xs ${done[i] ? 'border-transparent bg-white/10 text-white/40 line-through' : 'border-white/15 text-white/80'}`}>{g}</li>)}</ul>
+        </div>
+
+        <div className="mt-6 grid gap-5 lg:grid-cols-4">
+          <Link to="/staff/alerts" className={`${glass} relative flex h-[250px] flex-col justify-between overflow-hidden p-6 transition-transform hover:-translate-y-0.5`} style={{ backgroundImage: 'radial-gradient(260px 200px at 88% 6%, rgba(255,214,140,0.95), rgba(212,150,60,0.35) 35%, transparent 70%), linear-gradient(160deg, #1b2230, #0b0c10 70%)' }}>
+            <div className="flex items-start justify-between"><span className="text-xl">Open alerts</span><Siren size={20} className="text-black/70" /></div>
+            <div><div className="text-[54px] font-light leading-none">4</div><div className="mt-1 text-sm text-white/60">1 escalated · oldest 2 h 10 m</div></div>
+          </Link>
+          <Link to="/staff/patients?view=docs" className="relative flex h-[250px] flex-col justify-between overflow-hidden rounded-[28px] p-6 text-white transition-transform hover:-translate-y-0.5" style={{ backgroundImage: 'radial-gradient(220px 260px at 70% 40%, rgba(255,236,170,0.95), transparent 70%), repeating-linear-gradient(90deg, rgba(255,255,255,0.10) 0 2px, transparent 2px 9px), linear-gradient(120deg, #b4630d, #f0a92b 55%, #c9770f)' }}>
+            <span className="text-xl">Intake completion</span>
+            <div><div className="text-[54px] font-light leading-none">60%</div><div className="mt-1 text-sm text-white/90">3 of 5 complete · median 4.2 days</div></div>
+          </Link>
+          <div className={`${glass} relative h-[250px] overflow-hidden p-6 lg:col-span-2`} style={{ backgroundImage: 'radial-gradient(520px 160px at 55% -10%, rgba(140,160,190,0.35), transparent 70%)' }}>
+            <div className="flex items-start justify-between"><span className="text-[26px]">Check-ins & alerts today</span><span className="rounded-full bg-white/10 px-4 py-1.5 text-sm text-white/60">Response rate: <span className="text-white">89%</span></span></div>
+            <div className="absolute inset-x-6 bottom-0 flex h-[150px] items-end gap-2" role="img" aria-label="Check-ins answered and alerts created by hour">
+              <div className="pointer-events-none absolute inset-x-0 top-[52px] border-t border-dashed border-white/40" />
+              <span className="absolute left-0 top-[36px] z-10 rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-black">Peak: 8 am</span>
+              {hours.map(([h, c, a]) => <div key={h} className="relative flex flex-1 items-end justify-center gap-1">
+                <div className="w-1/2 max-w-[46px] rounded-t-[14px] bg-gradient-to-b from-[#56637a] to-[#151a23]" style={{ height: `${(c / maxH) * 130}px` }} title={`${c} check-ins at ${h}`} />
+                {a > 0 && <div className="w-1/2 max-w-[46px] rounded-t-[14px] bg-gradient-to-b from-[#f5c15a] to-[#6e4a12]" style={{ height: `${a * 22}px` }} title={`${a} alerts at ${h}`} />}
+              </div>)}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">{tiles.map(({ label, value, hint, to, Icon }) => (
+          <Link key={label} to={to} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 transition-colors hover:bg-white/[0.08]">
+            <div className="flex items-center justify-between text-white/50"><span className="text-xs">{label}</span><Icon size={15} /></div>
+            <div className="mt-2 text-2xl font-light">{value}</div><div className="text-xs text-white/45">{hint}</div>
+          </Link>))}</div>
+
+        <div className="mt-6 rounded-[32px] bg-white/[0.045] p-7">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-4"><h2 className="text-[26px]">Daily timeline</h2><span className="h-6 w-px bg-white/20" /><span className="text-white/80">{timeline.length} tasks for today</span></div>
+            <Link to="/staff/tasks" className="border-b border-white pb-0.5 text-sm font-medium">Add a task</Link>
+          </div>
+          <div className="mt-6 overflow-x-auto">
+            <div className="relative min-w-[1040px] pr-12">
+              <div className="flex justify-between text-sm text-white/45">{Array.from({ length: END - START + 1 }, (_, k) => START + k).map((h) => <span key={h} className="w-0 whitespace-nowrap">{h % 12 || 12} {h < 12 ? 'AM' : 'PM'}</span>)}</div>
+              <div className="relative mt-3 h-[170px]">
+                {Array.from({ length: END - START + 1 }, (_, k) => <span key={k} className="absolute inset-y-0 w-px bg-white/[0.07]" style={{ left: `${(k / (END - START)) * 100}%` }} />)}
+                {timeline.map((t) => <Link key={t.title} to={t.to_} className="absolute flex h-[58px] items-center justify-between gap-3 rounded-full border border-white/10 bg-[#24262c] pl-5 pr-2 transition-colors hover:bg-[#2e3138]" style={{ left: `${((t.from - START) / (END - START)) * 100}%`, width: `${((t.to - t.from) / (END - START)) * 100}%`, top: t.row * 84 + 10 }}>
+                  <span className="flex min-w-0 items-center gap-3"><t.Icon size={17} className="shrink-0 text-[#aab6cc]" /><span className="truncate text-[15px]">{t.title}</span></span>
+                  <span className="flex shrink-0 items-center gap-2 rounded-full bg-white/[0.07] px-3.5 py-2 text-sm text-white/85"><span className="h-2 w-2 rounded-full" style={{ background: t.dot }} />{t.tag}</span>
+                </Link>)}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-5 xl:grid-cols-3">
+          <div className={`${glass} p-6`}>
+            <h3 className="text-lg">Enrollment funnel · last 30 days</h3>
+            <ul className="mt-4 space-y-3">{funnel.map(([l, v]) => <li key={l} className="text-sm"><div className="flex justify-between"><span className="text-white/65">{l}</span><span>{v}</span></div><div className="mt-1.5 h-2 rounded-full bg-white/10"><div className="h-2 rounded-full bg-gradient-to-r from-[#8a6d1f] to-[#f5c15a]" style={{ width: `${(v / 12) * 100}%` }} /></div></li>)}</ul>
+          </div>
+          <div className={`${glass} p-6`}>
+            <div className="flex items-center justify-between"><h3 className="text-lg">AI Agent · 7 days</h3><Bot size={18} className="text-white/50" /></div>
+            <div className="mt-4 grid grid-cols-3 gap-2 text-center">{([['41', 'verified', '#4fd1a1'], ['2', 'exceptions', '#e06a8c'], ['6:02', 'last run (AM)', '#ffffff']] as const).map(([n, l, c]) => <div key={l} className="rounded-2xl bg-white/[0.06] p-3"><div className="text-2xl font-light" style={{ color: c }}>{n}</div><div className="text-xs text-white/50">{l}</div></div>)}</div>
+            <p className="mt-4 text-sm text-white/55">Intake notes 9 · booking copies 27 · schedule reads 7. Every write is read back and verified.</p>
+            <Link to="/staff/ecw-exceptions" className="mt-3 inline-block border-b border-white/60 pb-0.5 text-sm">Open exceptions</Link>
+          </div>
+          <div className={`${glass} p-6`}>
+            <h3 className="text-lg">Audit & security</h3>
+            <ul className="mt-4 space-y-2.5 text-sm text-white/70">{[['Staff sign-ins with second step', '100%'], ['Patient-record access · 7 d', '312'], ['Configuration changes · 7 d', '6'], ['Exports with patient data · 30 d', '2 (logged)'], ['Last backup restore test', 'Sep 28']].map(([l, v]) => <li key={l} className="flex justify-between gap-3"><span>{l}</span><span className="text-white">{v}</span></li>)}</ul>
+          </div>
+        </div>
+
+        <div className={`${glass} mt-5 overflow-hidden`}>
+          <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4"><h3 className="text-lg">Pilot defects</h3><button onClick={() => notify('Weekly report exported · logged with your name and time')} className="rounded-full border border-white/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] hover:bg-white/10">Export weekly report (logged)</button></div>
+          <div className="overflow-x-auto"><table className="w-full min-w-[720px] text-sm"><tbody>{defects.map((d) => <tr key={d.id} className="border-t border-white/10"><td className="whitespace-nowrap px-6 py-3 text-white/60">{d.id}</td><td className="px-3 py-3"><span className="flex items-center gap-2 whitespace-nowrap"><span className="h-2 w-2 rounded-full" style={{ background: d.sev === 'High' ? '#e06a8c' : d.sev === 'Medium' ? gold : '#5b8def' }} />{d.sev}</span></td><td className="px-3 py-3 text-white/85">{d.title}</td><td className="px-3 py-3 text-white/60">{d.owner}</td><td className="whitespace-nowrap px-6 py-3 text-right text-white/75">{d.status}</td></tr>)}</tbody></table></div>
+        </div>
+        <div className="mt-4"><ToConfirm>which numbers Cassandra wants on the weekly report, and which widgets each role sees</ToConfirm></div>
       </div>
-    </>
+    </div>
   )
 }
