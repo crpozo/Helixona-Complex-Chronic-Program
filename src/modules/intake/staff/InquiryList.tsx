@@ -6,14 +6,14 @@ import type { Inquiry, InquiryStatus } from '../../../mock/types'
 
 /** One color and icon per inquiry status, so the row of counts reads at a glance. The label always stays. */
 export const statusLook: Record<InquiryStatus, { color: string; tint: string; Icon: LucideIcon }> = {
-  'Lead received': { color: '#7fb0f5', tint: '#7fb0f526', Icon: Inbox },
-  'Waiting for response': { color: '#f3c770', tint: '#f3c77026', Icon: MessageCircle },
-  'Pending information': { color: '#ff9d6b', tint: '#ff9d6b26', Icon: FileQuestion },
-  'Interview scheduled': { color: '#c8a8ea', tint: '#c8a8ea26', Icon: CalendarCheck },
-  'Waiting for admission review': { color: '#e4cb94', tint: '#e4cb9426', Icon: ClipboardList },
-  'Accepted': { color: '#74e2b6', tint: '#74e2b626', Icon: CheckCircle2 },
-  'Waitlisted': { color: '#6fd3dc', tint: '#6fd3dc26', Icon: Hourglass },
-  'Denied': { color: '#ff9bb1', tint: '#ff9bb126', Icon: Ban },
+  'Lead received': { color: '#3b6ea5', tint: '#e3edf7', Icon: Inbox },
+  'Waiting for response': { color: '#b06a12', tint: '#fbecd2', Icon: MessageCircle },
+  'Pending information': { color: '#c2571a', tint: '#fbe3d3', Icon: FileQuestion },
+  'Interview scheduled': { color: '#6f4b8a', tint: '#ece2f1', Icon: CalendarCheck },
+  'Waiting for admission review': { color: '#8a6d1f', tint: '#f3eadb', Icon: ClipboardList },
+  'Accepted': { color: '#2f7a4f', tint: '#dcefe3', Icon: CheckCircle2 },
+  'Waitlisted': { color: '#1f7a82', tint: '#d8eef0', Icon: Hourglass },
+  'Denied': { color: '#b4382e', tint: '#f9dcd9', Icon: Ban },
 }
 import { allInquiries, currentUser, inquiryDate, inquiryStatuses, notify, patchInquiry, useStore, insuranceOf, priorityOf, inquiryAge, preferredName } from '../../../mock/store'
 
@@ -83,7 +83,7 @@ export default function InquiryList() {
 
   return (
     <>
-      <PageHeader eyebrow="Inquiries · not patients yet" title="Inquiries" description="People who asked about Helixona. An inquiry becomes a patient only when it is accepted and added to the patient list."
+      <PageHeader eyebrow="Inquiries · not patients yet" title="Inquiries" description="An inquiry becomes a patient when it is accepted."
         actions={<button className="btn-primary" onClick={() => nav('/staff/inquiries/new')}>+ Add inquiry</button>} />
 
       <div className="mb-3 flex flex-wrap items-center gap-3">
@@ -91,15 +91,13 @@ export default function InquiryList() {
         {period === 'Custom' && <span className="flex items-center gap-1.5 text-xs text-sand-500"><input type="date" className="input w-auto py-1 text-sm" value={from} max={to} onChange={(e) => setFrom(e.target.value)} />to<input type="date" className="input w-auto py-1 text-sm" value={to} min={from} onChange={(e) => setTo(e.target.value)} /></span>}
         <span className="text-xs text-sand-500">{inPeriod.length} inquiries in this period</span>
       </div>
-      <div className="mb-5 grid grid-cols-2 gap-2.5 sm:grid-cols-4 xl:grid-cols-8">
-        {inquiryStatuses.map((st) => { const n = byPath.filter((i) => i.status === st).length; const on = statuses.includes(st); const { color, tint, Icon } = statusLook[st]; return (
-          <button key={st} onClick={() => setStatuses(on ? statuses.filter((x) => x !== st) : [...statuses, st])} aria-pressed={on} style={{ borderColor: on ? color : undefined, background: on ? tint : undefined, boxShadow: on ? `0 0 0 1px ${color}` : undefined }} className={`card relative overflow-hidden p-3 pt-3.5 text-left transition-all hover:-translate-y-0.5 hover:shadow-md ${n === 0 ? 'opacity-60' : ''}`}>
-            <span className="absolute inset-x-0 top-0 h-1" style={{ background: color }} />
-            <div className="flex items-start justify-between gap-2">
-              <div className="text-[26px] font-semibold leading-none" style={{ color }}>{n}</div>
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg" style={{ background: tint, color }}><Icon size={15} /></span>
-            </div>
-            <div className="mt-2 text-[12px] font-medium leading-tight text-sand-700">{st}</div>
+      <div className="card mb-5 grid grid-cols-2 overflow-hidden sm:grid-cols-4 xl:grid-cols-8">
+        {inquiryStatuses.map((st) => { const n = byPath.filter((i) => i.status === st).length; const on = statuses.includes(st); const { color } = statusLook[st]; return (
+          <button key={st} onClick={() => setStatuses(on ? statuses.filter((x) => x !== st) : [...statuses, st])} aria-pressed={on} title={on ? 'Showing only this status · click to clear' : 'Show only this status'}
+            className={`relative border-b border-r border-sand-200 px-4 py-3.5 text-left transition-colors last:border-r-0 xl:border-b-0 ${on ? 'bg-sand-100' : 'hover:bg-sand-50'}`}>
+            <div className={`text-[28px] font-semibold leading-none ${n === 0 ? 'text-sand-300' : 'text-sand-900'}`}>{n}</div>
+            <div className="mt-2 flex items-start gap-1.5 text-[12.5px] leading-tight text-sand-600"><span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: color }} />{st}</div>
+            {on && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-sand-900" />}
           </button>) })}
       </div>
 

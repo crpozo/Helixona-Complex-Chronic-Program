@@ -114,38 +114,12 @@ select.input {
 select.input:disabled { cursor: not-allowed; opacity: 0.6; }
 
 /* ---------------------------------------------------------------
-   Night theme for the staff platform: dark canvas, glass cards, gold accent.
-   It only redefines the brand tokens inside .theme-night, so every screen
-   built on the tokens follows without changes of its own.
+   Staff theme: white background with the shared shapes of the platform:
+   large rounded cards with a soft shadow, pill buttons, rounded fields.
+   Defined once here so every staff screen follows without styling of its own.
    --------------------------------------------------------------- */
-.theme-night {
-  color-scheme: dark;
-  --color-white: #131417;
-  --color-sand-50: #0a0a0b; --color-sand-100: #1a1b1f; --color-sand-200: #26272c; --color-sand-300: #3a3b42; --color-sand-400: #70717a;
-  --color-sand-500: #9b9ba4; --color-sand-600: #bbbbc2; --color-sand-700: #d7d7db; --color-sand-800: #ececee; --color-sand-900: #f6f4ef;
-  --color-teal-50: rgb(212 183 122 / 0.10); --color-teal-100: rgb(212 183 122 / 0.18); --color-teal-200: rgb(212 183 122 / 0.30);
-  --color-teal-300: #b89a5e; --color-teal-400: #d4b77a; --color-teal-500: #c4a368; --color-teal-600: #d4b77a; --color-teal-700: #e4cb94; --color-teal-800: #101114; --color-teal-900: #000000;
-  --color-ok-100: rgb(79 209 161 / 0.14); --color-ok-600: #3fbf8d; --color-ok-700: #74e2b6;
-  --color-warn-100: rgb(245 193 90 / 0.14); --color-warn-600: #e0a53c; --color-warn-700: #f3c770;
-  --color-bad-100: rgb(224 106 140 / 0.16); --color-bad-600: #e0607e; --color-bad-700: #ff9bb1;
-  --color-info-100: rgb(91 141 239 / 0.16); --color-info-600: #6f9df2; --color-info-700: #a3c0f8;
-  --color-plum-100: rgb(170 130 210 / 0.18); --color-plum-600: #c8a8ea;
-  --shadow-card: 0 1px 0 rgb(255 255 255 / 0.04) inset;
-  background-color: #0a0a0b;
-  background-image: radial-gradient(900px 420px at 82% -8%, rgb(212 183 122 / 0.09), transparent 60%), radial-gradient(720px 380px at 0% 0%, rgb(120 140 170 / 0.09), transparent 60%);
-  background-attachment: fixed;
-  color: var(--color-sand-800);
-}
-.theme-night .card { background: rgb(255 255 255 / 0.04); border-color: rgb(255 255 255 / 0.10); border-radius: 22px; box-shadow: var(--shadow-card); }
-.theme-night .input { background-color: rgb(255 255 255 / 0.05); border-color: rgb(255 255 255 / 0.14); border-radius: 14px; }
-.theme-night .btn-primary, .theme-night .bg-teal-400, .theme-night .bg-teal-300, .theme-night .bg-teal-500 { color: #121212; }
-.theme-night .btn-primary, .theme-night .btn-secondary, .theme-night .btn-danger { border-radius: 999px; }
-.theme-night .btn-secondary { background: transparent; border-color: rgb(255 255 255 / 0.22); }
-.theme-night .btn-secondary:hover { background: rgb(255 255 255 / 0.08); }
-.theme-night .font-display { letter-spacing: -0.005em; }
-.theme-night select.input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23bbbbc2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); }
-.theme-night ::selection { background: rgb(212 183 122 / 0.35); }
-.theme-night .text-teal-800, .theme-night .text-teal-900 { color: #f6f4ef; }
-.theme-night [role="tab"][aria-selected="true"] { border-color: #d4b77a; }
-/* Screens that paint their own dark surface keep true white. */
-.theme-night .night-raw { --color-white: #ffffff; }
+.theme-staff { background-color: #ffffff; --shadow-card: 0 1px 2px rgb(18 18 18 / 0.04), 0 8px 24px -16px rgb(18 18 18 / 0.18); }
+.theme-staff .card { border-radius: 22px; box-shadow: var(--shadow-card); }
+.theme-staff .input { border-radius: 14px; }
+.theme-staff .btn-primary, .theme-staff .btn-secondary, .theme-staff .btn-danger { border-radius: 999px; }
+.theme-staff [role="tab"][aria-selected="true"] { border-color: #c4a368; }

@@ -109,7 +109,7 @@ Use first names in sample data for staff roles the way the clinic does (advisor,
 - Show the "not continuously monitored / not a substitute for 911" notice on survey and crash-report screens and on the patient home.
 - Staff lists show the patient's full name (decision of Nov 16, 2026); the internal ID is not shown and the eCW number is secondary. Nothing patient-identifying in notification previews (SMS/email mock content).
 - Light and dark theme support is nice to have, not required for mockups.
-- Staff screens use the **night theme** (Nov 24, 2026): dark canvas, glass cards with large rounded corners, pill buttons, gold accent. It is defined once as `.theme-night` in `src/index.css` by redefining the brand tokens, so screens need no styling of their own; never hard-code light colors on staff screens. Patient screens stay light.
+- Staff screens use the **staff theme** (Nov 24, 2026): **white background**, large rounded cards with a soft shadow, pill buttons, rounded fields, gold accent. It is defined once as `.theme-staff` in `src/index.css`, so screens need no styling of their own. A dark version was tried and rejected the same day.
 - Branding: Helixona has no design system file yet. Use a calm clinical palette (deep teal accent, warm neutral grays), a humanist sans (e.g., IBM Plex Sans or Source Sans 3), generous spacing. Do not use default Tailwind blue/indigo or generic SaaS templates. Keep it consistent across patient and staff surfaces.
 
 ## 7. Suggested mockup stack

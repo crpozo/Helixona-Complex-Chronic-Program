@@ -41,11 +41,11 @@ export function toneFor(status: string): Tone {
 }
 
 /* ---------- Page header ---------- */
-export function PageHeader({ eyebrow, title, description, actions, meta }: { eyebrow?: string; title: string; description?: ReactNode; actions?: ReactNode; meta?: ReactNode }) {
+/** `eyebrow` is accepted for older callers and intentionally not shown: the title stands on its own. */
+export function PageHeader({ title, description, actions, meta }: { eyebrow?: string; title: string; description?: ReactNode; actions?: ReactNode; meta?: ReactNode }) {
   return (
     <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
       <div className="min-w-0">
-        {eyebrow && <div className="eyebrow mb-1">{eyebrow}</div>}
         <h1 className="font-display text-[28px] leading-tight font-semibold text-sand-900">{title}</h1>
         {description && <p className="mt-1.5 max-w-3xl text-[15px] leading-relaxed text-sand-600">{description}</p>}
         {meta && <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-sand-500">{meta}</div>}
