@@ -1,12 +1,17 @@
 import ToastHost from '../../components/ToastHost'
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { ChevronDown, LayoutGrid, Smartphone, UserRound } from 'lucide-react'
+import { Bell, BellRing, Bot, CalendarClock, CalendarDays, ChevronDown, Circle, ClipboardList, CreditCard, IdCard, Inbox, LayoutDashboard, LayoutGrid, ListChecks, MessageSquare, Package, ShieldCheck, Smartphone, Sparkles, UserRound, Users, type LucideIcon } from 'lucide-react'
 import type { Role } from '../../mock/types'
 import { nav, roles, type NavGroup } from './roles'
 import { Wordmark } from '../../components/PhoneFrame'
 
 interface ShellCtx { role: Role; setRole: (r: Role) => void }
+const navIcons: Record<string, LucideIcon> = {
+  '/staff/inquiries': Inbox, '/staff/interviews': CalendarClock, '/staff/tasks': ListChecks, '/staff/patients': Users, '/staff/alerts': Bell, '/staff/calendar': CalendarDays,
+  '/staff/registry': IdCard, '/staff/payments': CreditCard, '/staff/dashboards': LayoutDashboard, '/staff/config/surveys': ClipboardList, '/staff/config/modalities': Sparkles,
+  '/staff/config/alerts': BellRing, '/staff/config/messages': MessageSquare, '/staff/ecw-exceptions': Bot, '/staff/admin/packages': Package, '/staff/admin/users': ShieldCheck,
+}
 const Ctx = createContext<ShellCtx>({ role: 'advisor', setRole: () => {} })
 export const useShell = () => useContext(Ctx)
 
@@ -49,18 +54,18 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       ) : (
         <div className="flex min-h-full">
-          <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col bg-teal-800 text-white md:flex">
-            <Link to={def.home} className="block px-5 pb-4 pt-5"><Wordmark size="sm" light /><span className="mt-1.5 block text-[10px] uppercase tracking-[0.22em] text-white/50">Complex Chronic Program</span></Link>
+          <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col bg-teal-800 text-white md:flex">
+            <Link to={def.home} className="block px-5 pb-4 pt-5"><Wordmark size="sm" light /><span className="mt-1.5 block text-[11px] uppercase tracking-[0.16em] text-white/70">Complex Chronic Program</span></Link>
             <nav className="tabs-row flex-1 overflow-y-auto px-3 pb-4" aria-label="Main">
               {groups.map((g) => { const its = items.filter((n) => n.group === g); if (!its.length) return null; const closed = collapsed.includes(g); return (
-                <div key={g} className="mt-3">
-                  <button onClick={() => setCollapsed(closed ? collapsed.filter((x) => x !== g) : [...collapsed, g])} aria-expanded={!closed} className="flex w-full items-center justify-between px-2 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-white/45 hover:text-white/80">{g}<ChevronDown size={12} className={`transition-transform ${closed ? '-rotate-90' : ''}`} /></button>
+                <div key={g} className="mt-4 border-t border-white/10 pt-3 first:mt-1 first:border-0 first:pt-0">
+                  <button onClick={() => setCollapsed(closed ? collapsed.filter((x) => x !== g) : [...collapsed, g])} aria-expanded={!closed} className="flex w-full items-center justify-between px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-teal-300 hover:text-teal-200">{g}<ChevronDown size={12} className={`transition-transform ${closed ? '-rotate-90' : ''}`} /></button>
                   {!closed && its.map((n) => (
-                    <NavLink key={n.to} to={n.to} className={({ isActive }) => `mt-0.5 flex items-center rounded-lg px-3 py-2 text-sm ${isActive ? 'bg-teal-400 font-semibold text-sand-900' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}>{n.label}</NavLink>
+                    <NavLink key={n.to} to={n.to} className={({ isActive }) => `mt-0.5 flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] ${isActive ? 'bg-teal-400 font-semibold text-sand-900' : 'font-medium text-white/90 hover:bg-white/10 hover:text-white'}`}>{(() => { const I = navIcons[n.to] ?? Circle; return <I size={17} strokeWidth={1.9} className="shrink-0 opacity-80" /> })()}{n.label}</NavLink>
                   ))}
                 </div>) })}
             </nav>
-            <div className="border-t border-white/10 px-5 py-3 text-xs text-white/50">Signed in as<div className="text-sm font-medium text-white">{def.person}</div><div>{def.label}</div></div>
+            <div className="border-t border-white/10 px-5 py-3 text-xs text-white/70">Signed in as<div className="text-[15px] font-semibold text-white">{def.person}</div><div>{def.label}</div></div>
           </aside>
           <div className="theme-staff flex min-w-0 flex-1 flex-col">
             <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-sand-200 bg-white/85 px-5 py-2.5 backdrop-blur">
